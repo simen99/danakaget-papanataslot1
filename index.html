@@ -426,6 +426,39 @@
   background:rgba(0,0,0,.7); color:#fff; font-weight:900;
 }
 .popup-x:hover{ filter:brightness(1.15); transform:scale(1.05); }
+
+/* Popup hadiah: box emas */
+#popup .popup-box{
+  position: relative;                 /* utk posisi tombol X */
+  border-radius:16px !important;
+  padding:22px !important;
+  /* frame emas */
+  border:1px solid #b37b00;
+  background:
+    radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%) !important;
+  color:#1a1300 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.45),
+    inset 0 -3px 8px rgba(0,0,0,.15),
+    0 12px 28px rgba(179,123,0,.28);
+}
+
+/* Konten di dalam tetap rapi di atas background emas */
+#popup .pas-popup{ margin-top:10px; }
+
+/* Tombol X: tanpa background, warna putih */
+.popup-x{
+  position:absolute; top:8px; right:10px;
+  background:transparent;            /* no background */
+  border:none; outline:none;
+  color:#fff;                        /* putih */
+  font-weight:900; font-size:22px;   /* agak besar */
+  line-height:1; cursor:pointer;
+  text-shadow:0 1px 2px rgba(0,0,0,.45); /* biar kebaca di emas */
+  transition:transform .15s ease;
+}
+.popup-x:hover{ transform:scale(1.08); }
     
   </style>
 
@@ -642,7 +675,7 @@ setTimeout(()=>{
     <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
     <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
     <div class="pas-btn-row">
-      <a href="https://klikblg.com/wa-pas" target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
+      <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
       <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
     </div>
     <button type="button" class="pas-btn pas-reset"
