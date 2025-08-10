@@ -459,6 +459,23 @@
   transition:transform .15s ease;
 }
 .popup-x:hover{ transform:scale(1.08); }
+
+/* Override: tombol X di popup promo (tanpa background, lebih besar) */
+    
+.promo-close{
+  position:absolute; top:6px; right:6px;
+  background:transparent !important;  /* hilangkan lingkaran hitam */
+  border:none !important;
+  border-radius:0 !important;
+  color:#fff !important;              /* X putih */
+  font-size:30px !important;          /* lebih besar */
+  line-height:1 !important;
+  padding:6px 8px !important;         /* area klik nyaman */
+  width:auto !important; height:auto !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.45);
+  cursor:pointer; transition:transform .15s ease;
+}
+.promo-close:hover{ transform:scale(1.06); }
     
   </style>
 
@@ -729,6 +746,9 @@ requestAnimationFrame(() => {
   setEnabled(true);
   document.getElementById('userId').value = '';
   document.getElementById('kupon').value  = '';
+
+    // tampilkan promo SEKALI (bukan 6x)
+  showPromo();
 }
 
 // aktifkan getar random untuk semua kartu saat halaman buka
