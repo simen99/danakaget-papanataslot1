@@ -362,23 +362,24 @@
 });
 
     // === flip kartu & isi hadiah ===
-    const cards = document.querySelectorAll('.card');
-const clickedBtn = cards[idx - 1].querySelector('.front .btn');
-if (clickedBtn) clickedBtn.textContent = 'Mengecek…';
+const cards = document.querySelectorAll('.card');
 
-    setTimeout(()=>{
-      cards.forEach((c,i)=>{
-        const back = c.querySelector('.back');
-        if(i === (idx-1)){
-          back.innerHTML = `<div class="saldo-wrap">
-                              <div class="saldo-title">SALDO AKUN</div>
-                              <div class="saldo-amount">Rp ${Number(res.hadiah).toLocaleString('id-ID')}</div>
-                            </div>`;
-        } else {
-          back.innerHTML = `<div class="fake-amount">Rp ${Number(res.allPrizes[i]).toLocaleString('id-ID')}</div>`;
-        }
-      });
-    }, 260);
+// mulai animasi flip semua kartu
+cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
+
+setTimeout(()=>{
+  cards.forEach((c,i)=>{
+    const back = c.querySelector('.back');
+    if(i === (idx-1)){
+      back.innerHTML = `<div class="saldo-wrap">
+                          <div class="saldo-title">SALDO AKUN</div>
+                          <div class="saldo-amount">Rp ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+                        </div>`;
+    } else {
+      back.innerHTML = `<div class="fake-amount">Rp ${Number(res.allPrizes[i]).toLocaleString('id-ID')}</div>`;
+    }
+  });
+}, 260);
 
     setTimeout(()=>{
   confetti({ particleCount:160, spread:70, origin:{y:0.6} });
@@ -419,8 +420,10 @@ if (clickedBtn) clickedBtn.textContent = 'Mengecek…';
       const back = card.querySelector('.back');
       if (back) back.innerHTML = '';
     });
-   
-   document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
+
+   // kembalikan tombol yang disembunyikan
+  document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
+  document.querySelectorAll('.front .btn').forEach(b => b.style.removeProperty('display')); // hapus display:none inline
    
     document.getElementById('popup').style.display = 'none';
     locked = false;
@@ -439,6 +442,21 @@ if (clickedBtn) clickedBtn.textContent = 'Mengecek…';
 <a href="https://klikblg.com/wa-pas" target="_blank" class="floating-btn" style="bottom: 110px;">
   <img src="https://i.ibb.co/LXp1Yy3S/whats-app.gif" alt="WhatsApp" />
 </a>
+
+<!--Start of Tawk.to Script-->
+  <script type="text/javascript">
+  var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+  (function(){
+  var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+  s1.async=true;
+  s1.src='https://embed.tawk.to/680c7b424b378d190bfa1983/1ipoc2vkj';
+  s1.charset='UTF-8';
+  s1.setAttribute('crossorigin','*');
+  s0.parentNode.insertBefore(s1,s0);
+  })();
+    
+  </script>
+  <!--End of Tawk.to Script-->
   
 </body>
 </html>
