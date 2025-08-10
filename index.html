@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-  <a href="https://klikblg.com/tele-pas" target="_blank" class="floating-btn" style="bottom: 180px;">
-  <img src="https://i.ibb.co/tMf82kDb/telegram-gif.gif" alt="Telegram" />
-</a>
-
-<a href="https://klikblg.com/wa-pas" target="_blank" class="floating-btn" style="bottom: 110px;">
-  <img src="https://i.ibb.co/LXp1Yy3S/whats-app.gif" alt="WhatsApp" />
-</a>
-  
   <title>Papanatasslot - Dana Kaget</title>
   <link rel="icon" type="image/png" href="https://i.ibb.co/LzZ7kXMj/049b1ca3-db9f-42b9-980d-7363faac5600.png">
   <base target="_top">
@@ -219,6 +210,25 @@
   outline: 2px solid #000;
   outline-offset: 2px;
 }
+
+/* Tombol Mengambang Kiri */
+.floating-btn {
+  position: fixed;
+  left: 20px;          /* jarak dari kiri */
+  z-index: 9999;
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+.floating-btn img {
+  width: 60px;         /* ukuran tombol */
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.floating-btn:hover {
+  transform: scale(1.08);
+}
+
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -394,5 +404,15 @@
   }
     
 </script>
+
+  <!-- Tombol Mengambang Telegram & WhatsApp -->
+<a href="https://klikblg.com/tele-pas" target="_blank" class="floating-btn" style="bottom: 180px;">
+  <img src="https://i.ibb.co/tMf82kDb/telegram-gif.gif" alt="Telegram" />
+</a>
+
+<a href="https://klikblg.com/wa-pas" target="_blank" class="floating-btn" style="bottom: 110px;">
+  <img src="https://i.ibb.co/LXp1Yy3S/whats-app.gif" alt="WhatsApp" />
+</a>
+  
 </body>
 </html>
