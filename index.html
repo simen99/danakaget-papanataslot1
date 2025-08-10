@@ -336,52 +336,34 @@
   .card.shake { animation: none !important; }
 }
     
-/* Tombol LINK LOGIN di bawah grid */
-.login-cta{
-  margin: 10px auto 24px;
-  display: flex;
-  justify-content: center;
-}
-.login-btn{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border-radius: 14px;
-  border: 2px solid #000;
-  background:
-    radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
-    linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
-  color: #1a1300;
-  font-weight: 900;
-  letter-spacing: .3px;
-  text-decoration: none;
-  box-shadow: 0 6px 0 rgba(0,0,0,.25), 0 0 0 rgba(255,215,0,0);
-  transition: transform .15s ease, box-shadow .2s ease;
-  animation: pulse 1.5s infinite; /* pakai animasi yang sudah ada */
-}
-.login-btn:hover{
-  transform: translateY(-1px) scale(1.03);
-  box-shadow: 0 8px 0 rgba(0,0,0,.28), 0 0 12px rgba(255,215,0,.8);
-}
-@media (max-width: 420px){
-  .login-btn{ width: min(92%, 360px); justify-content: center; }
-}
-/* Tombol LINK LOGIN sama persis gaya & ukuran input-gold */
-.login-wrap{
-  display:flex; justify-content:center; margin: 14px 0 24px;
-}
-    
-.login-link{
-  /* padding normal tanpa ruang ikon */
-  padding: 12px 14px;
-  text-align: center;
+/* LINK LOGIN: gaya sama seperti input, teks tebal & uppercase */
+.login-link,
+.login-link:link,
+.login-link:visited{
+  display:flex;
+  justify-content:center;
+  align-items:center;
 
-  /* background TANPA url() ikon */
+  width:240px;
+  padding:12px 14px;           /* tanpa ikon kiri */
+  border-radius:14px;
+  border:1px solid #b37b00;
   background:
     radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
     linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.45),
+    inset 0 -3px 8px rgba(0,0,0,.15),
+    0 6px 16px rgba(179,123,0,.18);
+
+  color:#1a1300 !important;    /* hilangkan ungu */
+  text-decoration:none !important;
+  text-transform:uppercase;
+  font-weight:900;
+  letter-spacing:.6px;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
 }
+
 .login-link:hover,
 .login-link:focus{
   transform: translateY(-1px);
@@ -391,7 +373,6 @@
     inset 0 -3px 10px rgba(0,0,0,.18),
     0 0 0 3px rgba(255,207,51,.28),
     0 10px 22px rgba(255,215,0,.25);
-  filter: saturate(1.08);
   outline:0;
 }
     
