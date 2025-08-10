@@ -246,31 +246,30 @@
   display: flex;
   align-items: center;
   background: linear-gradient(165deg, #ffe27a 0%, #f1c232 40%, #d8a700 100%);
-  color: #111;
   padding: 8px 12px;
   border-radius: 12px;
   max-width: 680px;
   margin: 0 auto 14px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.25), inset 0 2px 0 rgba(255,255,255,0.4);
-  overflow: hidden;
-  position: relative;
 }
 
 .marquee-icon {
   font-size: 20px;
-  margin-right: 10px;
-  z-index: 2; /* ikon selalu di atas teks */
-  background: linear-gradient(165deg, #ffe27a 0%, #f1c232 40%, #d8a700 100%);
-  padding-right: 5px; /* tambahin ruang agar teks tidak nempel */
+  font-weight: bold;
+  margin-right: 8px;
+  flex-shrink: 0; /* biar ikon tidak mengecil */
+}
+
+.marquee-container {
+  overflow: hidden;
+  flex: 1;
 }
 
 .marquee-text {
-  white-space: nowrap;
   display: inline-block;
+  white-space: nowrap;
   animation: marqueeAnim 15s linear infinite;
   font-weight: bold;
-  letter-spacing: 0.5px;
-  padding-left: 5px; /* jarak awal dari ikon */
 }
 
 @keyframes marqueeAnim {
@@ -286,9 +285,11 @@
   <h1>🎁 Dana Kaget Papanatasslot</h1>
   
 <div class="marquee-box">
-  <span class="marquee-icon">📢 : </span>
-  <div class="marquee-text">
-    Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim Sekarang Juga !!!
+  <span class="marquee-icon">📢 :</span>
+  <div class="marquee-container">
+    <div class="marquee-text">
+      Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim Sekarang Juga !!!
+    </div>
   </div>
 </div>
   
