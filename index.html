@@ -239,7 +239,9 @@
   50%  { transform: scale(1.05); box-shadow: 0 0 12px rgba(0,0,0,0.2); }
   100% { transform: scale(1); box-shadow: 0 0 0 rgba(0,0,0,0.3); }
 }
-
+    
+.btn-hide { display: none !important; }
+    
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -350,6 +352,10 @@
       return;
     }
 
+    document.querySelectorAll('.card').forEach((c, i) => {
+  if (i !== (idx - 1)) c.querySelector('.btn')?.classList.add('btn-hide');
+});
+
     // === flip kartu & isi hadiah ===
     const cards = document.querySelectorAll('.card');
     cards.forEach((c,i)=>{ setTimeout(()=>c.classList.add('flipped'), i*120); });
@@ -407,6 +413,9 @@
       const back = card.querySelector('.back');
       if (back) back.innerHTML = '';
     });
+   
+   document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
+   
     document.getElementById('popup').style.display = 'none';
     locked = false;
     setEnabled(true);
