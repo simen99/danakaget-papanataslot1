@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Poppins:wght@400;600&family=Russo+One&display=swap" rel="stylesheet">
+  <style>
+    :root{ --gold1:#ffd700; --gold2:#f5c013; --gold3:#b8860b; }
+    body{ margin:0; background:#111; color:#fff; text-align:center; padding:24px 12px; font-family:'Poppins',sans-serif; }
+    h1{ font-family:'Orbitron',sans-serif; color:#ffcc00; letter-spacing:.5px; margin:0 0 14px; font-size:30px; }
+
+    /* Inputs */
+    .input-container{
+  display:flex;
+  flex-direction:column;    /* urut vertikal */
+  align-items:center;       /* tengah */
+  gap:10px;                 /* jarak antar input */
+}
+    .input-gold{
+  width:240px;
+  padding:12px 14px 12px 46px; /* space untuk ikon kiri */
+  border-radius:14px;
+  border:1px solid #b37b00;
+  background:
+    radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
+  color:#1a1300;
+  font-weight:700;
+  letter-spacing:.2px;
+  outline:0;
+  transition:transform .18s ease, box-shadow .2s ease, border-color .2s ease, filter .2s ease;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.45),
+    inset 0 -3px 8px rgba(0,0,0,.15),
+    0 6px 16px rgba(179,123,0,.18);
+  backdrop-filter: saturate(1.1);
+}
+   .input-gold::placeholder{
+  color: rgba(26,19,0,.8); /* lebih pekat, tetap elegan */
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(255,255,255,.35);
+}
+    .input-gold:hover,.input-gold:focus{
+  transform: translateY(-1px);
+  border-color:#ffcf33;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.55),
+    inset 0 -3px 10px rgba(0,0,0,.18),
+    0 0 0 3px rgba(255,207,51,.28),
+    0 10px 22px rgba(255,215,0,.25);
+  filter: saturate(1.08);
+}
+
+    /* Grid */
+    .grid{ display:grid; grid-template-columns:repeat(3,180px); gap:28px; justify-content:center; margin:28px auto 6px; }
+
+    /* Card (flip) */
+    .card{ width:180px; height:180px; perspective:1000px; }
+    .card-inner{
+      position:relative; width:100%; height:100%; transform-style:preserve-3d;
+      transition:transform .6s ease;
+    }
+    /* Ikon kiri tanpa ubah HTML */
+#userId{
+  background:
+    url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z' fill='%231a1300'/%3E%3C/svg%3E") no-repeat 14px 50% / 22px,
+    radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
+}
+
+#kupon{
+  background:
+    url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%231a1300' d='M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 1 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 1 0 0-4Zm6 1h2v8H9Zm4 0h2v8h-2Z'/%3E%3C/svg%3E") no-repeat 14px 50% / 22px,
+    radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
+}
+    .card.flipped .card-inner{ transform:rotateY(180deg); }
+
+    .face{
+      position:absolute; inset:0; border-radius:16px; overflow:hidden;
+      box-shadow:0 0 10px rgba(255,215,0,.7);
+      display:flex; align-items:flex-end; justify-content:center;
+      backface-visibility:hidden;
+    }
+    .front{
+      background-image:url('https://i.ibb.co/zVbhV11C/dana-kaget-spesial-weekend.jpg');
+      background-size:cover; background-position:center;
+      padding:10px;
+    }
+    .back{
+      transform:rotateY(180deg);
+      background:linear-gradient(160deg,var(--gold1) 0%,var(--gold2) 50%,var(--gold3) 100%);
+      color:#111; display:flex; align-items:center; justify-content:center;
+    }
+
+    /* Button */
+    .btn{
+      padding:9px 14px; margin-bottom:10px; border:0; border-radius:10px;
+      background:#ffcc00; color:#111; font-weight:900; cursor:pointer;
+      transition:transform .15s, box-shadow .2s; animation:pulse 1.5s infinite;
+      box-shadow:0 4px 0 rgba(0,0,0,.25), 0 0 0 rgba(255,215,0,0);
+    }
+    .btn:hover{ transform:translateY(-1px) scale(1.03); box-shadow:0 6px 0 rgba(0,0,0,.28), 0 0 12px rgba(255,215,0,.8); }
+    .btn:disabled{ opacity:.6; cursor:not-allowed; animation:none; }
+    @keyframes pulse{
+      0%{box-shadow:0 4px 0 rgba(0,0,0,.25),0 0 0 rgba(255,215,0,0)}
+      50%{box-shadow:0 4px 0 rgba(0,0,0,.25),0 0 14px rgba(255,215,0,.9)}
+      100%{box-shadow:0 4px 0 rgba(0,0,0,.25),0 0 0 rgba(255,215,0,0)}
+    }
+
+    /* Back contents */
+    .saldo-wrap{ text-align:center; }
+    .saldo-title{ font-weight:900; letter-spacing:.6px; margin-bottom:6px; }
+    .saldo-amount{ font-family:'Russo One',sans-serif; font-size:22px; }
+
+    .fake-amount{ font-family:'Russo One',sans-serif; font-size:20px; }
+
+ /* ==== POPUP HADIAH — FINAL (3 tombol rapi) ==== */
+#popup .popup-box{
+  width: min(92%, 380px) !important;
+  padding: 22px !important;
+  border-radius: 16px !important;
+}
+
+.pas-popup { font-family:'Poppins',sans-serif; text-align:center; }
+.pas-popup .pas-brand { width:170px; margin:0 auto 8px; }
+.pas-popup .pas-subtitle { margin:4px 0 6px; font-weight:800; }
+.pas-popup .pas-amount {
+  color:#e30606; font-weight:900; font-size:36px;
+  font-family:'Russo One',sans-serif;
+}
+.pas-popup .pas-meta { font-size:14px; margin:2px 0; font-weight:700; }
+.pas-popup .pas-hint {
+  margin:12px auto; padding:10px 12px; max-width:340px;
+  border-radius:10px; background:#efefef; font-weight:800;
+}
+
+.pas-btn{
+  display:block;
+  width:min(100%,340px);
+  margin:6px auto;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-weight:900;
+  color:#fff;
+  text-decoration:none;
+  cursor:pointer;
+  transition:transform .15s ease, filter .2s ease;
+}
+.pas-btn:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+.pas-wa{ background:#16a34a; }
+.pas-tg{ background:#1d9bf0; }
+.pas-reset{ background:#2563eb; }
+
+/* HP kecil: tombol klaim ditumpuk */
+@media (max-width:360px){
+  .pas-btn-row{ flex-direction:column; }
+}
+
+.pas-btn-row{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  align-items:center;
+  max-width:340px;
+  margin:10px auto 8px;
+}
+
+/* override ukuran tombol saat di dalam baris flex */
+.pas-btn-row .pas-btn{
+  flex:1;
+  width:auto;      /* jangan full width */
+  margin:0;        /* hilangkan margin auto bawaan */
+}
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+  <h1>🎁 Dana Kaget Papanatasslot</h1>
+
+  <div class="input-container">
+    <input id="userId" class="input-gold" placeholder="Masukkan USER ID">
+    <input id="kupon"  class="input-gold" placeholder="Masukkan KUPON">
+  </div>
+
+  <div class="grid" id="grid">
+    <!-- 6 cards -->
+    <div class="card"><div class="card-inner">
+      <div class="face front"><button class="btn" onclick="claim(1)">PILIH BOX</button></div>
+      <div class="face back"></div>
+    </div></div>
+
+    <div class="card"><div class="card-inner">
+      <div class="face front"><button class="btn" onclick="claim(2)">PILIH BOX</button></div>
+      <div class="face back"></div>
+    </div></div>
+
+    <div class="card"><div class="card-inner">
+      <div class="face front"><button class="btn" onclick="claim(3)">PILIH BOX</button></div>
+      <div class="face back"></div>
+    </div></div>
+
+    <div class="card"><div class="card-inner">
+      <div class="face front"><button class="btn" onclick="claim(4)">PILIH BOX</button></div>
+      <div class="face back"></div>
+    </div></div>
+
+    <div class="card"><div class="card-inner">
+      <div class="face front"><button class="btn" onclick="claim(5)">PILIH BOX</button></div>
+      <div class="face back"></div>
+    </div></div>
+
+    <div class="card"><div class="card-inner">
+      <div class="face front"><button class="btn" onclick="claim(6)">PILIH BOX</button></div>
+      <div class="face back"></div>
+    </div></div>
+  </div>
+
+  <!-- Popup (SATU SAJA) -->
+  <div class="popup" id="popup" style="display:none; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,.82); z-index:999;">
+    <div class="popup-box" id="popup-content" style="background:#fff; color:#111; padding:20px; border-radius:14px; width:min(90%,360px); text-align:center;"></div>
+  </div>
+
+  <script>
+    let locked = false;
+
+    function setEnabled(enabled){
+      document.querySelectorAll('.btn').forEach(b=>{
+        b.disabled = !enabled;
+        if(!enabled) b.textContent = "PILIH BOX";
+      });
+    }
+
+    function claim(idx){
+      if(locked) return;
+
+      const userId = document.getElementById('userId').value.trim();
+      const kupon  = document.getElementById('kupon').value.trim();
+      if(!userId || !kupon){ alert('⚠️ Masukkan USER ID dan KUPON terlebih dahulu!'); return; }
+
+      setEnabled(false);
+
+      google.script.run
+  .withSuccessHandler(function(res) {
+    if (res.status !== 'success') {
+      alert(res.message || 'Terjadi kesalahan.');
+      setEnabled(true);
+      return;
+    }
+
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((c, i) => { setTimeout(() => c.classList.add('flipped'), i * 120); });
+
+    setTimeout(() => {
+      cards.forEach((c, i) => {
+        const back = c.querySelector('.back');
+        if (i === (idx - 1)) {
+          back.innerHTML = `<div class="saldo-wrap">
+                              <div class="saldo-title">SALDO AKUN</div>
+                              <div class="saldo-amount">Rp ${res.hadiah.toLocaleString()}</div>
+                            </div>`;
+        } else {
+          back.innerHTML = `<div class="fake-amount">Rp ${res.allPrizes[i].toLocaleString()}</div>`;
+        }
+      });
+    }, 260);
+
+    setTimeout(() => {
+      confetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
+
+      document.getElementById('popup-content').innerHTML = `
+  <div class="pas-popup">
+    <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
+    <div class="pas-subtitle">Anda mendapatkan</div>
+    <div class="pas-amount">IDR ${res.hadiah.toLocaleString('id-ID')}</div>
+    <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
+    <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
+
+    <div class="pas-hint">
+      SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM
+    </div>
+
+    <div class="pas-btn-row">
+      <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
+      <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
+    </div>
+
+    <button type="button" class="pas-reset"
+      onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
+      PILIH BOX LAGI
+    </button>
+  </div>
+`;
+      document.getElementById('popup').style.display = 'flex';
+      locked = true;
+    }, cards.length * 120 + 360);
+
+  })
+  .pilihBox(userId, kupon, idx);
+
+    }
+
+    function resetBoxes(){
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card=>{
+    card.classList.remove('flipped');
+    card.querySelector('.back').innerHTML = '';
+  });
+  document.getElementById('popup').style.display = 'none';
+  locked = false;
+  setEnabled(true);
+  document.getElementById('userId').value = '';
+  document.getElementById('kupon').value  = '';
+}
+
+  </script>
+</body>
+</html>
