@@ -303,6 +303,15 @@
       else b.textContent = "PILIH BOX";
     });
   }
+    
+  // === Tambahkan helper shuffle di sini ===
+function shuffle(arr){
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
   async function claim(idx){
   if (locked) return;
@@ -367,16 +376,33 @@ const cards = document.querySelectorAll('.card');
 // mulai animasi flip semua kartu
 cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
 
+// pool nominal palsu
+const pool = [4000, 6000, 10000, 50000, 100000, 250000];
+
+// pastikan tidak ada yang sama dengan hadiah asli
+const hadiahAsli = Number(res.hadiah);
+const others = shuffle(pool.filter(v => v !== hadiahAsli));
+
+// siapkan 6 nilai unik untuk 6 kotak
+const displayAmounts = new Array(6);
+displayAmounts[idx - 1] = hadiahAsli;      // kotak yang dipilih = hadiah asli
+
+let k = 0;
+for (let i = 0; i < 6; i++) {
+  if (i === (idx - 1)) continue;
+  displayAmounts[i] = others[k++];          // sisanya pakai pool yang sudah dibersihkan
+}
+
 setTimeout(()=>{
   cards.forEach((c,i)=>{
     const back = c.querySelector('.back');
     if(i === (idx-1)){
       back.innerHTML = `<div class="saldo-wrap">
                           <div class="saldo-title">SALDO AKUN</div>
-                          <div class="saldo-amount">Rp ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+                          <div class="saldo-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>
                         </div>`;
     } else {
-      back.innerHTML = `<div class="fake-amount">Rp ${Number(res.allPrizes[i]).toLocaleString('id-ID')}</div>`;
+      back.innerHTML = `<div class="fake-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>`;
     }
   });
 }, 260);
