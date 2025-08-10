@@ -396,6 +396,36 @@
   text-transform:uppercase;
   letter-spacing:.6px;
 }
+
+/* === PROMO POPUP 610x310 === */
+.promo-overlay{
+  position:fixed; inset:0; display:none;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,.82); z-index:10080;
+}
+.promo-box{
+  width:610px; height:310px; position:relative; overflow:hidden;
+  border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.55);
+  background:#000;
+}
+.promo-box img{ width:100%; height:100%; object-fit:cover; display:block; }
+.promo-close{
+  position:absolute; top:6px; right:6px; width:32px; height:32px;
+  border:none; border-radius:50%; cursor:pointer;
+  background:rgba(0,0,0,.6); color:#fff; font-weight:900; line-height:32px;
+}
+@media (max-width:660px){
+  .promo-box{ width:min(95vw,610px); height:calc(min(95vw,610px) * 310 / 610); }
+}
+
+#popup .popup-box{ position: relative; }   /* supaya posisi absolut nempel ke box */
+.popup-x{
+  position:absolute; top:8px; right:8px;
+  width:32px; height:32px; line-height:32px;
+  border:none; border-radius:50%; cursor:pointer;
+  background:rgba(0,0,0,.7); color:#fff; font-weight:900;
+}
+.popup-x:hover{ filter:brightness(1.15); transform:scale(1.05); }
     
   </style>
 
@@ -602,22 +632,25 @@ setTimeout(()=>{
 
     setTimeout(()=>{
   document.getElementById('popup-content').innerHTML = `
-    <div class="pas-popup">
-      <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
-      <div class="pas-subtitle">Anda mendapatkan</div>
-      <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
-      <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
-      <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
-      <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
-      <div class="pas-btn-row">
-        <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
-        <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
-      </div>
-      <button type="button" class="pas-btn pas-reset" onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
-        PILIH BOX LAGI
-      </button>
+  <button class="popup-x" aria-label="Tutup"
+    onclick="document.getElementById('popup').style.display='none'">✖</button>
+  <div class="pas-popup">
+    <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
+    <div class="pas-subtitle">Anda mendapatkan</div>
+    <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+    <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
+    <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
+    <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
+    <div class="pas-btn-row">
+      <a href="https://klikblg.com/wa-pas" target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
+      <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
     </div>
-  `;
+    <button type="button" class="pas-btn pas-reset"
+      onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
+      PILIH BOX LAGI
+    </button>
+  </div>
+`;
   document.getElementById('popup').style.display = 'flex';
 
    // Jalankan confetti di canvas khusus (di depan popup)
@@ -649,6 +682,7 @@ requestAnimationFrame(() => {
     if (back){
       back.innerHTML = '';
       back.style.cssText = '';                         // bersihkan inline style di back
+      showPromo();   // tampilkan popup promo lagi setelah reset
     }
   });
 
@@ -716,7 +750,55 @@ window.claim = async function(idx){
 }
 </script>
 
+  <script>
+let lastClickedBtn = null;
+// tandai tombol yang ditekan
+document.querySelectorAll('.grid .front .btn').forEach(btn=>{
+  btn.addEventListener('click', function(){
+    lastClickedBtn = this;
+    this.dataset.prev = this.textContent;
+    this.textContent = 'Mengecek...';
+  });
+});
+
+// wrap claim versi cooldown (yang sudah ada) supaya tombol balik normal
+const _claimWithCool = window.claim;
+window.claim = async function(idx){
+  try { await _claimWithCool(idx); }
+  finally {
+    if (lastClickedBtn) {
+      lastClickedBtn.textContent = lastClickedBtn.dataset.prev || 'PILIH BOX';
+      lastClickedBtn = null;
+    }
+  }
+}
+</script>
+
   <canvas id="confetti-canvas"></canvas>
+
+  <!-- Promo Popup -->
+<div id="promoPopup" class="promo-overlay" aria-modal="true" role="dialog">
+  <div class="promo-box">
+    <button class="promo-close" aria-label="Tutup" onclick="hidePromo()">✖</button>
+    <a href="https://papanatasslotgaming2.com" target="_top" rel="noopener">
+      <img src="https://i.ibb.co/GQNJ9VSM/20250706004135-banner-papanatasslot-popup-all-promo.jpg" alt="Promo - Event - Bonus">
+    </a>
+  </div>
+</div>
+
+  <script>
+function showPromo(){ document.getElementById('promoPopup').style.display='flex'; }
+function hidePromo(){ document.getElementById('promoPopup').style.display='none'; }
+
+// Muncul saat pertama kali buka / refresh
+document.addEventListener('DOMContentLoaded', showPromo);
+
+// Tutup dengan ESC
+document.addEventListener('keydown', e=>{
+  const el = document.getElementById('promoPopup');
+  if (e.key === 'Escape' && el.style.display === 'flex') hidePromo();
+});
+</script>
   
 </body>
 </html>
