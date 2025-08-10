@@ -472,6 +472,13 @@
     });
   }
     
+function mapDisplay(v){
+  if (v === 100000) return { type:'zonk' };        // ZONK !
+  if (v === 250000) return { type:'num', value:25000 };
+  if (v === 50000)  return { type:'num', value:2000 };
+  return { type:'num', value:v };
+}
+    
   // === Tambahkan helper shuffle di sini ===
 function shuffle(arr){
   for(let i = arr.length - 1; i > 0; i--){
@@ -566,17 +573,20 @@ setTimeout(()=>{
     const back = c.querySelector('.back');
     const v = displayAmounts[i];
 
-    // aturan display
+    // mapping display
     const isZonk = (v === 100000);
-    const shownV = (v === 250000) ? 25000 : v;
+    let shownV = v;
+    if (v === 250000) shownV = 25000;   // 250k -> 25k
+    else if (v === 50000) shownV = 2000; // 50k  -> 2k
+
     const labelRp = `Rp ${shownV.toLocaleString('id-ID')}`;
 
     if (isZonk) {
-      // ZONK: merah + teks putih (jangan pakai selected-box hijau)
+      // ZONK: merah + teks putih
       c.classList.add('zonk-box');
       back.innerHTML = `<div class="zonk-label">ZONK !</div>`;
     } else if (i === (idx - 1)) {
-      // kartu terpilih normal (hijau)
+      // kartu terpilih (hijau)
       c.classList.add('selected-box');
       back.innerHTML = `
         <div class="saldo-wrap">
