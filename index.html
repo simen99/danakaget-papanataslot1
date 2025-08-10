@@ -282,6 +282,16 @@
   color: #fff !important;
   box-shadow: 0 0 15px rgba(0, 255, 100, 0.8), 0 0 30px rgba(0, 255, 100, 0.6);
 }
+
+.card.selected-box .back,
+.back.is-selected{
+  background: linear-gradient(160deg, #00c853 0%, #00e676 50%, #1b5e20 100%) !important;
+  color:#fff !important;
+  box-shadow:
+    0 0 16px rgba(0,255,120,.85),
+    0 0 36px rgba(0,255,120,.45);
+  transition: background .25s ease, box-shadow .25s ease;
+}
     
   </style>
 
@@ -447,14 +457,17 @@ setTimeout(()=>{
   cards.forEach((c,i)=>{
     const back = c.querySelector('.back');
     if(i === (idx-1)){
-  c.classList.add('selected-box'); // kasih class hijau
-  back.innerHTML = `<div class="saldo-wrap">
-                      <div class="saldo-title">SALDO AKUN</div>
-                      <div class="saldo-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>
-                    </div>`;
-} else {
-  back.innerHTML = `<div class="fake-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>`;
-}
+      // >>> tambahkan 2 baris ini
+      c.classList.add('selected-box');   // tandai kartu terpilih
+      back.classList.add('is-selected'); // pastikan sisi back ikut hijau
+
+      back.innerHTML = `<div class="saldo-wrap">
+                          <div class="saldo-title">SALDO AKUN</div>
+                          <div class="saldo-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>
+                        </div>`;
+    } else {
+      back.innerHTML = `<div class="fake-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>`;
+    }
   });
 }, 260);
 
@@ -496,23 +509,27 @@ setTimeout(()=>{
 }
     
  function resetBoxes(){
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card=>{
-      card.classList.remove('flipped');
-      const back = card.querySelector('.back');
-      if (back) back.innerHTML = '';
-    });
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(card=>{
+    card.classList.remove('flipped', 'selected-box'); // cabut hijau & flip
+    const back = card.querySelector('.back');
+    if (back){
+      back.classList.remove('is-selected');           // cabut hijau pada back
+      back.innerHTML = '';                            // kosongkan isi back
+      back.style.cssText = '';                        // kalau ada inline style, hapus
+    }
+  });
 
-   // kembalikan tombol yang disembunyikan
+  // balikin tombol yang disembunyikan
   document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
-  document.querySelectorAll('.front .btn').forEach(b => b.style.removeProperty('display')); // hapus display:none inline
-   
-    document.getElementById('popup').style.display = 'none';
-    locked = false;
-    setEnabled(true);
-    document.getElementById('userId').value = '';
-    document.getElementById('kupon').value  = '';
-  }
+  document.querySelectorAll('.front .btn').forEach(b => b.style.removeProperty('display'));
+
+  document.getElementById('popup').style.display = 'none';
+  locked = false;
+  setEnabled(true);
+  document.getElementById('userId').value = '';
+  document.getElementById('kupon').value  = '';
+}
     
 </script>
 
