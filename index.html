@@ -56,9 +56,6 @@
   filter: saturate(1.08);
 }
 
-    /* Grid */
-    .grid{ display:grid; grid-template-columns:repeat(3,180px); gap:28px; justify-content:center; margin:28px auto 6px; }
-
     /* Card (flip) */
     .card{ width:180px; height:180px; perspective:1000px; }
     .card-inner{
@@ -542,11 +539,6 @@
 .card-inner{ position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .6s ease; }
 .face{ position:absolute; inset:0; border-radius:16px; overflow:hidden; box-shadow:0 0 10px rgba(255,215,0,.7); display:flex; align-items:flex-end; justify-content:center; backface-visibility:hidden; }
 
-/* Override lebar input & tombol login agar responsif */
-.input-gold,
-.login-link{
-  width: min(92vw, 320px) !important;
-}   
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -831,6 +823,7 @@ document.querySelectorAll('.card').forEach((c) => {
 .login-link{ 
   width: min(92vw, 320px) !important;
 }
+    
 </script>
 
   <!-- Tombol Mengambang Telegram & WhatsApp -->
