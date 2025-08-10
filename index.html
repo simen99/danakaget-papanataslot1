@@ -607,6 +607,27 @@ document.querySelectorAll('.card').forEach((c) => {
   </script>
   <!--End of Tawk.to Script-->
 
+  <script>
+function haptic(ms=8){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch{} }
+document.querySelectorAll('.btn').forEach(b=>{
+  b.addEventListener('click', ()=> haptic(10));
+});
+</script>
+
+  <script>
+let cool = false;
+function coolDown(ms=1200){
+  cool = true; setTimeout(()=> cool = false, ms);
+}
+    
+const _claimOrig = claim; // simpan referensi aslinya
+window.claim = async function(idx){
+  if (cool) return;
+  coolDown();
+  await _claimOrig(idx);
+}
+</script>
+
   <canvas id="confetti-canvas"></canvas>
   
 </body>
