@@ -550,38 +550,38 @@ requestAnimationFrame(() => {
     document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
   }
 }
-    
+
+ <script>
  function resetBoxes(){
-   document.querySelectorAll('.card').forEach(card=>{
-     card.classList.remove('flipped');
   const cards = document.querySelectorAll('.card');
-  cards.forEach(card=>{
-    card.classList.remove('flipped', 'selected-box'); // cabut hijau & flip
-    card.style.boxShadow = '';                        // pastikan tak ada glow tersisa
+
+  cards.forEach(card => {
+    card.classList.remove('flipped', 'selected-box'); // cabut flip & glow hijau
+    card.style.boxShadow = '';                         // bersihkan glow inline kalau ada
     const back = card.querySelector('.back');
     if (back){
       back.innerHTML = '';
-      back.style.cssText = '';                        // bersihkan inline style di back
+      back.style.cssText = '';                         // bersihkan inline style di back
     }
   });
 
+  // balikin tombol
   document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
   document.querySelectorAll('.front .btn').forEach(b => b.style.removeProperty('display'));
 
+  // tutup popup & reset state
   document.getElementById('popup').style.display = 'none';
   locked = false;
   setEnabled(true);
   document.getElementById('userId').value = '';
   document.getElementById('kupon').value  = '';
 }
-                                              
+
 // aktifkan getar random untuk semua kartu saat halaman buka
-document.querySelectorAll('.card').forEach((c, i) => {
+document.querySelectorAll('.card').forEach((c) => {
   c.classList.add('shake');
-  // delay acak biar tidak barengan
   c.style.setProperty('--shake-delay', (Math.random() * 2.5).toFixed(2) + 's');
 });
-    
 </script>
 
   <!-- Tombol Mengambang Telegram & WhatsApp -->
