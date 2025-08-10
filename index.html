@@ -488,6 +488,36 @@
   background:#fff;
   border:1px solid rgba(0,0,0,.08);
 }   
+
+/* === Border EMAS untuk promo popup === */
+.promo-box{
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;                 /* biar sudut emas rapi */
+}
+
+/* cincin emas gradient */
+.promo-box::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:14px;
+  padding:4px;                      /* tebal border */
+  background: linear-gradient(160deg,#ffe27a 0%,#f1c232 45%,#b8860b 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;  /* lubangi tengahnya */
+  pointer-events:none;
+  z-index:2;
+}
+
+/* sedikit glow biar makin “emas” */
+.promo-box{
+  box-shadow: 0 12px 34px rgba(0,0,0,.45),
+              0 0 22px rgba(255,215,0,.35);
+}
+    
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
