@@ -276,6 +276,12 @@
   0%   { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
+
+.selected-box {
+  background: linear-gradient(160deg, #00c853 0%, #00e676 50%, #1b5e20 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 0 15px rgba(0, 255, 100, 0.8), 0 0 30px rgba(0, 255, 100, 0.6);
+}
     
   </style>
 
@@ -441,18 +447,18 @@ setTimeout(()=>{
   cards.forEach((c,i)=>{
     const back = c.querySelector('.back');
     if(i === (idx-1)){
-      back.innerHTML = `<div class="saldo-wrap">
-                          <div class="saldo-title">SALDO AKUN</div>
-                          <div class="saldo-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>
-                        </div>`;
-    } else {
-      back.innerHTML = `<div class="fake-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>`;
-    }
+  c.classList.add('selected-box'); // kasih class hijau
+  back.innerHTML = `<div class="saldo-wrap">
+                      <div class="saldo-title">SALDO AKUN</div>
+                      <div class="saldo-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>
+                    </div>`;
+} else {
+  back.innerHTML = `<div class="fake-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>`;
+}
   });
 }, 260);
 
     setTimeout(()=>{
-  confetti({ particleCount:160, spread:70, origin:{y:0.6} });
   document.getElementById('popup-content').innerHTML = `
     <div class="pas-popup">
       <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
@@ -471,6 +477,12 @@ setTimeout(()=>{
     </div>
   `;
   document.getElementById('popup').style.display = 'flex';
+
+   // Jalankan confetti setelah popup sudah terlihat
+  requestAnimationFrame(() => {
+    confetti({ particleCount:160, spread:70, origin:{y:0.6} });
+  });
+      
   locked = true;
   document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
 }, cards.length*120 + 360 + 3000); // +3 detik
