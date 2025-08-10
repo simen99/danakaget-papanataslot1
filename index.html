@@ -384,6 +384,18 @@
   margin:18px 0 28px;
 }
 .login-link{ margin:0 auto; } /* center */
+
+.card.zonk-box .back{
+  background: linear-gradient(160deg,#ff3b30 0%,#ff6b6b 50%,#b00020 100%) !important;
+  color:#fff !important;
+  box-shadow: 0 0 16px rgba(255,59,48,.85), 0 0 36px rgba(255,59,48,.45);
+}
+.zonk-label{
+  font-family:'Russo One',sans-serif;
+  font-size:22px;
+  text-transform:uppercase;
+  letter-spacing:.6px;
+}
     
   </style>
 
@@ -552,16 +564,29 @@ for (let i = 0; i < 6; i++) {
 setTimeout(()=>{
   cards.forEach((c,i)=>{
     const back = c.querySelector('.back');
-    if(i === (idx-1)){
-  c.classList.add('selected-box'); // tandai kartu terpilih
-  back.innerHTML = `
-    <div class="saldo-wrap">
-      <div class="saldo-title">SALDO AKUN</div>
-      <div class="saldo-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>
-    </div>`;
-} else {
-  back.innerHTML = `<div class="fake-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>`;
-}
+    const v = displayAmounts[i];
+
+    // aturan display
+    const isZonk = (v === 100000);
+    const shownV = (v === 250000) ? 25000 : v;
+    const labelRp = `Rp ${shownV.toLocaleString('id-ID')}`;
+
+    if (isZonk) {
+      // ZONK: merah + teks putih (jangan pakai selected-box hijau)
+      c.classList.add('zonk-box');
+      back.innerHTML = `<div class="zonk-label">ZONK !</div>`;
+    } else if (i === (idx - 1)) {
+      // kartu terpilih normal (hijau)
+      c.classList.add('selected-box');
+      back.innerHTML = `
+        <div class="saldo-wrap">
+          <div class="saldo-title">SALDO AKUN</div>
+          <div class="saldo-amount">${labelRp}</div>
+        </div>`;
+    } else {
+      // kartu lain biasa
+      back.innerHTML = `<div class="fake-amount">${labelRp}</div>`;
+    }
   });
 }, 260);
 
@@ -608,7 +633,7 @@ requestAnimationFrame(() => {
   const cards = document.querySelectorAll('.card');
 
   cards.forEach(card => {
-    card.classList.remove('flipped', 'selected-box'); // cabut flip & glow hijau
+    card.classList.remove('flipped', 'selected-box', 'zonk-box');
     card.style.boxShadow = '';                         // bersihkan glow inline kalau ada
     const back = card.querySelector('.back');
     if (back){
