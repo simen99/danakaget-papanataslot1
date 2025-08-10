@@ -226,6 +226,7 @@
   </div>
 
   <script>
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbz_W6dB4zGZLOOM6dBmyaMGA7Df9K3FjgaMmfNw6YQsTJuvGlhmL0AeCVTVFXO88CZHqg/exec";
   let locked = false;
 
   function setEnabled(enabled){
@@ -236,81 +237,83 @@
     });
   }
 
-  function claim(idx){
-    if (locked) return;
+  async function claim(idx){
+  if (locked) return;
 
-    const userId = document.getElementById('userId').value.trim();
-    const kupon  = document.getElementById('kupon').value.trim();
-    if(!userId || !kupon){ alert('⚠️ Masukkan USER ID dan KUPON terlebih dahulu!'); return; }
-
-    setEnabled(false);
-
-    google.script.run
-      .withSuccessHandler(res => {
-        if (res.status !== "success") {
-          alert(res.message || "Terjadi kesalahan.");
-          setEnabled(true);
-          return;
-        }
-
-        // flip semua kartu
-        const cards = document.querySelectorAll('.card');
-        cards.forEach((c,i)=>{ setTimeout(()=>c.classList.add('flipped'), i*120); });
-
-        setTimeout(()=>{
-          cards.forEach((c,i)=>{
-            const back = c.querySelector('.back');
-            if(i === (idx-1)){
-              back.innerHTML = `<div class="saldo-wrap">
-                                  <div class="saldo-title">SALDO AKUN</div>
-                                  <div class="saldo-amount">Rp ${Number(res.hadiah).toLocaleString('id-ID')}</div>
-                                </div>`;
-            } else {
-              back.innerHTML = `<div class="fake-amount">Rp ${Number(res.allPrizes[i]).toLocaleString('id-ID')}</div>`;
-            }
-          });
-        }, 260);
-
-        setTimeout(()=>{
-          confetti({ particleCount:160, spread:70, origin:{y:0.6} });
-
-          document.getElementById('popup-content').innerHTML = `
-            <div class="pas-popup">
-              <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
-              <div class="pas-subtitle">Anda mendapatkan</div>
-              <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
-              <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
-              <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
-
-              <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
-
-              <div class="pas-btn-row">
-                <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
-                <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
-              </div>
-
-              <button type="button" class="pas-btn pas-reset" onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
-                PILIH BOX LAGI
-              </button>
-            </div>
-          `;
-          document.getElementById('popup').style.display = 'flex';
-          locked = true;
-        }, cards.length*120 + 360);
-      })
-      .withFailureHandler(err => {
-        console.error(err);
-        alert("Gagal menghubungi server. Coba lagi.");
-        setEnabled(true);
-      })
-      .pilihBox(userId, kupon, idx);
+  const userId = document.getElementById('userId').value.trim();
+  const kupon  = document.getElementById('kupon').value.trim();
+  if(!userId || !kupon){ 
+    alert('⚠️ Masukkan USER ID dan KUPON terlebih dahulu!'); 
+    return; 
   }
 
-  function resetBoxes(){
+  setEnabled(false);
+
+  try {
+    const url = `${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)}`;
+    const r = await fetch(url, { method: "GET", cache: "no-store" });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const res = await r.json();
+
+    if (res.status !== "success") {
+      alert(res.message || "Terjadi kesalahan.");
+      setEnabled(true);
+      return;
+    }
+
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((c,i)=>{ setTimeout(()=>c.classList.add('flipped'), i*120); });
+
+    setTimeout(()=>{
+      cards.forEach((c,i)=>{
+        const back = c.querySelector('.back');
+        if(i === (idx-1)){
+          back.innerHTML = `<div class="saldo-wrap">
+                              <div class="saldo-title">SALDO AKUN</div>
+                              <div class="saldo-amount">Rp ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+                            </div>`;
+        } else {
+          back.innerHTML = `<div class="fake-amount">Rp ${Number(res.allPrizes[i]).toLocaleString('id-ID')}</div>`;
+        }
+      });
+    }, 260);
+
+    setTimeout(()=>{
+      confetti({ particleCount:160, spread:70, origin:{y:0.6} });
+      document.getElementById('popup-content').innerHTML = `
+        <div class="pas-popup">
+          <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
+          <div class="pas-subtitle">Anda mendapatkan</div>
+          <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+          <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
+          <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
+          <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
+          <div class="pas-btn-row">
+            <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
+            <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
+          </div>
+          <button type="button" class="pas-btn pas-reset" onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
+            PILIH BOX LAGI
+          </button>
+        </div>
+      `;
+      document.getElementById('popup').style.display = 'flex';
+      locked = true;
+    }, cards.length*120 + 360);
+
+  } catch (err) {
+    console.error(err);
+    alert("Gagal menghubungi server. Coba lagi.");
+    setEnabled(true);
+  }
+}
+
+ function resetBoxes(){
     const cards = document.querySelectorAll('.card');
     cards.forEach(card=>{
       card.classList.remove('flipped');
-      card.querySelector('.back').innerHTML = '';
+      const back = card.querySelector('.back');
+      if (back) back.innerHTML = '';
     });
     document.getElementById('popup').style.display = 'none';
     locked = false;
@@ -318,6 +321,7 @@
     document.getElementById('userId').value = '';
     document.getElementById('kupon').value  = '';
   }
+    
 </script>
 </body>
 </html>
