@@ -542,7 +542,21 @@
 .input-gold,
 .login-link {
   width: min(92vw, 320px);
-}    
+}
+
+/* Biar sisi belakang (hadiah/zonk) tetap di tengah */
+.card .back{
+  display:flex;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+/* Tombol di sisi depan tetap nempel bawah */
+.card .front{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
 
   </style>
 
