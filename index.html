@@ -712,12 +712,21 @@ const cards = document.querySelectorAll('.card');
 // mulai animasi flip semua kartu
 cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
 
+// kunci tampilan, dipakai agar tidak ada duplikat visual
+function displayKey(v){
+  if (v === 100000) return 'ZONK';
+  if (v === 250000) return '25000';
+  if (v === 50000)  return '2000';
+  return String(v);
+}
+    
 // pool nominal palsu
 const pool = [4000, 6000, 10000, 50000, 100000, 250000];
 
-// pastikan tidak ada yang sama dengan hadiah asli
+// pastikan tidak ada yang SAMA SECARA TAMPILAN dengan hadiah asli
 const hadiahAsli = Number(res.hadiah);
-const others = shuffle(pool.filter(v => v !== hadiahAsli));
+const hadiahKey  = displayKey(hadiahAsli);
+const others     = shuffle(pool.filter(v => displayKey(v) !== hadiahKey));
 
 // siapkan 6 nilai unik untuk 6 kotak
 const displayAmounts = new Array(6);
