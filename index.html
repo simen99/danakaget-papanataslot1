@@ -316,7 +316,6 @@
 
   setEnabled(false);
   // feedback kecil di tombol agar terasa responsif
-  document.querySelectorAll('.btn').forEach(b => b.textContent = 'Mengecek…');
 
   try {
     const url = `${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)}`;
@@ -353,12 +352,19 @@
     }
 
     document.querySelectorAll('.card').forEach((c, i) => {
-  if (i !== (idx - 1)) c.querySelector('.btn')?.classList.add('btn-hide');
+  if (i !== (idx - 1)) {
+    const btn = c.querySelector('.front .btn');
+    if (btn) {
+      btn.classList.add('btn-hide');  // CSS: display:none !important
+      btn.style.display = 'none';     // hard fallback kalau ada override
+    }
+  }
 });
 
     // === flip kartu & isi hadiah ===
     const cards = document.querySelectorAll('.card');
-    cards.forEach((c,i)=>{ setTimeout(()=>c.classList.add('flipped'), i*120); });
+const clickedBtn = cards[idx - 1].querySelector('.front .btn');
+if (clickedBtn) clickedBtn.textContent = 'Mengecek…';
 
     setTimeout(()=>{
       cards.forEach((c,i)=>{
