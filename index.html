@@ -304,8 +304,38 @@
   pointer-events: none; /* biar klik tetap tembus ke bawah */
   z-index: 10000; /* lebih tinggi dari popup hadiah */
 }
-    
 
+/* getar halus */
+@keyframes pasShake {
+  0%, 100% { transform: translate3d(0,0,0) rotate(0deg); }
+  5%  { transform: translate3d(1px,-1px,0) rotate(-0.4deg); }
+  10% { transform: translate3d(-1px,1px,0) rotate(0.4deg); }
+  15% { transform: translate3d(1px,0,0) rotate(-0.3deg); }
+  20% { transform: translate3d(-1px,0,0) rotate(0.3deg); }
+  25% { transform: translate3d(0,1px,0) rotate(-0.2deg); }
+  30% { transform: translate3d(0,-1px,0) rotate(0.2deg); }
+  /* sisanya diam sampai akhir biar tidak terlalu ramai */
+  60%, 99% { transform: translate3d(0,0,0) rotate(0deg); }
+}
+
+/* terapkan ke semua box */
+.card.shake {
+  animation: pasShake 4.5s ease-in-out infinite;
+  animation-delay: var(--shake-delay, 0s); /* tiap box beda delay */
+  will-change: transform;
+}
+
+/* saat di-hover atau sudah dibuka, hentikan getar */
+.card:hover,
+.card.flipped {
+  animation: none !important;
+}
+
+/* aksesibilitas: matikan kalau user pilih reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .card.shake { animation: none !important; }
+}
+    
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -522,6 +552,8 @@ requestAnimationFrame(() => {
 }
     
  function resetBoxes(){
+   document.querySelectorAll('.card').forEach(card=>{
+     card.classList.remove('flipped');
   const cards = document.querySelectorAll('.card');
   cards.forEach(card=>{
     card.classList.remove('flipped', 'selected-box'); // cabut hijau & flip
@@ -542,6 +574,13 @@ requestAnimationFrame(() => {
   document.getElementById('userId').value = '';
   document.getElementById('kupon').value  = '';
 }
+                                              
+// aktifkan getar random untuk semua kartu saat halaman buka
+document.querySelectorAll('.card').forEach((c, i) => {
+  c.classList.add('shake');
+  // delay acak biar tidak barengan
+  c.style.setProperty('--shake-delay', (Math.random() * 2.5).toFixed(2) + 's');
+});
     
 </script>
 
