@@ -242,25 +242,50 @@
 
   const userId = document.getElementById('userId').value.trim();
   const kupon  = document.getElementById('kupon').value.trim();
-  if(!userId || !kupon){ 
-    alert('⚠️ Masukkan USER ID dan KUPON terlebih dahulu!'); 
-    return; 
+  if(!userId || !kupon){
+    alert('⚠️ Masukkan USER ID dan KUPON terlebih dahulu!');
+    return;
   }
 
   setEnabled(false);
+  // feedback kecil di tombol agar terasa responsif
+  document.querySelectorAll('.btn').forEach(b => b.textContent = 'Mengecek…');
 
   try {
     const url = `${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)}`;
-    const r = await fetch(url, { method: "GET", cache: "no-store" });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const res = await r.json();
+    const r = await fetch(url, { method: "GET", redirect: "follow", cache: "no-store" });
+
+    // Ambil teks mentah dulu supaya kalau bukan JSON kita bisa lihat potongannya
+    const txt = await r.text();
+    console.log('RAW RESPONSE:', txt.slice(0, 300));
+
+    if (!r.ok) {
+      alert(`Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.`);
+      setEnabled(true);
+      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
+      return;
+    }
+
+    let res;
+    try {
+      res = JSON.parse(txt);
+    } catch (e) {
+      // Ini sering terjadi kalau Web App belum "Anyone" → balas login HTML Google
+      alert("Server tidak mengirim JSON (mungkin Web App belum di-set 'Anyone').\n" +
+            "Potongan balasan:\n" + txt.slice(0, 200) + "...");
+      setEnabled(true);
+      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
+      return;
+    }
 
     if (res.status !== "success") {
       alert(res.message || "Terjadi kesalahan.");
       setEnabled(true);
+      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
       return;
     }
 
+    // === flip kartu & isi hadiah ===
     const cards = document.querySelectorAll('.card');
     cards.forEach((c,i)=>{ setTimeout(()=>c.classList.add('flipped'), i*120); });
 
@@ -299,15 +324,17 @@
       `;
       document.getElementById('popup').style.display = 'flex';
       locked = true;
+      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
     }, cards.length*120 + 360);
 
   } catch (err) {
     console.error(err);
     alert("Gagal menghubungi server. Coba lagi.");
     setEnabled(true);
+    document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
   }
 }
-
+    
  function resetBoxes(){
     const cards = document.querySelectorAll('.card');
     cards.forEach(card=>{
