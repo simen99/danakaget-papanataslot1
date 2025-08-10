@@ -494,11 +494,22 @@
   max-width:640px;
 }
 
-@media (max-width:720px){
-  .grid{ grid-template-columns:repeat(2, minmax(150px, 1fr)); max-width:520px; }
+/* HP: paksa 2 kolom */
+@media (max-width: 720px){
+  .grid{
+    grid-template-columns: repeat(2, minmax(140px, 1fr)) !important;
+    max-width: 520px !important;   /* opsional biar pas di tengah */
+    margin-inline: auto;
+  }
+  .card{ max-width: none; }        /* biar ikut lebar kolom */
 }
-@media (max-width:380px){
-  .grid{ grid-template-columns:1fr; max-width:340px; }
+
+/* HP super kecil tetap 2 kolom */
+@media (max-width: 380px){
+  .grid{
+    grid-template-columns: repeat(2, minmax(140px, 1fr)) !important;
+    gap: 12px;                      /* rapetin jarak kalau perlu */
+  }
 }
 
 /* Biar sisi belakang (hadiah/zonk) tetap di tengah */
