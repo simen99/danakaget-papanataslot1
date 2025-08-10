@@ -367,6 +367,41 @@
 @media (max-width: 420px){
   .login-btn{ width: min(92%, 360px); justify-content: center; }
 }
+/* Tombol LINK LOGIN sama persis gaya & ukuran input-gold */
+.login-wrap{
+  display:flex; justify-content:center; margin: 14px 0 24px;
+}
+    
+.login-link{
+  width:240px;
+  padding:12px 14px 12px 46px;          /* sama seperti .input-gold */
+  border-radius:14px;
+  border:1px solid #b37b00;
+  background:
+    url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%231a1300' d='M12 17a5 5 0 1 1 5-5h2a1 1 0 0 1 1 1v3h2v3h-2v2h-3v-2h-2v-3h2v-2a5 5 0 0 1-5 5Z'/%3E%3C/svg%3E") no-repeat 14px 50% / 22px,
+    radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
+  color:#1a1300;
+  font-weight:900; letter-spacing:.2px; text-transform:uppercase;
+  text-decoration:none; line-height:1;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.45),
+    inset 0 -3px 8px rgba(0,0,0,.15),
+    0 6px 16px rgba(179,123,0,.18);
+  transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease, filter .2s ease;
+}
+.login-link:hover,
+.login-link:focus{
+  transform: translateY(-1px);
+  border-color:#ffcf33;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.55),
+    inset 0 -3px 10px rgba(0,0,0,.18),
+    0 0 0 3px rgba(255,207,51,.28),
+    0 10px 22px rgba(255,215,0,.25);
+  filter: saturate(1.08);
+  outline:0;
+}
     
   </style>
 
@@ -396,8 +431,8 @@
       <div class="face back"></div>
     </div></div>
 
-    <div class="login-cta">
-  <a class="login-btn" href="https://papanatasslotgaming2.com" target="_top">🔑 LINK LOGIN</a>
+    <div class="login-wrap">
+  <a class="login-link" href="https://papanatasslotgaming2.com" target="_top">Link Login</a>
 </div>
 
     <div class="card"><div class="card-inner">
