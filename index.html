@@ -277,22 +277,24 @@
   100% { transform: translateX(-100%); }
 }
 
-.selected-box {
-  background: linear-gradient(160deg, #00c853 0%, #00e676 50%, #1b5e20 100%) !important;
-  color: #fff !important;
-  box-shadow: 0 0 15px rgba(0, 255, 100, 0.8), 0 0 30px rgba(0, 255, 100, 0.6);
-}
-
-.card.selected-box .back,
-.back.is-selected{
+/* Box terpilih: back jadi hijau + glow hijau */
+.card.selected-box .back{
   background: linear-gradient(160deg, #00c853 0%, #00e676 50%, #1b5e20 100%) !important;
   color:#fff !important;
-  box-shadow:
-    0 0 16px rgba(0,255,120,.85),
-    0 0 36px rgba(0,255,120,.45);
+  box-shadow: 0 0 16px rgba(0,255,120,.85), 0 0 36px rgba(0,255,120,.45);
   transition: background .25s ease, box-shadow .25s ease;
 }
-    
+
+/* Override glow kuning saat hover — jangan ganggu yang hijau */
+.card.selected-box:hover{
+  box-shadow: 0 0 0 rgba(0,0,0,0); /* matikan hover kuning bawaan .card */
+}
+
+/* Optional: saat sudah flipped, hover kuning dimatikan juga */
+.card.flipped:hover{
+  box-shadow: none;
+}
+
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -457,17 +459,15 @@ setTimeout(()=>{
   cards.forEach((c,i)=>{
     const back = c.querySelector('.back');
     if(i === (idx-1)){
-      // >>> tambahkan 2 baris ini
-      c.classList.add('selected-box');   // tandai kartu terpilih
-      back.classList.add('is-selected'); // pastikan sisi back ikut hijau
-
-      back.innerHTML = `<div class="saldo-wrap">
-                          <div class="saldo-title">SALDO AKUN</div>
-                          <div class="saldo-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>
-                        </div>`;
-    } else {
-      back.innerHTML = `<div class="fake-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>`;
-    }
+  c.classList.add('selected-box'); // tandai kartu terpilih
+  back.innerHTML = `
+    <div class="saldo-wrap">
+      <div class="saldo-title">SALDO AKUN</div>
+      <div class="saldo-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>
+    </div>`;
+} else {
+  back.innerHTML = `<div class="fake-amount">Rp ${displayAmounts[i].toLocaleString('id-ID')}</div>`;
+}
   });
 }, 260);
 
@@ -512,15 +512,14 @@ setTimeout(()=>{
   const cards = document.querySelectorAll('.card');
   cards.forEach(card=>{
     card.classList.remove('flipped', 'selected-box'); // cabut hijau & flip
+    card.style.boxShadow = '';                        // pastikan tak ada glow tersisa
     const back = card.querySelector('.back');
     if (back){
-      back.classList.remove('is-selected');           // cabut hijau pada back
-      back.innerHTML = '';                            // kosongkan isi back
-      back.style.cssText = '';                        // kalau ada inline style, hapus
+      back.innerHTML = '';
+      back.style.cssText = '';                        // bersihkan inline style di back
     }
   });
 
-  // balikin tombol yang disembunyikan
   document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
   document.querySelectorAll('.front .btn').forEach(b => b.style.removeProperty('display'));
 
