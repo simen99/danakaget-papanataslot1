@@ -226,97 +226,98 @@
   </div>
 
   <script>
-    let locked = false;
+  let locked = false;
 
-    function setEnabled(enabled){
-      document.querySelectorAll('.btn').forEach(b=>{
-        b.disabled = !enabled;
-        if(!enabled) b.textContent = "PILIH BOX";
-      });
-    }
+  function setEnabled(enabled){
+    document.querySelectorAll('.btn').forEach(b=>{
+      b.disabled = !enabled;
+      if(!enabled) b.textContent = "PILIH BOX";
+      else b.textContent = "PILIH BOX";
+    });
+  }
 
-    function claim(idx){
-      if(locked) return;
+  function claim(idx){
+    if (locked) return;
 
-      const userId = document.getElementById('userId').value.trim();
-      const kupon  = document.getElementById('kupon').value.trim();
-      if(!userId || !kupon){ alert('⚠️ Masukkan USER ID dan KUPON terlebih dahulu!'); return; }
+    const userId = document.getElementById('userId').value.trim();
+    const kupon  = document.getElementById('kupon').value.trim();
+    if(!userId || !kupon){ alert('⚠️ Masukkan USER ID dan KUPON terlebih dahulu!'); return; }
 
-      setEnabled(false);
+    setEnabled(false);
 
-      google.script.run
-  .withSuccessHandler(function(res) {
-    if (res.status !== 'success') {
-      alert(res.message || 'Terjadi kesalahan.');
-      setEnabled(true);
-      return;
-    }
-
-    const cards = document.querySelectorAll('.card');
-    cards.forEach((c, i) => { setTimeout(() => c.classList.add('flipped'), i * 120); });
-
-    setTimeout(() => {
-      cards.forEach((c, i) => {
-        const back = c.querySelector('.back');
-        if (i === (idx - 1)) {
-          back.innerHTML = `<div class="saldo-wrap">
-                              <div class="saldo-title">SALDO AKUN</div>
-                              <div class="saldo-amount">Rp ${res.hadiah.toLocaleString()}</div>
-                            </div>`;
-        } else {
-          back.innerHTML = `<div class="fake-amount">Rp ${res.allPrizes[i].toLocaleString()}</div>`;
+    google.script.run
+      .withSuccessHandler(res => {
+        if (res.status !== "success") {
+          alert(res.message || "Terjadi kesalahan.");
+          setEnabled(true);
+          return;
         }
-      });
-    }, 260);
 
-    setTimeout(() => {
-      confetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
+        // flip semua kartu
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((c,i)=>{ setTimeout(()=>c.classList.add('flipped'), i*120); });
 
-      document.getElementById('popup-content').innerHTML = `
-  <div class="pas-popup">
-    <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
-    <div class="pas-subtitle">Anda mendapatkan</div>
-    <div class="pas-amount">IDR ${res.hadiah.toLocaleString('id-ID')}</div>
-    <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
-    <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
+        setTimeout(()=>{
+          cards.forEach((c,i)=>{
+            const back = c.querySelector('.back');
+            if(i === (idx-1)){
+              back.innerHTML = `<div class="saldo-wrap">
+                                  <div class="saldo-title">SALDO AKUN</div>
+                                  <div class="saldo-amount">Rp ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+                                </div>`;
+            } else {
+              back.innerHTML = `<div class="fake-amount">Rp ${Number(res.allPrizes[i]).toLocaleString('id-ID')}</div>`;
+            }
+          });
+        }, 260);
 
-    <div class="pas-hint">
-      SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM
-    </div>
+        setTimeout(()=>{
+          confetti({ particleCount:160, spread:70, origin:{y:0.6} });
 
-    <div class="pas-btn-row">
-      <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
-      <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
-    </div>
+          document.getElementById('popup-content').innerHTML = `
+            <div class="pas-popup">
+              <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
+              <div class="pas-subtitle">Anda mendapatkan</div>
+              <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+              <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
+              <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
 
-    <button type="button" class="pas-reset"
-      onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
-      PILIH BOX LAGI
-    </button>
-  </div>
-`;
-      document.getElementById('popup').style.display = 'flex';
-      locked = true;
-    }, cards.length * 120 + 360);
+              <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
 
-  })
-  .pilihBox(userId, kupon, idx);
+              <div class="pas-btn-row">
+                <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
+                <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
+              </div>
 
-    }
+              <button type="button" class="pas-btn pas-reset" onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
+                PILIH BOX LAGI
+              </button>
+            </div>
+          `;
+          document.getElementById('popup').style.display = 'flex';
+          locked = true;
+        }, cards.length*120 + 360);
+      })
+      .withFailureHandler(err => {
+        console.error(err);
+        alert("Gagal menghubungi server. Coba lagi.");
+        setEnabled(true);
+      })
+      .pilihBox(userId, kupon, idx);
+  }
 
-    function resetBoxes(){
-  const cards = document.querySelectorAll('.card');
-  cards.forEach(card=>{
-    card.classList.remove('flipped');
-    card.querySelector('.back').innerHTML = '';
-  });
-  document.getElementById('popup').style.display = 'none';
-  locked = false;
-  setEnabled(true);
-  document.getElementById('userId').value = '';
-  document.getElementById('kupon').value  = '';
-}
-
-  </script>
+  function resetBoxes(){
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card=>{
+      card.classList.remove('flipped');
+      card.querySelector('.back').innerHTML = '';
+    });
+    document.getElementById('popup').style.display = 'none';
+    locked = false;
+    setEnabled(true);
+    document.getElementById('userId').value = '';
+    document.getElementById('kupon').value  = '';
+  }
+</script>
 </body>
 </html>
