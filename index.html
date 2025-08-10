@@ -304,28 +304,28 @@
     }, 260);
 
     setTimeout(()=>{
-      confetti({ particleCount:160, spread:70, origin:{y:0.6} });
-      document.getElementById('popup-content').innerHTML = `
-        <div class="pas-popup">
-          <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
-          <div class="pas-subtitle">Anda mendapatkan</div>
-          <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
-          <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
-          <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
-          <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
-          <div class="pas-btn-row">
-            <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
-            <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
-          </div>
-          <button type="button" class="pas-btn pas-reset" onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
-            PILIH BOX LAGI
-          </button>
-        </div>
-      `;
-      document.getElementById('popup').style.display = 'flex';
-      locked = true;
-      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
-    }, cards.length*120 + 360);
+  confetti({ particleCount:160, spread:70, origin:{y:0.6} });
+  document.getElementById('popup-content').innerHTML = `
+    <div class="pas-popup">
+      <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
+      <div class="pas-subtitle">Anda mendapatkan</div>
+      <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+      <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
+      <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
+      <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
+      <div class="pas-btn-row">
+        <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
+        <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
+      </div>
+      <button type="button" class="pas-btn pas-reset" onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
+        PILIH BOX LAGI
+      </button>
+    </div>
+  `;
+  document.getElementById('popup').style.display = 'flex';
+  locked = true;
+  document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
+}, cards.length*120 + 360 + 3000); // +3 detik
 
   } catch (err) {
     console.error(err);
