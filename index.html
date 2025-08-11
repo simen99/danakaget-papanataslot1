@@ -715,10 +715,24 @@
   box-shadow:0 4px 12px rgba(0,0,0,.4);
 }
 
-/* khusus LiveChat: isi gambar dibesarkan sedikit biar presisi */
-.floating-btn.livechat img{
-  transform: scale(1.14);   /* naikkan/kurangi sampai pas (1.10–1.18) */
-  transform-origin: center;
+/* Samakan ukuran cincin LiveChat dengan WA & Telegram */
+.floating-btn.livechat img {
+  width: 60px;   /* sesuaikan dengan ukuran WA & Telegram */
+  height: 60px;
+  padding: 2px;  /* cincin tipis */
+  background: linear-gradient(145deg, #ffd700, #b8860b);
+  border-radius: 50%;
+  box-shadow:
+    0 0 6px rgba(255, 215, 0, 0.6),
+    0 0 12px rgba(255, 215, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.floating-btn.livechat img:hover {
+  transform: scale(1.06);
+  box-shadow:
+    0 0 8px rgba(255, 215, 0, 0.8),
+    0 0 16px rgba(255, 215, 0, 0.6);
 }
     
   </style>
