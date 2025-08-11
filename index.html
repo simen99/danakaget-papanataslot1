@@ -202,14 +202,28 @@
   display: inline-block;
   transition: transform 0.25s ease;
 }
+    
+/* Bingkai lingkaran emas mewah */
 .floating-btn img {
-  width: 60px;         /* ukuran tombol */
-  height: auto;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  padding: 4px; /* ruang untuk bingkai emas */
+  background: linear-gradient(145deg, #ffd700, #b8860b); /* emas */
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.8), /* glow emas */
+    0 0 20px rgba(255, 215, 0, 0.6),
+    0 0 30px rgba(255, 215, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
-.floating-btn:hover {
+
+/* Efek hover: membesar & glow lebih kuat */
+.floating-btn img:hover {
   transform: scale(1.08);
+  box-shadow:
+    0 0 15px rgba(255, 215, 0, 1),
+    0 0 30px rgba(255, 215, 0, 0.9),
+    0 0 45px rgba(255, 215, 0, 0.7);
 }
     
 /* Efek denyut halus untuk tombol popup hadiah */
