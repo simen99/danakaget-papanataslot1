@@ -929,9 +929,6 @@ window.claim = async (idx) => {
 function showPromo(){ document.getElementById('promoPopup').style.display='flex'; }
 function hidePromo(){ document.getElementById('promoPopup').style.display='none'; }
 
-// Muncul saat pertama kali buka / refresh
-document.addEventListener('DOMContentLoaded', showPromo);
-
 // Tutup dengan ESC
 document.addEventListener('keydown', e=>{
   const el = document.getElementById('promoPopup');
