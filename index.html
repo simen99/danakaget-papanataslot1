@@ -651,8 +651,7 @@ let locked = false;
 
 function setEnabled(enabled){
   document.querySelectorAll('.btn').forEach(b=>{
-    b.disabled = !enabled;
-    b.textContent = 'PILIH BOX';
+    b.disabled = !enabled;         // JANGAN ubah textContent di sini
   });
 }
 
@@ -672,87 +671,81 @@ function displayKey(v){
   return String(v);
 }
 
+const toNum = s => parseInt(String(s).replace(/[^0-9]/g,''), 10) || 0;
+
 async function claim(idx){
   if (locked) return;
+
+  // tombol yang diklik
+  const btn = document.querySelector(`.grid .card:nth-child(${idx}) .front .btn`);
+  const restore = () => { if (btn) btn.textContent = 'PILIH BOX'; };
+
+  // auto tutup promo kalau masih terbuka
+  try { hidePromo(); } catch(e) {}
 
   const userId = document.getElementById('userId').value.trim();
   const kupon  = document.getElementById('kupon').value.trim();
   if(!userId || !kupon){
     alert('⚠️ Masukkan USER ID dan KUPON terlebih dahulu!');
-    return;
+    return; // belum sempat ubah teks tombol, jadi aman
   }
 
+  if (btn) btn.textContent = 'Mengecek...';
   setEnabled(false);
 
   try {
     const url = `${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)}`;
     const r = await fetch(url, { method: "GET", redirect: "follow", cache: "no-store" });
-
     const txt = await r.text();
-    console.log('RAW RESPONSE:', txt.slice(0, 300));
+    console.log('RAW RESPONSE:', txt.slice(0,300));
 
     if (!r.ok) {
       alert(`Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.`);
-      setEnabled(true);
-      return;
+      return; // biar finally yang restore
     }
 
     let res;
-    try {
-      res = JSON.parse(txt);
-    } catch (e) {
+    try { res = JSON.parse(txt); }
+    catch {
       alert("Server tidak mengirim JSON (mungkin Web App belum di-set 'Anyone').\n"
-            + "Potongan balasan:\n" + txt.slice(0, 200) + "...");
-      setEnabled(true);
+            + "Potongan balasan:\n" + txt.slice(0,200) + "...");
       return;
     }
 
     if (res.status !== "success") {
       alert(res.message || "Terjadi kesalahan.");
-      setEnabled(true);
       return;
     }
 
-    // Sembunyikan tombol di kartu lain
+    // ====== lanjut flow sukses (sama seperti punyamu) ======
     document.querySelectorAll('.card').forEach((c, i) => {
       if (i !== (idx - 1)) {
-        const btn = c.querySelector('.front .btn');
-        if (btn) {
-          btn.classList.add('btn-hide');
-          btn.style.display = 'none';
-        }
+        const b = c.querySelector('.front .btn');
+        if (b) { b.classList.add('btn-hide'); b.style.display = 'none'; }
       }
     });
 
     const cards = document.querySelectorAll('.card');
-
-    // animasi flip semua kartu
     cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
 
-    // siapkan nilai display
     const pool = [4000, 6000, 10000, 50000, 100000, 250000];
-    const hadiahAsli = Number(res.hadiah);
+    const hadiahAsli = toNum(res.hadiah);            // <- aman format
     const hadiahKey  = displayKey(hadiahAsli);
     const others     = shuffle(pool.filter(v => displayKey(v) !== hadiahKey));
 
-    const displayAmounts = new Array(6);
+    const displayAmounts = Array(6);
     displayAmounts[idx - 1] = hadiahAsli;
     let k = 0;
-    for (let i = 0; i < 6; i++) {
-      if (i === (idx - 1)) continue;
-      displayAmounts[i] = others[k++];
-    }
+    for (let i=0;i<6;i++){ if(i!==idx-1) displayAmounts[i]=others[k++]; }
 
     setTimeout(()=>{
       cards.forEach((c,i)=>{
         const back = c.querySelector('.back');
         const v = displayAmounts[i];
-
         const isZonk = (v === 100000);
         let shownV = v;
-        if (v === 250000) shownV = 25000;   // 250k -> 25k
-        else if (v === 50000) shownV = 2000; // 50k -> 2k
-
+        if (v === 250000) shownV = 25000;
+        else if (v === 50000) shownV = 2000;
         const labelRp = `Rp ${shownV.toLocaleString('id-ID')}`;
 
         if (isZonk) {
@@ -771,7 +764,6 @@ async function claim(idx){
       });
     }, 260);
 
-    // Popup hadiah + confetti
     setTimeout(()=>{
       document.getElementById('popup-content').innerHTML = `
         <button class="popup-x" aria-label="Tutup"
@@ -779,7 +771,7 @@ async function claim(idx){
         <div class="pas-popup">
           <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
           <div class="pas-subtitle">Anda mendapatkan</div>
-          <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+          <div class="pas-amount">IDR ${hadiahAsli.toLocaleString('id-ID')}</div>
           <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
           <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
           <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
@@ -791,25 +783,25 @@ async function claim(idx){
             onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
             PILIH BOX LAGI
           </button>
-        </div>
-      `;
+        </div>`;
       document.getElementById('popup').style.display = 'flex';
 
-      requestAnimationFrame(() => {
+      requestAnimationFrame(()=>{
         const myCanvas = document.getElementById('confetti-canvas');
         const myConfetti = confetti.create(myCanvas, { resize: true, useWorker: true });
         myConfetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
       });
 
       locked = true;
-      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
     }, cards.length*120 + 360 + 3000);
 
   } catch (err) {
     console.error(err);
     alert("Gagal menghubungi server. Coba lagi.");
+  } finally {
+    // SELALU dipanggil: sukses/gagal/return di try
+    restore();
     setEnabled(true);
-    document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
   }
 }
 
@@ -884,30 +876,6 @@ window.claim = async function(idx){
   if (cool) return;
   coolDown();
   await _claimOrig(idx);
-}
-</script>
-
-  <script>
-let lastClickedBtn = null;
-// tandai tombol yang ditekan
-document.querySelectorAll('.grid .front .btn').forEach(btn=>{
-  btn.addEventListener('click', function(){
-    lastClickedBtn = this;
-    this.dataset.prev = this.textContent;
-    this.textContent = 'Mengecek...';
-  });
-});
-
-// wrap claim versi cooldown (yang sudah ada) supaya tombol balik normal
-const _claimWithCool = window.claim;
-window.claim = async function(idx){
-  try { await _claimWithCool(idx); }
-  finally {
-    if (lastClickedBtn) {
-      lastClickedBtn.textContent = lastClickedBtn.dataset.prev || 'PILIH BOX';
-      lastClickedBtn = null;
-    }
-  }
 }
 </script>
 
