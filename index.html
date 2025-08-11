@@ -715,12 +715,12 @@
   box-shadow:0 4px 12px rgba(0,0,0,.4);
 }
 
-/* === LIVECHAT: samakan ukuran & ring tipis === */
-#livechatBtn{
+/* === LIVECHAT: pakai class .livechat, ring tipis === */
+.floating-btn.livechat{
   position: fixed;
   left: 20px;
-  bottom: 260px;              /* posisinya tetap di atas Telegram */
-  width: 60px;                /* ukuran luar = sama dg WA/Telegram */
+  bottom: 250px;      /* tetap di atas Telegram */
+  width: 60px;
   height: 60px;
   display: grid;
   place-items: center;
@@ -728,32 +728,31 @@
   z-index: 9999;
 }
 
-/* cincin emas tipis 2px */
-#livechatBtn::after{
-  content:"";
-  position:absolute; inset:0;
-  border-radius:50%;
-  padding:-1px; /* tebal ring */
+/* Matikan ring bawaan dari .floating-btn img */
+.floating-btn.livechat img{
+  width: 56px;        /* 60 - (ring 1.5px x2) */
+  height: 56px;
+  border-radius: 50%;
+  padding: 0 !important;
+  background: none !important;
+  box-shadow: none !important;
+  object-fit: cover;
+}
+
+/* Ring emas super tipis seperti cincin */
+.floating-btn.livechat::after{
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  padding: 1.5px;                       /* << tebal ring (atur 1–2px) */
   background: linear-gradient(145deg,#ffd700,#b8860b);
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
-  box-shadow: 0 0 8px rgba(255,215,0,.45);
-  pointer-events:none;
-}
-
-/* gambar di dalam: 56px -> pas meninggalkan ruang untuk ring 2px */
-#livechatBtn img{
-  width:56px;
-  height:56px;
-  border-radius:50%;
-  display:block;
-  object-fit: contain;
-  background: #111;           /* opsional: dasar gelap agar rapi */
-  padding:0;                  /* pastikan tak menambah ring */
-  box-shadow:none;            /* reset bayangan sebelumnya */
+  box-shadow: 0 0 6px rgba(255,215,0,.35);
+  pointer-events: none;
 }
     
   </style>
