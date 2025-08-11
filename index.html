@@ -719,6 +719,9 @@ if (clickedBtn) clickedBtn.textContent = 'Mengecek...';
       return;
     }
 
+    locked = true;
+setEnabled(false);
+
     document.querySelectorAll('.card').forEach((c, i) => {
   if (i !== (idx - 1)) {
     const btn = c.querySelector('.front .btn');
@@ -823,7 +826,6 @@ requestAnimationFrame(() => {
   myConfetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
 });
       
-  locked = true;
 }, cards.length*120 + 360 + 3000); // +3 detik
 
   } catch (err) {
