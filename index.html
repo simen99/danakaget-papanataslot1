@@ -646,25 +646,17 @@
 </div>
 
   <script>
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbzBrCqW_moLD7izqP_p3kCksdT_SDZ6Zq9VZoUDYEs4RD76tSGKmjLPwggR1rwjuSmT3g/exec";
-  let locked = false;
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzBrCqW_moLD7izqP_p3kCksdT_SDZ6Zq9VZoUDYEs4RD76tSGKmjLPwggR1rwjuSmT3g/exec";
+let locked = false;
 
-  function setEnabled(enabled){
-    document.querySelectorAll('.btn').forEach(b=>{
-      b.disabled = !enabled;
-      if(!enabled) b.textContent = "PILIH BOX";
-      else b.textContent = "PILIH BOX";
-    });
-  }
-    
-function mapDisplay(v){
-  if (v === 100000) return { type:'zonk' };        // ZONK !
-  if (v === 250000) return { type:'num', value:25000 };
-  if (v === 50000)  return { type:'num', value:2000 };
-  return { type:'num', value:v };
+function setEnabled(enabled){
+  document.querySelectorAll('.btn').forEach(b=>{
+    b.disabled = !enabled;
+    b.textContent = 'PILIH BOX';
+  });
 }
-    
-  // === Tambahkan helper shuffle di sini ===
+
+// tetap boleh ada kalau mau dipakai di tempat lain
 function shuffle(arr){
   for(let i = arr.length - 1; i > 0; i--){
     const j = Math.floor(Math.random() * (i + 1));
@@ -673,7 +665,14 @@ function shuffle(arr){
   return arr;
 }
 
-  async function claim(idx){
+function displayKey(v){
+  if (v === 100000) return 'ZONK';
+  if (v === 250000) return '25000';
+  if (v === 50000)  return '2000';
+  return String(v);
+}
+
+async function claim(idx){
   if (locked) return;
 
   const userId = document.getElementById('userId').value.trim();
@@ -684,20 +683,17 @@ function shuffle(arr){
   }
 
   setEnabled(false);
-  // feedback kecil di tombol agar terasa responsif
 
   try {
-    const url = ${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)};
+    const url = `${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)}`;
     const r = await fetch(url, { method: "GET", redirect: "follow", cache: "no-store" });
 
-    // Ambil teks mentah dulu supaya kalau bukan JSON kita bisa lihat potongannya
     const txt = await r.text();
     console.log('RAW RESPONSE:', txt.slice(0, 300));
 
     if (!r.ok) {
-      alert(Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.);
+      alert(`Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.`);
       setEnabled(true);
-      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
       return;
     }
 
@@ -705,128 +701,109 @@ function shuffle(arr){
     try {
       res = JSON.parse(txt);
     } catch (e) {
-      // Ini sering terjadi kalau Web App belum "Anyone" → balas login HTML Google
-      alert("Server tidak mengirim JSON (mungkin Web App belum di-set 'Anyone').\n" +
-            "Potongan balasan:\n" + txt.slice(0, 200) + "...");
+      alert("Server tidak mengirim JSON (mungkin Web App belum di-set 'Anyone').\n"
+            + "Potongan balasan:\n" + txt.slice(0, 200) + "...");
       setEnabled(true);
-      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
       return;
     }
 
     if (res.status !== "success") {
       alert(res.message || "Terjadi kesalahan.");
       setEnabled(true);
-      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
       return;
     }
 
+    // Sembunyikan tombol di kartu lain
     document.querySelectorAll('.card').forEach((c, i) => {
-  if (i !== (idx - 1)) {
-    const btn = c.querySelector('.front .btn');
-    if (btn) {
-      btn.classList.add('btn-hide');  // CSS: display:none !important
-      btn.style.display = 'none';     // hard fallback kalau ada override
+      if (i !== (idx - 1)) {
+        const btn = c.querySelector('.front .btn');
+        if (btn) {
+          btn.classList.add('btn-hide');
+          btn.style.display = 'none';
+        }
+      }
+    });
+
+    const cards = document.querySelectorAll('.card');
+
+    // animasi flip semua kartu
+    cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
+
+    // siapkan nilai display
+    const pool = [4000, 6000, 10000, 50000, 100000, 250000];
+    const hadiahAsli = Number(res.hadiah);
+    const hadiahKey  = displayKey(hadiahAsli);
+    const others     = shuffle(pool.filter(v => displayKey(v) !== hadiahKey));
+
+    const displayAmounts = new Array(6);
+    displayAmounts[idx - 1] = hadiahAsli;
+    let k = 0;
+    for (let i = 0; i < 6; i++) {
+      if (i === (idx - 1)) continue;
+      displayAmounts[i] = others[k++];
     }
-  }
-});
-
-    // === flip kartu & isi hadiah ===
-const cards = document.querySelectorAll('.card');
-
-// mulai animasi flip semua kartu
-cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
-
-// kunci tampilan, dipakai agar tidak ada duplikat visual
-function displayKey(v){
-  if (v === 100000) return 'ZONK';
-  if (v === 250000) return '25000';
-  if (v === 50000)  return '2000';
-  return String(v);
-}
-    
-// pool nominal palsu
-const pool = [4000, 6000, 10000, 50000, 100000, 250000];
-
-// pastikan tidak ada yang SAMA SECARA TAMPILAN dengan hadiah asli
-const hadiahAsli = Number(res.hadiah);
-const hadiahKey  = displayKey(hadiahAsli);
-const others     = shuffle(pool.filter(v => displayKey(v) !== hadiahKey));
-
-// siapkan 6 nilai unik untuk 6 kotak
-const displayAmounts = new Array(6);
-displayAmounts[idx - 1] = hadiahAsli;      // kotak yang dipilih = hadiah asli
-
-let k = 0;
-for (let i = 0; i < 6; i++) {
-  if (i === (idx - 1)) continue;
-  displayAmounts[i] = others[k++];          // sisanya pakai pool yang sudah dibersihkan
-}
-
-setTimeout(()=>{
-  cards.forEach((c,i)=>{
-    const back = c.querySelector('.back');
-    const v = displayAmounts[i];
-
-    // mapping display
-    const isZonk = (v === 100000);
-    let shownV = v;
-    if (v === 250000) shownV = 25000;   // 250k -> 25k
-    else if (v === 50000) shownV = 2000; // 50k  -> 2k
-
-    const labelRp = Rp ${shownV.toLocaleString('id-ID')};
-
-    if (isZonk) {
-      // ZONK: merah + teks putih
-      c.classList.add('zonk-box');
-      back.innerHTML = <div class="zonk-label">ZONK !</div>;
-    } else if (i === (idx - 1)) {
-      // kartu terpilih (hijau)
-      c.classList.add('selected-box');
-      back.innerHTML = 
-        <div class="saldo-wrap">
-          <div class="saldo-title">SALDO AKUN</div>
-          <div class="saldo-amount">${labelRp}</div>
-        </div>;
-    } else {
-      // kartu lain biasa
-      back.innerHTML = <div class="fake-amount">${labelRp}</div>;
-    }
-  });
-}, 260);
 
     setTimeout(()=>{
-  document.getElementById('popup-content').innerHTML = 
-  <button class="popup-x" aria-label="Tutup"
-    onclick="document.getElementById('popup').style.display='none'">✖</button>
-  <div class="pas-popup">
-    <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
-    <div class="pas-subtitle">Anda mendapatkan</div>
-    <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
-    <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
-    <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
-    <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
-    <div class="pas-btn-row">
-      <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
-      <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
-    </div>
-    <button type="button" class="pas-btn pas-reset"
-      onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
-      PILIH BOX LAGI
-    </button>
-  </div>
-;
-  document.getElementById('popup').style.display = 'flex';
+      cards.forEach((c,i)=>{
+        const back = c.querySelector('.back');
+        const v = displayAmounts[i];
 
-   // Jalankan confetti di canvas khusus (di depan popup)
-requestAnimationFrame(() => {
-  const myCanvas = document.getElementById('confetti-canvas');
-  const myConfetti = confetti.create(myCanvas, { resize: true, useWorker: true });
-  myConfetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
-});
-      
-  locked = true;
-  document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
-}, cards.length*120 + 360 + 3000); // +3 detik
+        const isZonk = (v === 100000);
+        let shownV = v;
+        if (v === 250000) shownV = 25000;   // 250k -> 25k
+        else if (v === 50000) shownV = 2000; // 50k -> 2k
+
+        const labelRp = `Rp ${shownV.toLocaleString('id-ID')}`;
+
+        if (isZonk) {
+          c.classList.add('zonk-box');
+          back.innerHTML = `<div class="zonk-label">ZONK !</div>`;
+        } else if (i === (idx - 1)) {
+          c.classList.add('selected-box');
+          back.innerHTML = `
+            <div class="saldo-wrap">
+              <div class="saldo-title">SALDO AKUN</div>
+              <div class="saldo-amount">${labelRp}</div>
+            </div>`;
+        } else {
+          back.innerHTML = `<div class="fake-amount">${labelRp}</div>`;
+        }
+      });
+    }, 260);
+
+    // Popup hadiah + confetti
+    setTimeout(()=>{
+      document.getElementById('popup-content').innerHTML = `
+        <button class="popup-x" aria-label="Tutup"
+          onclick="document.getElementById('popup').style.display='none'">✖</button>
+        <div class="pas-popup">
+          <img class="pas-brand" src="https://i.ibb.co/VWz6Nfz8/papanatasslot-logo.png" alt="Papan Atas Slot">
+          <div class="pas-subtitle">Anda mendapatkan</div>
+          <div class="pas-amount">IDR ${Number(res.hadiah).toLocaleString('id-ID')}</div>
+          <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
+          <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
+          <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
+          <div class="pas-btn-row">
+            <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
+            <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
+          </div>
+          <button type="button" class="pas-btn pas-reset"
+            onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
+            PILIH BOX LAGI
+          </button>
+        </div>
+      `;
+      document.getElementById('popup').style.display = 'flex';
+
+      requestAnimationFrame(() => {
+        const myCanvas = document.getElementById('confetti-canvas');
+        const myConfetti = confetti.create(myCanvas, { resize: true, useWorker: true });
+        myConfetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
+      });
+
+      locked = true;
+      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
+    }, cards.length*120 + 360 + 3000);
 
   } catch (err) {
     console.error(err);
@@ -836,42 +813,34 @@ requestAnimationFrame(() => {
   }
 }
 
- function resetBoxes(){
+// ====== PERBAIKI resetBoxes: panggil showPromo() SEKALI saja di akhir ======
+function resetBoxes(){
   const cards = document.querySelectorAll('.card');
 
   cards.forEach(card => {
     card.classList.remove('flipped', 'selected-box', 'zonk-box');
-    card.style.boxShadow = '';                         // bersihkan glow inline kalau ada
+    card.style.boxShadow = '';
     const back = card.querySelector('.back');
     if (back){
       back.innerHTML = '';
-      back.style.cssText = '';                         // bersihkan inline style di back
-      showPromo();   // tampilkan popup promo lagi setelah reset
+      back.style.cssText = '';
     }
   });
 
-  // balikin tombol
   document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
   document.querySelectorAll('.front .btn').forEach(b => b.style.removeProperty('display'));
 
-  // tutup popup & reset state
   document.getElementById('popup').style.display = 'none';
   locked = false;
   setEnabled(true);
   document.getElementById('userId').value = '';
   document.getElementById('kupon').value  = '';
 
-    // tampilkan promo SEKALI (bukan 6x)
+  // tampilkan promo SEKALI saja
   showPromo();
 }
-
-// aktifkan getar random untuk semua kartu saat halaman buka
-document.querySelectorAll('.card').forEach((c) => {
-  c.classList.add('shake');
-  c.style.setProperty('--shake-delay', (Math.random() * 2.5).toFixed(2) + 's');
-});
-    
 </script>
+
 
   <!-- Tombol Mengambang Telegram & WhatsApp -->
 <a href="https://klikblg.com/tele-pas" target="_blank" class="floating-btn" style="bottom: 180px;">
