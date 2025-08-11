@@ -694,6 +694,20 @@
 .alert-overlay[data-type="warning"] { --accent:#f59e0b; } /* amber-500 */
 .alert-overlay[data-type="error"]   { --accent:#ef4444; } /* red-500 */
 .alert-overlay[data-type="info"]    { --accent:#3b82f6; } /* blue-500 */
+
+/* semua tombol: pastikan benar-benar 60x60 dan bulat */
+.floating-btn img{
+  width:60px;
+  height:60px;         /* sebelumnya auto; bikin pas bulat */
+  border-radius:50%;
+  box-shadow:0 4px 12px rgba(0,0,0,.4);
+}
+
+/* khusus LiveChat: isi gambar dibesarkan sedikit biar presisi */
+.floating-btn.livechat img{
+  transform: scale(1.14);   /* naikkan/kurangi sampai pas (1.10–1.18) */
+  transform-origin: center;
+}
     
   </style>
 
@@ -956,9 +970,9 @@ function resetBoxes(){
   <img src="https://i.ibb.co/LXp1Yy3S/whats-app.gif" alt="WhatsApp" />
 </a>
 
-<a href="https://tawk.to/chat/680c7b424b378d190bfa1983/1ipoc2vkj" 
-   target="_blank" 
-   class="floating-btn" 
+<a href="https://tawk.to/chat/680c7b424b378d190bfa1983/1ipoc2vkj"
+   target="_blank"
+   class="floating-btn livechat"
    style="bottom: 250px;">
   <img src="https://i.ibb.co/LhR8cFJp/piala388.webp" alt="LiveChat">
 </a>
