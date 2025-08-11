@@ -582,27 +582,136 @@
   backface-visibility: hidden;
 }
 
+/* === Overlay kaca + fade === */
 .alert-overlay{
-  position:fixed; inset:0; display:none;
+  position:fixed; inset:0;
+  display:none;                /* akan di-show via class .show */
   align-items:center; justify-content:center;
-  background:rgba(0,0,0,.82); z-index:10090;
+  background:rgba(0,0,0,.55);
+  backdrop-filter: blur(8px) saturate(1.1);
+  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  z-index:10090;
+  opacity:0;
+  transition:opacity .25s ease;
 }
+.alert-overlay.show{ opacity:1; }
+
+/* === Card glassy + ring accent realistis === */
 .alert-box{
-  width:min(92%,360px); padding:20px; border-radius:16px;
+  position:relative;
+  width:min(92vw, 380px);
+  padding:26px 20px 18px;
+  border-radius:20px;
   background:
     radial-gradient(140% 90% at 30% 0%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 60%),
-    linear-gradient(180deg, #f5f6f8 0%, #e8eaef 100%);
-  border:1px solid rgba(0,0,0,.12);
-  color:#111; text-align:center; position:relative;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 12px 28px rgba(0,0,0,.28);
+    linear-gradient(180deg,#f7f8fb 0%,#eef1f7 60%,#e6e9f0 100%);
+  border:1px solid rgba(255,255,255,.6);
+  box-shadow:
+    0 18px 45px rgba(0,0,0,.35),
+    0 2px 0 rgba(255,255,255,.85) inset,
+    0 -6px 18px rgba(0,0,0,.06) inset;
+  transform: translateY(12px) scale(.98);
+  opacity:0;
+  transition: transform .28s cubic-bezier(.22,.9,.22,1), opacity .28s ease;
 }
+.alert-overlay.show .alert-box{
+  transform: translateY(0) scale(1);
+  opacity:1;
+}
+
+/* Accent ring (conic) — warna diatur via --accent */
+.alert-box::before{
+  content:"";
+  position:absolute; inset:-2px;
+  border-radius:22px;
+  padding:2px;
+  background:
+    conic-gradient(from 140deg, var(--accent) 0 30%, rgba(255,255,255,.0) 30% 70%, var(--accent) 70% 100%);
+  -webkit-mask: 
+    linear-gradient(#000 0 0) content-box, 
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  pointer-events:none;
+  filter: blur(.4px);
+  opacity:.9;
+}
+
+/* Top highlight tipis biar glossy */
+.alert-box::after{
+  content:"";
+  position:absolute; left:12px; right:12px; top:10px; height:10px;
+  background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,0));
+  border-radius:8px;
+  opacity:.8; pointer-events:none;
+}
+
+/* Close button */
 .alert-close{
-  position:absolute; top:8px; right:10px;
-  background:transparent; border:none; color:#222; font-size:20px; cursor:pointer;
+  position:absolute; top:10px; right:12px;
+  background:rgba(0,0,0,.06);
+  border:1px solid rgba(0,0,0,.08);
+  width:34px; height:34px; border-radius:10px;
+  font-size:18px; line-height:1; color:#222; cursor:pointer;
+  display:grid; place-items:center;
+  box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
+  transition:transform .12s ease, background .2s ease;
 }
-.alert-icon{ font-size:34px; margin-bottom:6px; }
-.alert-title{ font-weight:900; letter-spacing:.4px; margin-bottom:6px; }
-.alert-msg{ font-weight:700; }
+.alert-close:hover{ transform:scale(1.06); background:rgba(0,0,0,.08); }
+
+/* Icon “keluar” dari kartu */
+.alert-icon{
+  width:64px; height:64px; margin:-54px auto 10px;
+  display:grid; place-items:center;
+  border-radius:50%;
+  color:#fff; font-size:30px; font-weight:900;
+  border:3px solid #fff;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000 30%));
+  box-shadow:
+    0 10px 24px color-mix(in srgb, var(--accent) 35%, transparent 65%),
+    0 2px 0 rgba(255,255,255,.85) inset,
+    0 -10px 18px rgba(0,0,0,.15) inset;
+}
+
+/* Teks */
+.alert-title{
+  font-weight:900; letter-spacing:.4px;
+  font-size:18px; color:#121212; margin:2px 0 6px;
+}
+.alert-msg{
+  font-weight:700; color:#333; line-height:1.45;
+  padding:0 6px; margin-bottom:10px;
+}
+
+/* Tombol aksi */
+.alert-actions{ display:flex; justify-content:center; gap:8px; margin-top:8px; }
+.btn-alert{
+  border:none; cursor:pointer; border-radius:12px; padding:10px 16px;
+  font-weight:900; color:#fff;
+  background:
+    radial-gradient(circle at 30% 0%, rgba(255,255,255,.25), transparent 60%),
+    linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000 30%));
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 35%, transparent 65%);
+  transition: transform .12s ease, filter .2s ease;
+}
+.btn-alert:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+
+/* Progress bar untuk auto-close */
+.alert-progress{ position:relative; height:4px; border-radius:99px; background:rgba(0,0,0,.08); overflow:hidden; margin-top:10px;}
+.alert-progress .fill{
+  position:absolute; inset:0; width:100%;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #fff 40%));
+  animation: alertProgress linear forwards;
+  transform-origin:left center;
+}
+@keyframes alertProgress { from{transform:scaleX(1)} to{transform:scaleX(0)} }
+
+/* Tema per jenis (set di data-type pada overlay) */
+.alert-overlay[data-type="success"] { --accent:#22c55e; } /* green-500 */
+.alert-overlay[data-type="warning"] { --accent:#f59e0b; } /* amber-500 */
+.alert-overlay[data-type="error"]   { --accent:#ef4444; } /* red-500 */
+.alert-overlay[data-type="info"]    { --accent:#3b82f6; } /* blue-500 */
     
   </style>
 
@@ -929,34 +1038,56 @@ document.addEventListener('keydown', e=>{
 
 <script>
 function showAlert(message, { type='warning', title='Pemberitahuan', autoclose=0 } = {}){
+  const el = document.getElementById('alertModal');
   const iconMap = { success:'✅', warning:'⚠️', error:'⛔', info:'ℹ️' };
+
+  el.dataset.type = type; // tema warna via CSS
   document.getElementById('alertIcon').textContent = iconMap[type] || '⚠️';
   document.getElementById('alertTitle').textContent = title;
   document.getElementById('alertMsg').textContent = message;
-  const el = document.getElementById('alertModal');
+
+  // progress bar (opsional)
+  const bar = document.getElementById('alertProgress');
+  if (autoclose > 0 && bar){
+    bar.style.display = 'block';
+    bar.querySelector('.fill').style.animationDuration = autoclose + 'ms';
+  } else if (bar){
+    bar.style.display = 'none';
+  }
+
   el.style.display = 'flex';
-  // ESC close
+  void el.offsetWidth;            // reflow
+  el.classList.add('show');       // kelas animasi
+
   const esc = (e)=>{ if(e.key==='Escape') hideAlert(); };
   el._esc = esc; document.addEventListener('keydown', esc);
+
   if (autoclose > 0){
     clearTimeout(el._t); el._t = setTimeout(hideAlert, autoclose);
   }
 }
+
 function hideAlert(){
   const el = document.getElementById('alertModal');
-  el.style.display = 'none';
+  el.classList.remove('show');
+  setTimeout(()=>{ el.style.display='none'; }, 250); // tunggu transisi
   if (el._esc){ document.removeEventListener('keydown', el._esc); el._esc=null; }
 }
 </script>
 
-  <!-- Alert Popup (custom) -->
+<!-- Modalnya di paling akhir body -->
 <div id="alertModal" class="alert-overlay" style="display:none" aria-modal="true" role="dialog">
   <div class="alert-box" role="document">
     <button class="alert-close" aria-label="Tutup" onclick="hideAlert()">✖</button>
     <div class="alert-icon" id="alertIcon">⚠️</div>
     <div class="alert-title" id="alertTitle">Pemberitahuan</div>
     <div class="alert-msg" id="alertMsg">Pesan di sini…</div>
-    <button class="pas-btn pas-reset" onclick="hideAlert()">Oke</button>
+    <div class="alert-actions">
+      <button class="btn-alert" onclick="hideAlert()">Oke</button>
+    </div>
+    <div class="alert-progress" id="alertProgress" style="display:none;">
+      <span class="fill"></span>
+    </div>
   </div>
 </div>
   
