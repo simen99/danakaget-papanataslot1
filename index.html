@@ -650,10 +650,12 @@
   let locked = false;
 
   function setEnabled(enabled){
-  document.querySelectorAll('.btn').forEach(b=>{
-    b.disabled = !enabled;
-  });
-}
+    document.querySelectorAll('.btn').forEach(b=>{
+      b.disabled = !enabled;
+      if(!enabled) b.textContent = "PILIH BOX";
+      else b.textContent = "PILIH BOX";
+    });
+  }
     
 function mapDisplay(v){
   if (v === 100000) return { type:'zonk' };        // ZONK !
@@ -684,13 +686,8 @@ function shuffle(arr){
   setEnabled(false);
   // feedback kecil di tombol agar terasa responsif
 
-  // tandai tombol yang diklik
-const clickedBtn = document.querySelectorAll('.grid .front .btn')[idx-1];
-const prevLabel  = clickedBtn ? clickedBtn.textContent : null;
-if (clickedBtn) clickedBtn.textContent = 'Mengecek...';
-
   try {
-    const url = `${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)}`;
+    const url = ${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)};
     const r = await fetch(url, { method: "GET", redirect: "follow", cache: "no-store" });
 
     // Ambil teks mentah dulu supaya kalau bukan JSON kita bisa lihat potongannya
@@ -698,8 +695,9 @@ if (clickedBtn) clickedBtn.textContent = 'Mengecek...';
     console.log('RAW RESPONSE:', txt.slice(0, 300));
 
     if (!r.ok) {
-      alert(`Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.`);
+      alert(Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.);
       setEnabled(true);
+      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
       return;
     }
 
@@ -711,16 +709,16 @@ if (clickedBtn) clickedBtn.textContent = 'Mengecek...';
       alert("Server tidak mengirim JSON (mungkin Web App belum di-set 'Anyone').\n" +
             "Potongan balasan:\n" + txt.slice(0, 200) + "...");
       setEnabled(true);
+      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
       return;
     }
 
     if (res.status !== "success") {
       alert(res.message || "Terjadi kesalahan.");
+      setEnabled(true);
+      document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
       return;
     }
-
-    locked = true;
-setEnabled(false);
 
     document.querySelectorAll('.card').forEach((c, i) => {
   if (i !== (idx - 1)) {
@@ -775,29 +773,29 @@ setTimeout(()=>{
     if (v === 250000) shownV = 25000;   // 250k -> 25k
     else if (v === 50000) shownV = 2000; // 50k  -> 2k
 
-    const labelRp = `Rp ${shownV.toLocaleString('id-ID')}`;
+    const labelRp = Rp ${shownV.toLocaleString('id-ID')};
 
     if (isZonk) {
       // ZONK: merah + teks putih
       c.classList.add('zonk-box');
-      back.innerHTML = `<div class="zonk-label">ZONK !</div>`;
+      back.innerHTML = <div class="zonk-label">ZONK !</div>;
     } else if (i === (idx - 1)) {
       // kartu terpilih (hijau)
       c.classList.add('selected-box');
-      back.innerHTML = `
+      back.innerHTML = 
         <div class="saldo-wrap">
           <div class="saldo-title">SALDO AKUN</div>
           <div class="saldo-amount">${labelRp}</div>
-        </div>`;
+        </div>;
     } else {
       // kartu lain biasa
-      back.innerHTML = `<div class="fake-amount">${labelRp}</div>`;
+      back.innerHTML = <div class="fake-amount">${labelRp}</div>;
     }
   });
 }, 260);
 
     setTimeout(()=>{
-  document.getElementById('popup-content').innerHTML = `
+  document.getElementById('popup-content').innerHTML = 
   <button class="popup-x" aria-label="Tutup"
     onclick="document.getElementById('popup').style.display='none'">✖</button>
   <div class="pas-popup">
@@ -816,7 +814,7 @@ setTimeout(()=>{
       PILIH BOX LAGI
     </button>
   </div>
-`;
+;
   document.getElementById('popup').style.display = 'flex';
 
    // Jalankan confetti di canvas khusus (di depan popup)
@@ -826,33 +824,35 @@ requestAnimationFrame(() => {
   myConfetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
 });
       
+  locked = true;
+  document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
 }, cards.length*120 + 360 + 3000); // +3 detik
 
   } catch (err) {
     console.error(err);
     alert("Gagal menghubungi server. Coba lagi.");
-  } finally {
-    if (clickedBtn) clickedBtn.textContent = prevLabel || 'PILIH BOX';
-    setEnabled(!locked); // kalau sudah locked, tetap nonaktif
+    setEnabled(true);
+    document.querySelectorAll('.btn').forEach(b => b.textContent = 'PILIH BOX');
   }
-</script>
+}
 
- <script>
-function resetBoxes(){
+ function resetBoxes(){
   const cards = document.querySelectorAll('.card');
+
   cards.forEach(card => {
-    card.classList.remove('flipped', 'selected-box', 'zonk-box', 'shake');
-    card.style.boxShadow = '';
+    card.classList.remove('flipped', 'selected-box', 'zonk-box');
+    card.style.boxShadow = '';                         // bersihkan glow inline kalau ada
     const back = card.querySelector('.back');
-    if (back){ back.innerHTML = ''; back.style.cssText = ''; }
+    if (back){
+      back.innerHTML = '';
+      back.style.cssText = '';                         // bersihkan inline style di back
+      showPromo();   // tampilkan popup promo lagi setelah reset
+    }
   });
 
   // balikin tombol
   document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
-  document.querySelectorAll('.front .btn').forEach(b => {
-    b.style.removeProperty('display');
-    b.textContent = 'PILIH BOX';
-  });
+  document.querySelectorAll('.front .btn').forEach(b => b.style.removeProperty('display'));
 
   // tutup popup & reset state
   document.getElementById('popup').style.display = 'none';
@@ -861,15 +861,16 @@ function resetBoxes(){
   document.getElementById('userId').value = '';
   document.getElementById('kupon').value  = '';
 
-  // tampilkan promo SEKALI (di luar loop)
+    // tampilkan promo SEKALI (bukan 6x)
   showPromo();
-
-  // aktifkan getar random lagi
-  document.querySelectorAll('.card').forEach((c) => {
-    c.classList.add('shake');
-    c.style.setProperty('--shake-delay', (Math.random() * 2.5).toFixed(2) + 's');
-  });
 }
+
+// aktifkan getar random untuk semua kartu saat halaman buka
+document.querySelectorAll('.card').forEach((c) => {
+  c.classList.add('shake');
+  c.style.setProperty('--shake-delay', (Math.random() * 2.5).toFixed(2) + 's');
+});
+    
 </script>
 
   <!-- Tombol Mengambang Telegram & WhatsApp -->
@@ -905,12 +906,40 @@ document.querySelectorAll('.btn').forEach(b=>{
 
   <script>
 let cool = false;
-const _origClaim = window.claim;
-window.claim = async (idx) => {
+function coolDown(ms=1200){
+  cool = true; setTimeout(()=> cool = false, ms);
+}
+    
+const _claimOrig = claim; // simpan referensi aslinya
+window.claim = async function(idx){
   if (cool) return;
-  cool = true; setTimeout(()=> cool = false, 1200);
-  return _origClaim(idx);
-};
+  coolDown();
+  await _claimOrig(idx);
+}
+</script>
+
+  <script>
+let lastClickedBtn = null;
+// tandai tombol yang ditekan
+document.querySelectorAll('.grid .front .btn').forEach(btn=>{
+  btn.addEventListener('click', function(){
+    lastClickedBtn = this;
+    this.dataset.prev = this.textContent;
+    this.textContent = 'Mengecek...';
+  });
+});
+
+// wrap claim versi cooldown (yang sudah ada) supaya tombol balik normal
+const _claimWithCool = window.claim;
+window.claim = async function(idx){
+  try { await _claimWithCool(idx); }
+  finally {
+    if (lastClickedBtn) {
+      lastClickedBtn.textContent = lastClickedBtn.dataset.prev || 'PILIH BOX';
+      lastClickedBtn = null;
+    }
+  }
+}
 </script>
 
   <canvas id="confetti-canvas"></canvas>
@@ -928,6 +957,9 @@ window.claim = async (idx) => {
   <script>
 function showPromo(){ document.getElementById('promoPopup').style.display='flex'; }
 function hidePromo(){ document.getElementById('promoPopup').style.display='none'; }
+
+// Muncul saat pertama kali buka / refresh
+document.addEventListener('DOMContentLoaded', showPromo);
 
 // Tutup dengan ESC
 document.addEventListener('keydown', e=>{
