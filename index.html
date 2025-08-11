@@ -956,8 +956,11 @@ function resetBoxes(){
   <img src="https://i.ibb.co/LXp1Yy3S/whats-app.gif" alt="WhatsApp" />
 </a>
 
-<a href="https://tawk.to/chat/680c7b424b378d190bfa1983/1ipoc2vkj" target="_blank" id="livechatBtn">
-  <img src="https://i.ibb.co/LhR8cFJp/piala388.webp" alt="LiveChat" />
+<a href="https://tawk.to/chat/680c7b424b378d190bfa1983/1ipoc2vkj" 
+   target="_blank" 
+   class="floating-btn" 
+   style="bottom: 250px;">
+  <img src="https://i.ibb.co/LhR8cFJp/piala388.webp" alt="LiveChat">
 </a>
 
   <script>
@@ -1045,33 +1048,6 @@ function hideAlert(){
   if (el._esc){ document.removeEventListener('keydown', el._esc); el._esc=null; }
 }
 </script>
-
-<style>
-  /* Posisi fixed kiri bawah, di atas Telegram */
-  #livechatBtn {
-    position: fixed;
-    bottom: 260px; /* atur supaya pas di atas gif telegram */
-    left: 20px;
-    z-index: 999;
-    display: inline-block;
-    animation: float 3s ease-in-out infinite;
-  }
-  #livechatBtn img {
-    width: 60px; /* ukuran ikon */
-    height: auto;
-    border-radius: 50%;
-    box-shadow: 0 4px 8px rgba(0,0,0,.3);
-    transition: transform 0.2s ease;
-  }
-  #livechatBtn img:hover {
-    transform: scale(1.08);
-  }
-  /* animasi melayang */
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-</style>
 
 <!-- Modalnya di paling akhir body -->
 <div id="alertModal" class="alert-overlay" style="display:none" aria-modal="true" role="dialog">
