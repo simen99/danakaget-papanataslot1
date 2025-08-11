@@ -577,123 +577,120 @@
   backface-visibility: hidden;
 }
 
-/* === Overlay kaca + fade === */
+/* Overlay: gelap + blur, tanpa vignette putih */
 .alert-overlay{
   position:fixed; inset:0;
-  display:none;                /* akan di-show via class .show */
+  display:none;
   align-items:center; justify-content:center;
-  background:rgba(0,0,0,.55);
-  backdrop-filter: blur(8px) saturate(1.1);
-  -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  background:rgba(0,0,0,.60);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   z-index:10090;
-  opacity:0;
-  transition:opacity .25s ease;
+  opacity:0; transition:opacity .22s ease;
 }
 .alert-overlay.show{ opacity:1; }
 
-/* === Card glassy + ring accent realistis === */
+/* Kartu: kaca gelap, sudut lembut, shadow natural (no inner white) */
 .alert-box{
   position:relative;
-  width:min(92vw, 380px);
-  padding:26px 20px 18px;
-  border-radius:20px;
-  background: linear-gradient(180deg,#f0f2f6 0%,#e5e8ee 100%) !important;
-  border:1px solid rgba(0,0,0,.08) !important;
-  box-shadow: 0 18px 45px rgba(0,0,0,.35) !important;
-  transform: translateY(12px) scale(.98);
-  opacity:0;
-  transition: transform .28s cubic-bezier(.22,.9,.22,1), opacity .28s ease;
+  width:min(92vw,420px);
+  padding:22px 18px 16px;
+  border-radius:16px;
+
+  /* lapisan kaca gelap tipis */
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)),
+    rgba(24,24,28,.78);
+  border:1px solid rgba(255,255,255,.08);
+
+  /* bayangan jatuh natural */
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.45),
+    0 2px 6px rgba(0,0,0,.25);
+
+  transform: translateY(10px) scale(.98);
+  opacity:.96;
+  transition: transform .28s cubic-bezier(.2,.9,.2,1), opacity .28s ease;
 }
 .alert-overlay.show .alert-box{
   transform: translateY(0) scale(1);
   opacity:1;
 }
 
-/* Accent ring (conic) — warna diatur via --accent */
-.alert-box::before{ content:none !important; }
-  position:absolute; inset:-2px;
-  border-radius:22px;
-  padding:2px;
-  background: linear-gradient(180deg,#f7f8fb 0%,#eef1f7 60%,#e6e9f0 100%) !important;
-  -webkit-mask: 
-    linear-gradient(#000 0 0) content-box, 
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor; mask-composite: exclude;
-  pointer-events:none;
-  filter: none !important;
-  opacity: .6 !important;  /* atau content:none untuk mematikan total */
-}
-
-/* Top highlight tipis biar glossy */
+/* Matikan semua aksen/strip putih lama */
+.alert-box::before,
 .alert-box::after{ content:none !important; }
-  position:absolute; left:12px; right:12px; top:10px; height:10px;
-  background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,0));
-  border-radius:8px;
-  opacity:.8; pointer-events:none;
-}
 
-/* Close button */
+/* Close: minimalis */
 .alert-close{
-  position:absolute; top:10px; right:12px;
-  background:rgba(0,0,0,.06);
-  border:1px solid rgba(0,0,0,.08);
+  position:absolute; top:10px; right:10px;
   width:34px; height:34px; border-radius:10px;
-  font-size:18px; line-height:1; color:#222; cursor:pointer;
   display:grid; place-items:center;
-  box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
-  transition:transform .12s ease, background .2s ease;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  color:#e5e7eb; font-size:18px; line-height:1;
+  cursor:pointer; transition:transform .12s ease, background .2s ease;
 }
-.alert-close:hover{ transform:scale(1.06); background:rgba(0,0,0,.08); }
+.alert-close:hover{ transform:scale(1.06); background:rgba(255,255,255,.10); }
 
-/* Icon “keluar” dari kartu */
+/* Icon: badge bulat dengan glow warna (tanpa ring putih) */
 .alert-icon{
   width:64px; height:64px; margin:-54px auto 10px;
   display:grid; place-items:center;
   border-radius:50%;
-  color:#fff; font-size:30px; font-weight:900;
-  border:none !important;
-  background: linear-gradient(180deg,var(--accent),
-             color-mix(in srgb, var(--accent) 70%, #000 30%)) !important;
-  box-shadow: none !important;
-  border: none !important;
-  filter: none !important;
+  color:#fff; font-size:28px; font-weight:900;
+
+  background: radial-gradient(60% 60% at 30% 30%, rgba(255,255,255,.15), rgba(255,255,255,0)),
+              var(--accent);
+  box-shadow:
+    0 10px 24px color-mix(in srgb, var(--accent) 35%, transparent 65%),
+    0 0 0 3px rgba(255,255,255,.06) inset;
+  border:none;
 }
 
-/* Teks */
+/* Teks: kontras di dark glass */
 .alert-title{
-  font-weight:900; letter-spacing:.4px;
-  font-size:18px; color:#121212; margin:2px 0 6px;
+  margin:2px 0 6px;
+  font-size:18px; font-weight:900;
+  color:#f3f4f6; letter-spacing:.2px;
 }
 .alert-msg{
-  font-weight:700; color:#333; line-height:1.45;
-  padding:0 6px; margin-bottom:10px;
+  margin:0 6px 12px;
+  color:#e5e7eb; font-weight:600; line-height:1.45;
 }
 
-/* Tombol aksi */
-.alert-actions{ display:flex; justify-content:center; gap:8px; margin-top:8px; }
+/* Tombol aksi: kapsul dengan gradient accent + glow tipis */
+.alert-actions{ display:flex; justify-content:center; gap:8px; }
 .btn-alert{
-  border:none; cursor:pointer; border-radius:12px; padding:10px 16px;
-  font-weight:900; color:#fff;
+  border:none; cursor:pointer; border-radius:999px;
+  padding:11px 18px; font-weight:900; color:#0b0f14;
+
   background:
-    radial-gradient(circle at 30% 0%, rgba(255,255,255,.25), transparent 60%),
-    linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000 30%));
-  box-shadow: 0 8px 18px color-mix(in srgb, var(--accent) 35%, transparent 65%);
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--accent) 85%, #fff 15%),
+      color-mix(in srgb, var(--accent) 65%, #000 35%)
+    );
+  box-shadow:
+    0 8px 18px color-mix(in srgb, var(--accent) 30%, transparent 70%),
+    0 1px 0 rgba(255,255,255,.25) inset;
   transition: transform .12s ease, filter .2s ease;
 }
-.btn-alert:hover{ transform:translateY(-1px); filter:brightness(1.05); }
+.btn-alert:hover{ transform:translateY(-1px); filter:brightness(1.06); }
 
-/* Progress bar untuk auto-close */
-.alert-progress{ position:relative; height:4px; border-radius:99px; background:rgba(0,0,0,.08); overflow:hidden; margin-top:10px;}
+/* Progress bar: tipis elegan */
+.alert-progress{ height:4px; border-radius:99px; background:rgba(255,255,255,.08); overflow:hidden; }
 .alert-progress .fill{
-  position:absolute; inset:0; width:100%;
-  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 60%, #fff 40%));
+  height:100%; display:block;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 70%, #fff 30%),
+    var(--accent)
+  );
   animation: alertProgress linear forwards;
   transform-origin:left center;
 }
-@keyframes alertProgress { from{transform:scaleX(1)} to{transform:scaleX(0)} }
 
-/* Tema per jenis (set di data-type pada overlay) */
-.alert-overlay[data-type="success"] { --accent:#22c55e; } /* green-500 */
+/* Tema warna dari data-type */
+.alert-overlay[data-type="success"] { --accent:#16a34a; } /* green-600 */
 .alert-overlay[data-type="warning"] { --accent:#f59e0b; } /* amber-500 */
 .alert-overlay[data-type="error"]   { --accent:#ef4444; } /* red-500 */
 .alert-overlay[data-type="info"]    { --accent:#3b82f6; } /* blue-500 */
