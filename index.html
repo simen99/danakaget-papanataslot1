@@ -625,15 +625,14 @@
   position:absolute; inset:-2px;
   border-radius:22px;
   padding:2px;
-  background:
-    conic-gradient(from 140deg, var(--accent) 0 30%, rgba(255,255,255,.0) 30% 70%, var(--accent) 70% 100%);
+  background: linear-gradient(180deg,#f7f8fb 0%,#eef1f7 60%,#e6e9f0 100%) !important;
   -webkit-mask: 
     linear-gradient(#000 0 0) content-box, 
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
   pointer-events:none;
-  filter: blur(.4px);
-  opacity:.9;
+  filter: none !important;
+  opacity: .6 !important;  /* atau content:none untuk mematikan total */
 }
 
 /* Top highlight tipis biar glossy */
@@ -665,10 +664,13 @@
   border-radius:50%;
   color:#fff; font-size:30px; font-weight:900;
   border:none !important;
-  background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), rgba(255,255,255,0) 60%),
-    linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #000 30%));
+  background: linear-gradient(
+     180deg,
+     var(--accent),
+     color-mix(in srgb, var(--accent) 70%, #000 30%)
+  ) !important;
   box-shadow: none !important;
+  border: none !important;
   filter: none !important;
 }
 
