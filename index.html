@@ -715,45 +715,42 @@
   box-shadow:0 4px 12px rgba(0,0,0,.4);
 }
 
-/* === LIVECHAT: pakai class .livechat, ring tipis === */
+/* LIVECHAT — samakan ukuran & glow dengan WA/Tele */
 .floating-btn.livechat{
   position: fixed;
   left: 20px;
-  bottom: 280px;      /* tetap di atas Telegram */
-  width: 66px;
-  height: 66px;
+  bottom: 259px;      /* geser sesuai kebutuhan */
+  width: 60px;
+  height: 60px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   z-index: 9999;
 }
 
-/* Matikan ring bawaan dari .floating-btn img */
+/* pakai ring gradient sama seperti .floating-btn img */
 .floating-btn.livechat img{
-  width: 65px;        /* 60 - (ring 1.5px x2) */
-  height: 65px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  padding: 0 !important;
-  background: none !important;
-  box-shadow: none !important;
-  object-fit: cover;
+  padding: 2px;  /* cincin tipis */
+  background: linear-gradient(145deg, #ffd700, #b8860b);
+  box-shadow:
+    0 0 6px rgba(255,215,0,.6),
+    0 0 12px rgba(255,215,0,.4);
+  transition: transform .2s ease, box-shadow .3s ease;
 }
 
-/* Ring emas super tipis seperti cincin */
-.floating-btn.livechat::after{
-  content: "";
-  position: absolute; inset: 0;
-  border-radius: 50%;
-  padding: 1.5px;                       /* << tebal ring (atur 1–2px) */
-  background: linear-gradient(145deg,#ffd700,#b8860b);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  box-shadow: 0 0 6px rgba(255,215,0,.35);
-  pointer-events: none;
+/* glow saat hover (sama dengan WA/Tele) */
+.floating-btn.livechat img:hover{
+  transform: scale(1.06);
+  box-shadow:
+    0 0 8px rgba(255,215,0,.8),
+    0 0 16px rgba(255,215,0,.6);
 }
+
+/* matikan ring pseudo-element lama kalau masih ada */
+.floating-btn.livechat::after{ display:none; }
     
   </style>
 
@@ -1019,7 +1016,7 @@ function resetBoxes(){
 <a href="https://tawk.to/chat/680c7b424b378d190bfa1983/1ipoc2vkj"
    target="_blank"
    class="floating-btn livechat"
-   style="bottom: 260px;">
+   style="bottom: 259px;">
   <img src="https://i.ibb.co/LhR8cFJp/piala388.webp" alt="LiveChat">
 </a>
 
