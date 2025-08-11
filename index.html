@@ -581,6 +581,28 @@
   -webkit-backface-visibility: hidden;    /* tambahkan */
   backface-visibility: hidden;
 }
+
+.alert-overlay{
+  position:fixed; inset:0; display:none;
+  align-items:center; justify-content:center;
+  background:rgba(0,0,0,.82); z-index:10090;
+}
+.alert-box{
+  width:min(92%,360px); padding:20px; border-radius:16px;
+  background:
+    radial-gradient(140% 90% at 30% 0%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(180deg, #f5f6f8 0%, #e8eaef 100%);
+  border:1px solid rgba(0,0,0,.12);
+  color:#111; text-align:center; position:relative;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 12px 28px rgba(0,0,0,.28);
+}
+.alert-close{
+  position:absolute; top:8px; right:10px;
+  background:transparent; border:none; color:#222; font-size:20px; cursor:pointer;
+}
+.alert-icon{ font-size:34px; margin-bottom:6px; }
+.alert-title{ font-weight:900; letter-spacing:.4px; margin-bottom:6px; }
+.alert-msg{ font-weight:700; }
     
   </style>
 
@@ -685,10 +707,10 @@ async function claim(idx){
 
   const userId = document.getElementById('userId').value.trim();
   const kupon  = document.getElementById('kupon').value.trim();
-  if(!userId || !kupon){
-    alert('⚠️ Masukkan USER ID dan KUPON terlebih dahulu!');
-    return; // belum sempat ubah teks tombol, jadi aman
-  }
+ if(!userId || !kupon){
+  showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
+  return;
+}
 
   if (btn) btn.textContent = 'Mengecek...';
   setEnabled(false);
@@ -700,22 +722,20 @@ async function claim(idx){
     console.log('RAW RESPONSE:', txt.slice(0,300));
 
     if (!r.ok) {
-      alert(`Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.`);
-      return; // biar finally yang restore
-    }
-
+  showAlert(`Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.`, {type:'error', title:'Request gagal'});
+  return;
+}
     let res;
     try { res = JSON.parse(txt); }
-    catch {
-      alert("Server tidak mengirim JSON (mungkin Web App belum di-set 'Anyone').\n"
-            + "Potongan balasan:\n" + txt.slice(0,200) + "...");
-      return;
-    }
+    catch (e) {
+  showAlert("Server tidak mengirim JSON (mungkin Web App belum di-set 'Anyone').\nCek deploy GAS.", {type:'error', title:'Format balasan salah'});
+  return;
+}
 
     if (res.status !== "success") {
-      alert(res.message || "Terjadi kesalahan.");
-      return;
-    }
+  showAlert(res.message || "Terjadi kesalahan.", {type:'error', title:'Gagal'});
+  return;
+}
 
     // ====== lanjut flow sukses (sama seperti punyamu) ======
     document.querySelectorAll('.card').forEach((c, i) => {
@@ -795,14 +815,15 @@ async function claim(idx){
       locked = true;
     }, cards.length*120 + 360 + 3000);
 
-  } catch (err) {
-    console.error(err);
-    alert("Gagal menghubungi server. Coba lagi.");
-  } finally {
-    // SELALU dipanggil: sukses/gagal/return di try
-    restore();
-    setEnabled(true);
-  }
+} catch (err) {
+  console.error(err);
+  showAlert("Gagal menghubungi server. Coba lagi.", {
+    type: "error",
+    title: "Jaringan bermasalah"
+  });
+} finally {
+  restore();
+  setEnabled(true);
 }
 
 // ====== PERBAIKI resetBoxes: panggil showPromo() SEKALI saja di akhir ======
@@ -904,6 +925,39 @@ document.addEventListener('keydown', e=>{
   if (e.key === 'Escape' && el.style.display === 'flex') hidePromo();
 });
 </script>
+
+<script>
+function showAlert(message, { type='warning', title='Pemberitahuan', autoclose=0 } = {}){
+  const iconMap = { success:'✅', warning:'⚠️', error:'⛔', info:'ℹ️' };
+  document.getElementById('alertIcon').textContent = iconMap[type] || '⚠️';
+  document.getElementById('alertTitle').textContent = title;
+  document.getElementById('alertMsg').textContent = message;
+  const el = document.getElementById('alertModal');
+  el.style.display = 'flex';
+  // ESC close
+  const esc = (e)=>{ if(e.key==='Escape') hideAlert(); };
+  el._esc = esc; document.addEventListener('keydown', esc);
+  if (autoclose > 0){
+    clearTimeout(el._t); el._t = setTimeout(hideAlert, autoclose);
+  }
+}
+function hideAlert(){
+  const el = document.getElementById('alertModal');
+  el.style.display = 'none';
+  if (el._esc){ document.removeEventListener('keydown', el._esc); el._esc=null; }
+}
+</script>
+
+  <!-- Alert Popup (custom) -->
+<div id="alertModal" class="alert-overlay" style="display:none" aria-modal="true" role="dialog">
+  <div class="alert-box" role="document">
+    <button class="alert-close" aria-label="Tutup" onclick="hideAlert()">✖</button>
+    <div class="alert-icon" id="alertIcon">⚠️</div>
+    <div class="alert-title" id="alertTitle">Pemberitahuan</div>
+    <div class="alert-msg" id="alertMsg">Pesan di sini…</div>
+    <button class="pas-btn pas-reset" onclick="hideAlert()">Oke</button>
+  </div>
+</div>
   
 </body>
 </html>
