@@ -836,6 +836,22 @@
   100% { transform: translateY(-20vh) translateX(var(--bk-dx, 40px)) scale(var(--bk-scale,1)); }
 }
 
+/* === GOLD DUST DRIFT (INSIDE) === */
+.pas-dust{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.pas-dust .d{
+  position:absolute; border-radius:50%;
+  background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,215,0,.0) 65%);
+  opacity:.10; filter: blur(0.5px);
+  animation: pasDust 10s linear infinite;
+}
+@keyframes pasDust{
+  0%   { transform: translateY(20%); opacity:.00; }
+  10%  { opacity:.12; }
+  80%  { opacity:.12; }
+  100% { transform: translateY(-120%); opacity:0; }
+}
+.card.flipped .pas-dust{ display:none; }
+
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1273,6 +1289,33 @@ document.addEventListener('DOMContentLoaded', ()=>{
       bg.appendChild(d);
     }
   }
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  const perCard = 8;  // jumlah debu per kartu (halus)
+  document.querySelectorAll('.card .face.front').forEach(face=>{
+    const w = document.createElement('div');
+    w.className = 'pas-dust';
+    for(let i=0;i<perCard;i++){
+      const dot = document.createElement('span');
+      dot.className = 'd';
+      const size = (Math.random()*6 + 3).toFixed(0); // 3–9px
+      dot.style.width = dot.style.height = size+'px';
+      dot.style.left = (Math.random()*92) + '%';
+      dot.style.top  = (Math.random()*100) + '%';
+      dot.style.animationDuration = (9 + Math.random()*6).toFixed(1)+'s';
+      dot.style.animationDelay    = (-Math.random()*10).toFixed(2)+'s'; // desync
+      // sedikit drift horizontal acak
+      const dx = (Math.random()*40-20).toFixed(0);
+      dot.style.setProperty('--dx', dx+'px');
+      dot.style.transform = `translateX(0)`;
+      w.appendChild(dot);
+    }
+    face.appendChild(w);
+  });
 });
 </script>
 
