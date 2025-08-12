@@ -916,6 +916,23 @@
 .card.loaded{
   opacity:1; transform: none; transition: transform .45s ease, opacity .45s ease;
 }
+
+.marquee-box {
+  position: relative;
+  overflow: hidden;
+}
+.marquee-box::after{
+  content:"";
+  position:absolute; top:0; bottom:0; width:80px;
+  transform: skewX(-20deg) translateX(-120%);
+  background: linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.22), rgba(255,255,255,0));
+  animation: marqueeGlare 4.2s linear infinite;
+  pointer-events:none;
+}
+@keyframes marqueeGlare{
+  0% { transform: skewX(-20deg) translateX(-130%); }
+  100%{ transform: skewX(-20deg) translateX(230%); }
+}
     
   </style>
 
@@ -1060,28 +1077,6 @@ async function claim(idx){
 
     const cards = document.querySelectorAll('.card');
     cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
-
-    // efek pecahan emas dari kartu yang dipilih
-{
-  const chosen = document.querySelector(`.grid .card:nth-child(${idx})`);
-  const rect = chosen.getBoundingClientRect();
-  const cx = (rect.left + rect.width/2) / window.innerWidth;
-  const cy = (rect.top + rect.height/2) / window.innerHeight;
-  const myCanvas = document.getElementById('confetti-canvas');
-  const burst = confetti.create(myCanvas, { resize:true, useWorker:true });
-
-  burst({
-    particleCount: 80,
-    startVelocity: 55,
-    spread: 70,
-    origin: { x: cx, y: cy },
-    colors: ['#FFD700','#FFE27A','#F1C232','#B8860B','#FFFFFF']
-  });
-  setTimeout(()=>burst({
-    particleCount: 60, startVelocity: 38, spread: 60,
-    origin:{x: cx, y: cy}, scalar: .9
-  }), 160);
-}
 
     const pool = [4000, 6000, 10000, 50000, 100000, 250000];
     const hadiahAsli = toNum(res.hadiah);            // <- aman format
