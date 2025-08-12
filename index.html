@@ -921,6 +921,14 @@
 .pas-shuffling .card{ animation:none !important; }
 /* sedikit lift saat transisi */
 .card.pas-moving{ will-change: transform; }
+
+    /* stop shake & klik saat proses */
+.pas-prep, .pas-shuffling { }
+.pas-prep .card, .pas-shuffling .card { animation: none !important; }
+.pas-prep .front .btn, .pas-shuffling .front .btn { pointer-events: none; }
+
+/* tampilan tombol saat status berubah */
+#btnStart[disabled] { opacity: .7; cursor: not-allowed; }
     
   </style>
 
@@ -1517,6 +1525,130 @@ document.addEventListener('DOMContentLoaded', ()=>{
     s.parentElement.style.margin = '12px 0 4px'; // dari 14px 0 6px
   }
 });
+</script>
+
+  <script>
+/* ===== helper: beri identitas asli 1..6 kalau belum ada ===== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.querySelectorAll('#grid .card').forEach((c,i)=>{
+    if(!c.dataset.original) c.dataset.original = String(i+1);
+  });
+});
+
+/* ===== inject tombol MULAI BERMAIN kalau belum ada ===== */
+(function(){
+  if(!document.getElementById('btnStart')){
+    const wrap = document.createElement('div');
+    wrap.style.display='flex';
+    wrap.style.justifyContent='center';
+    wrap.style.margin='10px 0 8px';
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.type='button';
+    btn.id='btnStart';
+    btn.textContent='MULAI BERMAIN';
+    wrap.appendChild(btn);
+    (document.querySelector('.input-container') || document.body)
+      .insertAdjacentElement('afterend', wrap);
+  }
+})();
+
+/* ===== FLIP utility ===== */
+async function FLIPTo(newOrder, duration=620){
+  const grid = document.getElementById('grid');
+  const cards = Array.from(grid.querySelectorAll('.card'));
+  const first = new Map(cards.map(c=>[c, c.getBoundingClientRect()]));
+
+  // re-order DOM ke urutan baru
+  newOrder.forEach(c=> grid.appendChild(c));
+
+  // apply transform dari posisi lama -> baru
+  newOrder.forEach(c=>{
+    const last = c.getBoundingClientRect();
+    const f = first.get(c);
+    const dx = f.left - last.left;
+    const dy = f.top  - last.top;
+    c.style.transition = 'transform 0s';
+    c.style.transform  = `translate(${dx}px, ${dy}px)`;
+    requestAnimationFrame(()=>{
+      c.style.transition = `transform ${duration}ms cubic-bezier(.2,.9,.2,1)`;
+      c.style.transform  = 'translate(0,0)';
+    });
+  });
+
+  await new Promise(r=> setTimeout(r, duration + 40));
+  newOrder.forEach(c=>{ c.style.transition=''; c.style.transform=''; });
+}
+
+/* ===== 4 pola shuffle (dipilih acak setiap start) ===== */
+function patternRotate(cards){           // rotasi k langkah
+  const k = 1 + Math.floor(Math.random()*5);
+  return cards.slice(-k).concat(cards.slice(0,-k));
+}
+function patternReverse(cards){          // balik urutan
+  return cards.slice().reverse();
+}
+function patternInterleaveOdd(cards){    // 1,3,5,2,4,6
+  return [cards[0],cards[2],cards[4],cards[1],cards[3],cards[5]];
+}
+function patternSwapPairs(cards){        // 2,1,4,3,6,5
+  return [cards[1],cards[0],cards[3],cards[2],cards[5],cards[4]];
+}
+const SHUFFLE_PATTERNS = [
+  patternRotate, patternReverse, patternInterleaveOdd, patternSwapPairs
+];
+
+/* ===== Start flow ===== */
+(function(){
+  const btn = document.getElementById('btnStart');
+  let running = false;
+
+  btn.onclick = async function(){
+    if(running) return;
+    // validasi input
+    const userId = document.getElementById('userId')?.value.trim();
+    const kupon  = document.getElementById('kupon')?.value.trim();
+    if(!userId || !kupon){
+      showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
+      return;
+    }
+
+    try{ hidePromo(); }catch{}
+    running = true;
+    document.body.classList.add('pas-prep');
+    btn.disabled = true;
+
+    const grid  = document.getElementById('grid');
+    const cards = Array.from(grid.querySelectorAll('.card'));
+
+    // 1) Buka SEMUA kartu 3 detik
+    btn.textContent = 'MEMBUKA KARTU…';
+    cards.forEach(c=> c.classList.add('flipped'));
+    await new Promise(r=> setTimeout(r, 3000));
+    cards.forEach(c=> c.classList.remove('flipped'));
+
+    // 2) Shuffle dengan 1 dari 4 pola
+    document.body.classList.remove('pas-prep');
+    document.body.classList.add('pas-shuffling');
+    btn.textContent = 'MENGACAK…';
+
+    // nonaktifkan tombol pilih sementara
+    const state = Array.from(document.querySelectorAll('.front .btn')).map(b=>b.disabled);
+    document.querySelectorAll('.front .btn').forEach(b=> b.disabled = true);
+
+    const pattern = SHUFFLE_PATTERNS[Math.floor(Math.random()*SHUFFLE_PATTERNS.length)];
+    const newOrder = pattern(cards.slice());
+    await FLIPTo(newOrder, 620);
+
+    // selesai
+    document.body.classList.remove('pas-shuffling');
+    document.querySelectorAll('.front .btn').forEach((b,i)=> b.disabled = state[i]);
+    btn.textContent = 'SILAHKAN PILIH BOX DI BAWAH INI';
+    // biar tidak bisa dipencet lagi
+    btn.disabled = true;
+    running = false;
+  };
+})();
 </script>
 
 <!-- Modalnya di paling akhir body -->
