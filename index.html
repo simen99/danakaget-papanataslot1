@@ -762,11 +762,11 @@
 }
 @keyframes btnRipple{ to{ transform:scale(10); opacity:0; } }
 
-    /* === SHINE SWEEP EMAS PER CARD === */
+    /* === SHINE SWEEP EMAS PER CARD (Smooth) === */
 .card {
   --shine-size: 220%;
   --shine-rot: 25deg;
-  --shine-speed: 2.8s;
+  --shine-speed: 5s; /* durasi lebih panjang */
 }
 .card .face::after{
   content:"";
@@ -774,28 +774,27 @@
   pointer-events:none;
   background:
     linear-gradient(var(--shine-rot),
-      transparent 30%,
-      rgba(255,255,255,.35) 46%,
-      rgba(255,255,255,.8) 50%,
-      rgba(255,255,255,.35) 54%,
-      transparent 70%
+      transparent 35%,
+      rgba(255,255,255,.25) 46%,
+      rgba(255,255,255,.75) 50%,
+      rgba(255,255,255,.25) 54%,
+      transparent 65%
     );
   transform: translateX(-120%) rotate(var(--shine-rot));
-  animation: pasCardShine var(--shine-speed) cubic-bezier(.25,.6,.3,1) infinite;
+  animation: pasCardShine var(--shine-speed) ease-in-out infinite;
   animation-delay: var(--shine-delay, 0s);
   mix-blend-mode: screen;
-  filter: blur(0.2px);
   border-radius:16px;
 }
 @keyframes pasCardShine{
-  0%   { transform: translateX(-120%) rotate(var(--shine-rot)); opacity:.0; }
-  6%   { opacity:.95; }
-  10%  { transform: translateX(120%) rotate(var(--shine-rot)); opacity:.0; }
-  100% { transform: translateX(120%) rotate(var(--shine-rot)); opacity:.0; }
+  0%   { transform: translateX(-120%) rotate(var(--shine-rot)); opacity:0; }
+  10%  { opacity:.4; } /* masuk halus */
+  25%  { opacity:.9; } /* puncak */
+  40%  { opacity:.4; } /* keluar halus */
+  60%  { transform: translateX(120%) rotate(var(--shine-rot)); opacity:0; }
+  100% { transform: translateX(120%) rotate(var(--shine-rot)); opacity:0; }
 }
-/* Matikan shine saat dibuka agar fokus ke hadiah */
 .card.flipped .face::after{ display:none; }
-/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce){
   .card .face::after{ animation: none !important; }
 }
