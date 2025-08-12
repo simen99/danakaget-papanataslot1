@@ -751,6 +751,15 @@
 
 /* matikan ring pseudo-element lama kalau masih ada */
 .floating-btn.livechat::after{ display:none; }
+
+  .btn{ position:relative; overflow:hidden; }
+.btn .ripple{
+  position:absolute; border-radius:50%;
+  transform: scale(0); opacity:.6; pointer-events:none;
+  background:#fff;
+  animation: btnRipple .6s ease-out forwards;
+}
+@keyframes btnRipple{ to{ transform:scale(10); opacity:0; } }
     
   </style>
 
@@ -1114,6 +1123,22 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.card').forEach((c, i) => {
     c.classList.add('shake');
     c.style.setProperty('--shake-delay', (i * 0.3) + 's'); // beda-beda jedanya
+  });
+});
+</script>
+
+  <script>
+document.querySelectorAll('.btn').forEach(btn=>{
+  btn.addEventListener('click', e=>{
+    const d = Math.max(btn.clientWidth, btn.clientHeight);
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.width = ripple.style.height = d+'px';
+    const rect = btn.getBoundingClientRect();
+    ripple.style.left = (e.clientX - rect.left - d/2)+'px';
+    ripple.style.top  = (e.clientY - rect.top  - d/2)+'px';
+    btn.appendChild(ripple);
+    setTimeout(()=> ripple.remove(), 650);
   });
 });
 </script>
