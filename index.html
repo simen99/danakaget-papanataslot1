@@ -1024,9 +1024,10 @@ const toNum = s => parseInt(String(s).replace(/[^0-9]/g,''), 10) || 0;
 async function claim(idx){
   if (locked) return;
 
-  const chosenCard = document.querySelector(`#grid .card[data-original="${idx}"]`);
-  const btn = chosenCard?.querySelector('.front .btn');
-  const restore = () => { if (btn) btn.textContent = 'PILIH BOX'; };
+  const cards = Array.from(document.querySelectorAll('#grid .card'));
+  const chosenCard = document.querySelector(`#grid .card[data-original="${idx}"]`) || null;
+  const chosenBtn  = chosenCard?.querySelector('.front .btn');
+  const restore = () => { if (chosenBtn) chosenBtn.textContent = 'PILIH BOX'; };
 
   try { hidePromo(); } catch(e) {}
 
@@ -1037,58 +1038,80 @@ async function claim(idx){
     return;
   }
 
-  if (btn) btn.textContent = 'Mengecek...';
+  if (chosenBtn) chosenBtn.textContent = 'Mengecek...';
   setEnabled(false);
 
   try {
     const url = `${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)}`;
     const r = await fetch(url, { method: "GET", redirect: "follow", cache: "no-store" });
     const txt = await r.text();
-    if (!r.ok) { showAlert(`Gagal (HTTP ${r.status}). Cek Web App GAS.`, {type:'error', title:'Request gagal'}); return; }
 
-    let res; try { res = JSON.parse(txt); }
-    catch { showAlert("Server tidak mengirim JSON. Cek deploy GAS.", {type:'error', title:'Format balasan salah'}); return; }
+    if (!r.ok) {
+      showAlert(`Gagal (HTTP ${r.status}). Cek Web App GAS.`, {type:'error', title:'Request gagal'}); 
+      return;
+    }
 
-    if (res.status !== "success") { showAlert(res.message || "Terjadi kesalahan.", {type:'error', title:'Gagal'}); return; }
+    let res;
+    try { res = JSON.parse(txt); }
+    catch { 
+      showAlert("Server tidak mengirim JSON. Cek deploy GAS.", {type:'error', title:'Format balasan salah'}); 
+      return; 
+    }
 
-    // sembunyikan tombol box lain
-    document.querySelectorAll('#grid .card').forEach(c=>{
+    if (res.status !== "success") {
+      showAlert(res.message || "Terjadi kesalahan.", {type:'error', title:'Gagal'});
+      return;
+    }
+
+    // ——— sembunyikan tombol box lain
+    cards.forEach(c=>{
       if (c !== chosenCard){
         const b = c.querySelector('.front .btn');
         if (b){ b.classList.add('btn-hide'); b.style.display='none'; }
       }
     });
 
-    // flip semua kartu (stagger)
-    const cards = Array.from(document.querySelectorAll('#grid .card'));
+    // ——— flip semua kartu (stagger)
     cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
 
-    // siapkan nilai display
+    // ——— siapkan nilai display
     const pool = [4000, 6000, 10000, 50000, 100000, 250000];
-    const displayKey = (v)=> (v===100000?'ZONK': v===250000?'25000': v===50000?'2000': String(v));
+    const mapKey = (v)=> (v===100000 ? 'ZONK' : v===250000 ? '25000' : v===50000 ? '2000' : String(v));
     const toNum = s => parseInt(String(s).replace(/[^0-9]/g,''),10) || 0;
 
     const hadiahAsli = toNum(res.hadiah);
-    const hadiahKey  = displayKey(hadiahAsli);
-    const others     = (function(){
-      // acak kemudian ambil 5 yang kunci display berbeda
-      const shuffled = pool.slice().sort(()=> Math.random()-0.5);
-      const out=[]; for(const v of shuffled){ if(displayKey(v)!==hadiahKey) out.push(v); if(out.length===5) break; }
-      return out;
-    })();
+    const hadiahKey  = mapKey(hadiahAsli);
 
-    // render isi belakang kartu—pakai identitas, bukan index DOM
+    // ambil 5 nilai lain (selalu terisi)
+    const others = [];
+    pool.slice().sort(()=>Math.random()-0.5).forEach(v=>{
+      if (others.length<5 && mapKey(v)!==hadiahKey) others.push(v);
+    });
+    while (others.length<5) others.push(4000); // fallback jaga-jaga
+
+    // ——— render isi belakang (tunggu flip ~selesai)
     setTimeout(()=>{
       let k = 0;
       cards.forEach(c=>{
         const back = c.querySelector('.back');
-        const isSelected = (c === chosenCard);
-        const val = isSelected ? hadiahAsli : others[k++];
-        const isZonk = (val === 100000);
-        let shownV = val;
-        if (val === 250000) shownV = 25000;
-        else if (val === 50000) shownV = 2000;
-        const labelRp = `Rp ${shownV.toLocaleString('id-ID')}`;
+        if(!back) return;
+
+        // pilih kartu via identitas, bukan referensi elemen
+        const isSelected = (c.dataset.original === String(idx));
+        const v = isSelected ? hadiahAsli : others[k++];
+
+        // guard lagi
+        const n = Number(v);
+        if (!Number.isFinite(n)) { 
+          back.innerHTML = `<div class="fake-amount">—</div>`; 
+          return; 
+        }
+
+        const isZonk = (n === 100000);
+        let shown = n;
+        if (n === 250000) shown = 25000;
+        else if (n === 50000) shown = 2000;
+        const label = `Rp ${shown.toLocaleString('id-ID')}`;
 
         if (isZonk){
           c.classList.add('zonk-box');
@@ -1098,23 +1121,23 @@ async function claim(idx){
           back.innerHTML = `
             <div class="saldo-wrap">
               <div class="saldo-title">SALDO AKUN</div>
-              <div class="saldo-amount">${labelRp}</div>
+              <div class="saldo-amount">${label}</div>
             </div>`;
         } else {
-          back.innerHTML = `<div class="fake-amount">${labelRp}</div>`;
+          back.innerHTML = `<div class="fake-amount">${label}</div>`;
         }
       });
-    }, 260);
+    }, 650); // 600ms animasi flip + buffer
 
-    // popup hadiah + confetti (tetap sama)
+    // ——— popup hadiah + confetti
     setTimeout(()=>{
       document.getElementById('popup-content').innerHTML = `
         <button class="popup-x" aria-label="Tutup"
           onclick="document.getElementById('popup').style.display='none'">✖</button>
         <div class="pas-popup">
           <img class="pas-brand" 
-     src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/e02f8a4f84748a98fbfc25bccb2fb8a207d38073/assets/papanatasslot-logo%20(1).png" 
-     alt="Papan Atas Slot">
+               src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/e02f8a4f84748a98fbfc25bccb2fb8a207d38073/assets/papanatasslot-logo%20(1).png" 
+               alt="Papan Atas Slot">
           <div class="pas-subtitle">Anda mendapatkan</div>
           <div class="pas-amount">IDR ${hadiahAsli.toLocaleString('id-ID')}</div>
           <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
@@ -1133,8 +1156,8 @@ async function claim(idx){
 
       requestAnimationFrame(()=>{
         const myCanvas = document.getElementById('confetti-canvas');
-        const myConfetti = confetti.create(myCanvas, { resize: true, useWorker: true });
-        myConfetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
+        const myConfetti = confetti.create(myCanvas, { resize:true, useWorker:true });
+        myConfetti({ particleCount:160, spread:70, origin:{ y:0.6 } });
       });
 
       locked = true;
@@ -1149,7 +1172,6 @@ async function claim(idx){
   }
 }
 </script>
-
 
   <!-- Tombol Mengambang Telegram & WhatsApp -->
 <a href="https://klikblg.com/tele-pas" target="_blank" class="floating-btn" style="bottom: 180px;">
@@ -1649,6 +1671,38 @@ const SHUFFLE_PATTERNS = [
     running = false;
   };
 })();
+</script>
+
+  <script>
+function resetBoxes(){
+  // buka kunci
+  locked = false;
+
+  // tutup popup (jaga-jaga)
+  const pop = document.getElementById('popup');
+  if (pop) pop.style.display = 'none';
+
+  // reset semua kartu
+  document.querySelectorAll('#grid .card').forEach(c=>{
+    c.classList.remove('flipped','selected-box','zonk-box');
+    const back = c.querySelector('.back');
+    if (back) back.innerHTML = '';
+    const btn = c.querySelector('.front .btn');
+    if (btn){
+      btn.disabled = false;
+      btn.classList.remove('btn-hide');
+      btn.style.display = '';
+      btn.textContent = 'PILIH BOX';
+    }
+  });
+
+  // hidupkan lagi tombol mulai
+  const start = document.getElementById('btnStart');
+  if (start){
+    start.disabled = false;
+    start.textContent = 'MULAI BERMAIN';
+  }
+}
 </script>
 
 <!-- Modalnya di paling akhir body -->
