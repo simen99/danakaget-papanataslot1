@@ -1109,6 +1109,15 @@ function hideAlert(){
 }
 </script>
 
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.card').forEach((c, i) => {
+    c.classList.add('shake');
+    c.style.setProperty('--shake-delay', (i * 0.3) + 's'); // beda-beda jedanya
+  });
+});
+</script>
+
 <!-- Modalnya di paling akhir body -->
 <div id="alertModal" class="alert-overlay" style="display:none" aria-modal="true" role="dialog">
   <div class="alert-box" role="document">
