@@ -916,23 +916,6 @@
 .card.loaded{
   opacity:1; transform: none; transition: transform .45s ease, opacity .45s ease;
 }
-
-.marquee-box {
-  position: relative;
-  overflow: hidden;
-}
-.marquee-box::after{
-  content:"";
-  position:absolute; top:0; bottom:0; width:80px;
-  transform: skewX(-20deg) translateX(-120%);
-  background: linear-gradient(90deg, rgba(255,255,255,.0), rgba(255,255,255,.22), rgba(255,255,255,0));
-  animation: marqueeGlare 4.2s linear infinite;
-  pointer-events:none;
-}
-@keyframes marqueeGlare{
-  0% { transform: skewX(-20deg) translateX(-130%); }
-  100%{ transform: skewX(-20deg) translateX(230%); }
-}
     
   </style>
 
