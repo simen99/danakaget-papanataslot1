@@ -916,20 +916,7 @@
 .card.loaded{
   opacity:1; transform: none; transition: transform .45s ease, opacity .45s ease;
 }
-
-    /* Tilt magnet: efek depth */
-.card {
-  transform-style: preserve-3d;
-  transition: transform .15s ease, box-shadow .2s ease;
-  will-change: transform;
-}
-.card.tilted {
-  box-shadow:
-    0 10px 30px rgba(0,0,0,.45),
-    0 0 24px rgba(255,215,0,.35);
-}
-.card .front, .card .back { transform: translateZ(0.01px); } /* jaga layer */
-
+    
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1073,6 +1060,28 @@ async function claim(idx){
 
     const cards = document.querySelectorAll('.card');
     cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
+
+    // efek pecahan emas dari kartu yang dipilih
+{
+  const chosen = document.querySelector(`.grid .card:nth-child(${idx})`);
+  const rect = chosen.getBoundingClientRect();
+  const cx = (rect.left + rect.width/2) / window.innerWidth;
+  const cy = (rect.top + rect.height/2) / window.innerHeight;
+  const myCanvas = document.getElementById('confetti-canvas');
+  const burst = confetti.create(myCanvas, { resize:true, useWorker:true });
+
+  burst({
+    particleCount: 80,
+    startVelocity: 55,
+    spread: 70,
+    origin: { x: cx, y: cy },
+    colors: ['#FFD700','#FFE27A','#F1C232','#B8860B','#FFFFFF']
+  });
+  setTimeout(()=>burst({
+    particleCount: 60, startVelocity: 38, spread: 60,
+    origin:{x: cx, y: cy}, scalar: .9
+  }), 160);
+}
 
     const pool = [4000, 6000, 10000, 50000, 100000, 250000];
     const hadiahAsli = toNum(res.hadiah);            // <- aman format
@@ -1459,28 +1468,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     setTimeout(()=> c.classList.add('loaded'), 80 + i*70);
   });
 });
-</script>
-
-  <script>
-(function(){
-  const max = 10; // derajat max
-  document.querySelectorAll('.card').forEach(card=>{
-    const inner = card.querySelector('.card-inner');
-    function move(e){
-      const r = card.getBoundingClientRect();
-      const x = (e.clientX - r.left)/r.width - .5;
-      const y = (e.clientY - r.top)/r.height - .5;
-      inner.style.transform = `rotateY(${x*max}deg) rotateX(${ -y*max}deg)`;
-      card.classList.add('tilted');
-    }
-    function leave(){
-      inner.style.transform = '';
-      card.classList.remove('tilted');
-    }
-    card.addEventListener('mousemove', move);
-    card.addEventListener('mouseleave', leave);
-  });
-})();
 </script>
 
 <!-- Modalnya di paling akhir body -->
