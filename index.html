@@ -953,32 +953,32 @@
 
   <div class="grid" id="grid">
     <!-- 6 cards -->
-    <div class="card"><div class="card-inner">
+   <div class="card" data-original="1"><div class="card-inner">
       <div class="face front"><button class="btn" onclick="claim(1)">PILIH BOX</button></div>
       <div class="face back"></div>
     </div></div>
     
-    <div class="card"><div class="card-inner">
+    <div class="card" data-original="2"><div class="card-inner">
       <div class="face front"><button class="btn" onclick="claim(2)">PILIH BOX</button></div>
       <div class="face back"></div>
     </div></div>
 
-    <div class="card"><div class="card-inner">
+    <div class="card" data-original="3"><div class="card-inner">
       <div class="face front"><button class="btn" onclick="claim(3)">PILIH BOX</button></div>
       <div class="face back"></div>
     </div></div>
 
-    <div class="card"><div class="card-inner">
+    <div class="card" data-original="4"><div class="card-inner">
       <div class="face front"><button class="btn" onclick="claim(4)">PILIH BOX</button></div>
       <div class="face back"></div>
     </div></div>
 
-    <div class="card"><div class="card-inner">
+    <div class="card" data-original="5"><div class="card-inner">
       <div class="face front"><button class="btn" onclick="claim(5)">PILIH BOX</button></div>
       <div class="face back"></div>
     </div></div>
 
-    <div class="card"><div class="card-inner">
+    <div class="card" data-original="6"><div class="card-inner">
       <div class="face front"><button class="btn" onclick="claim(6)">PILIH BOX</button></div>
       <div class="face back"></div>
     </div></div>
@@ -998,9 +998,7 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbzBrCqW_moLD7izqP_p3kCk
 let locked = false;
 
 function setEnabled(enabled){
-  document.querySelectorAll('.btn').forEach(b=>{
-    b.disabled = !enabled;         // JANGAN ubah textContent di sini
-  });
+  document.querySelectorAll('.front .btn').forEach(b=>{ b.disabled = !enabled; });
 }
 
 // tetap boleh ada kalau mau dipakai di tempat lain
@@ -1090,6 +1088,7 @@ async function claim(idx){
     while (others.length<5) others.push(4000); // fallback jaga-jaga
 
     // ——— render isi belakang (tunggu flip ~selesai)
+    const renderDelay = (cards.length - 1) * 120 + 620; // contoh: 6 kartu -> ~1220ms
     setTimeout(()=>{
       let k = 0;
       cards.forEach(c=>{
@@ -1457,87 +1456,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
     c.dataset.original = String(i+1); // "1".."6"
   });
 });
-</script>
-
-  <script>
-(function(){
-  // sisipkan tombol di bawah input-container
-  const wrap = document.createElement('div');
-  wrap.style.display='flex'; wrap.style.justifyContent='center'; wrap.style.margin='14px 0 6px';
-  const btn = document.createElement('button');
-  btn.className = 'btn'; btn.type='button'; btn.id='btnStart';
-  btn.textContent = 'MULAI BERMAIN';
-  wrap.appendChild(btn);
-  const anchor = document.querySelector('.input-container') || document.body;
-  anchor.insertAdjacentElement('afterend', wrap);
-
-  // util
-  const sleep = ms => new Promise(r=>setTimeout(r,ms));
-  function fisherYates(a){
-    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
-    return a;
-  }
-
-  async function shuffleCardsFLIP(){
-    // validasi input dulu
-    const userId = document.getElementById('userId')?.value.trim();
-    const kupon  = document.getElementById('kupon')?.value.trim();
-    if(!userId || !kupon){
-      showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
-      return;
-    }
-
-    // tutup promo jika ada
-    try{ hidePromo(); }catch{}
-
-    const grid  = document.getElementById('grid');
-    const cards = Array.from(grid.querySelectorAll('.card'));
-    if(cards.length !== 6) return;
-
-    // siapkan FLIP: posisi awal
-    const first = new Map(cards.map(c=>[c, c.getBoundingClientRect()]));
-
-    // tentukan urutan baru (harus berbeda dari sekarang)
-    let order = cards.slice();
-    do { order = fisherYates(order.slice()); }
-    while(order.every((c,i)=> c===cards[i])); // jika sama, acak ulang
-
-    // status UI
-    document.body.classList.add('pas-shuffling');
-    btn.disabled = true; btn.textContent = 'MENGACAK…';
-
-    // pasang kelas penanda
-    order.forEach(c=> c.classList.add('pas-moving'));
-
-    // re-order DOM sesuai urutan baru
-    order.forEach(c=> grid.appendChild(c));
-
-    // posisi akhir
-    order.forEach(c=>{
-      const last = c.getBoundingClientRect();
-      const f = first.get(c);
-      const dx = f.left - last.left;
-      const dy = f.top  - last.top;
-      c.style.transition = 'transform 0s';
-      c.style.transform  = `translate(${dx}px, ${dy}px)`;
-      // animasikan ke tempat baru
-      requestAnimationFrame(()=>{
-        c.style.transition = 'transform 620ms cubic-bezier(.2,.9,.2,1)';
-        c.style.transform  = 'translate(0,0)';
-      });
-    });
-
-    // tunggu animasi selesai
-    await sleep(660);
-
-    // bersih-bersih
-    order.forEach(c=>{ c.classList.remove('pas-moving'); c.style.transition=''; c.style.transform=''; });
-    document.body.classList.remove('pas-shuffling');
-    btn.disabled = false; btn.textContent = 'MULAI BERMAIN';
-  }
-
-  btn.addEventListener('click', shuffleCardsFLIP);
-})();
 </script>
 
   <script>
