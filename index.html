@@ -856,6 +856,42 @@
 .btn .fx-orbit::after { right:-3px; top:50%; transform: translateY(-50%); opacity:.6; }
 @keyframes fxOrbit{ to { transform: rotate(360deg); } }
 
+    /* === FX: BREATHING HIGHLIGHT === */
+.fx-breath {
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  pointer-events: none;
+  background: radial-gradient(circle at center,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 70%
+  );
+  animation: fxBreathAnim 5s ease-in-out infinite;
+}
+@keyframes fxBreathAnim {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+}
+.card.flipped .fx-breath { display: none; }
+
+    /* === FX: RANDOM SPARK POP === */
+.fx-sparkwrap { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.fx-spark {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff, rgba(255, 255, 255, 0));
+  animation: fxSparkPop 1.8s ease-out forwards;
+  opacity: 0;
+}
+@keyframes fxSparkPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  20% { transform: scale(1.5); opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: scale(0.5); opacity: 0; }
+}
+.card.flipped .fx-sparkwrap { display: none; }
+
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1334,6 +1370,37 @@ document.addEventListener('DOMContentLoaded', ()=>{
     const o = document.createElement('span');
     o.className = 'fx-orbit';
     b.appendChild(o);
+  });
+});
+</script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.card .front').forEach(front => {
+    const breath = document.createElement('div');
+    breath.className = 'fx-breath';
+    front.appendChild(breath);
+  });
+});
+</script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.card .front').forEach(front => {
+    const wrap = document.createElement('div');
+    wrap.className = 'fx-sparkwrap';
+    front.appendChild(wrap);
+
+    setInterval(() => {
+      const s = document.createElement('span');
+      s.className = 'fx-spark';
+      const size = Math.random() * 4 + 3;
+      s.style.width = s.style.height = size + 'px';
+      s.style.left = Math.random() * 90 + '%';
+      s.style.top = Math.random() * 90 + '%';
+      wrap.appendChild(s);
+      setTimeout(() => s.remove(), 2000);
+    }, 1200);
   });
 });
 </script>
