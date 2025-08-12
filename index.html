@@ -916,6 +916,11 @@
 .card.loaded{
   opacity:1; transform: none; transition: transform .45s ease, opacity .45s ease;
 }
+
+    /* hentikan shake saat shuffle */
+.pas-shuffling .card{ animation:none !important; }
+/* sedikit lift saat transisi */
+.card.pas-moving{ will-change: transform; }
     
   </style>
 
@@ -1011,19 +1016,18 @@ const toNum = s => parseInt(String(s).replace(/[^0-9]/g,''), 10) || 0;
 async function claim(idx){
   if (locked) return;
 
-  // tombol yang diklik
-  const btn = document.querySelector(`.grid .card:nth-child(${idx}) .front .btn`);
+  const chosenCard = document.querySelector(`#grid .card[data-original="${idx}"]`);
+  const btn = chosenCard?.querySelector('.front .btn');
   const restore = () => { if (btn) btn.textContent = 'PILIH BOX'; };
 
-  // auto tutup promo kalau masih terbuka
   try { hidePromo(); } catch(e) {}
 
   const userId = document.getElementById('userId').value.trim();
   const kupon  = document.getElementById('kupon').value.trim();
- if(!userId || !kupon){
-  showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
-  return;
-}
+  if(!userId || !kupon){
+    showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
+    return;
+  }
 
   if (btn) btn.textContent = 'Mengecek...';
   setEnabled(false);
@@ -1032,59 +1036,56 @@ async function claim(idx){
     const url = `${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)}`;
     const r = await fetch(url, { method: "GET", redirect: "follow", cache: "no-store" });
     const txt = await r.text();
-    console.log('RAW RESPONSE:', txt.slice(0,300));
+    if (!r.ok) { showAlert(`Gagal (HTTP ${r.status}). Cek Web App GAS.`, {type:'error', title:'Request gagal'}); return; }
 
-    if (!r.ok) {
-  showAlert(`Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.`, {type:'error', title:'Request gagal'});
-  return;
-}
-    let res;
-    try { res = JSON.parse(txt); }
-    catch (e) {
-  showAlert("Server tidak mengirim JSON (mungkin Web App belum di-set 'Anyone').\nCek deploy GAS.", {type:'error', title:'Format balasan salah'});
-  return;
-}
+    let res; try { res = JSON.parse(txt); }
+    catch { showAlert("Server tidak mengirim JSON. Cek deploy GAS.", {type:'error', title:'Format balasan salah'}); return; }
 
-    if (res.status !== "success") {
-  showAlert(res.message || "Terjadi kesalahan.", {type:'error', title:'Gagal'});
-  return;
-}
+    if (res.status !== "success") { showAlert(res.message || "Terjadi kesalahan.", {type:'error', title:'Gagal'}); return; }
 
-    // ====== lanjut flow sukses (sama seperti punyamu) ======
-    document.querySelectorAll('.card').forEach((c, i) => {
-      if (i !== (idx - 1)) {
+    // sembunyikan tombol box lain
+    document.querySelectorAll('#grid .card').forEach(c=>{
+      if (c !== chosenCard){
         const b = c.querySelector('.front .btn');
-        if (b) { b.classList.add('btn-hide'); b.style.display = 'none'; }
+        if (b){ b.classList.add('btn-hide'); b.style.display='none'; }
       }
     });
 
-    const cards = document.querySelectorAll('.card');
+    // flip semua kartu (stagger)
+    const cards = Array.from(document.querySelectorAll('#grid .card'));
     cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
 
+    // siapkan nilai display
     const pool = [4000, 6000, 10000, 50000, 100000, 250000];
-    const hadiahAsli = toNum(res.hadiah);            // <- aman format
+    const displayKey = (v)=> (v===100000?'ZONK': v===250000?'25000': v===50000?'2000': String(v));
+    const toNum = s => parseInt(String(s).replace(/[^0-9]/g,''),10) || 0;
+
+    const hadiahAsli = toNum(res.hadiah);
     const hadiahKey  = displayKey(hadiahAsli);
-    const others     = shuffle(pool.filter(v => displayKey(v) !== hadiahKey));
+    const others     = (function(){
+      // acak kemudian ambil 5 yang kunci display berbeda
+      const shuffled = pool.slice().sort(()=> Math.random()-0.5);
+      const out=[]; for(const v of shuffled){ if(displayKey(v)!==hadiahKey) out.push(v); if(out.length===5) break; }
+      return out;
+    })();
 
-    const displayAmounts = Array(6);
-    displayAmounts[idx - 1] = hadiahAsli;
-    let k = 0;
-    for (let i=0;i<6;i++){ if(i!==idx-1) displayAmounts[i]=others[k++]; }
-
+    // render isi belakang kartu—pakai identitas, bukan index DOM
     setTimeout(()=>{
-      cards.forEach((c,i)=>{
+      let k = 0;
+      cards.forEach(c=>{
         const back = c.querySelector('.back');
-        const v = displayAmounts[i];
-        const isZonk = (v === 100000);
-        let shownV = v;
-        if (v === 250000) shownV = 25000;
-        else if (v === 50000) shownV = 2000;
+        const isSelected = (c === chosenCard);
+        const val = isSelected ? hadiahAsli : others[k++];
+        const isZonk = (val === 100000);
+        let shownV = val;
+        if (val === 250000) shownV = 25000;
+        else if (val === 50000) shownV = 2000;
         const labelRp = `Rp ${shownV.toLocaleString('id-ID')}`;
 
-        if (isZonk) {
+        if (isZonk){
           c.classList.add('zonk-box');
           back.innerHTML = `<div class="zonk-label">ZONK !</div>`;
-        } else if (i === (idx - 1)) {
+        } else if (isSelected){
           c.classList.add('selected-box');
           back.innerHTML = `
             <div class="saldo-wrap">
@@ -1097,6 +1098,7 @@ async function claim(idx){
       });
     }, 260);
 
+    // popup hadiah + confetti (tetap sama)
     setTimeout(()=>{
       document.getElementById('popup-content').innerHTML = `
         <button class="popup-x" aria-label="Tutup"
@@ -1130,43 +1132,13 @@ async function claim(idx){
       locked = true;
     }, cards.length*120 + 360 + 3000);
 
-} catch (err) {
-  console.error(err);
-  showAlert("Gagal menghubungi server. Coba lagi.", {
-    type: "error",
-    title: "Jaringan bermasalah"
-  });
-} finally {
-  restore();
-  setEnabled(true);
-}
-}
-
-// ====== PERBAIKI resetBoxes: panggil showPromo() SEKALI saja di akhir ======
-function resetBoxes(){
-  const cards = document.querySelectorAll('.card');
-
-  cards.forEach(card => {
-    card.classList.remove('flipped', 'selected-box', 'zonk-box');
-    card.style.boxShadow = '';
-    const back = card.querySelector('.back');
-    if (back){
-      back.innerHTML = '';
-      back.style.cssText = '';
-    }
-  });
-
-  document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
-  document.querySelectorAll('.front .btn').forEach(b => b.style.removeProperty('display'));
-
-  document.getElementById('popup').style.display = 'none';
-  locked = false;
-  setEnabled(true);
-  document.getElementById('userId').value = '';
-  document.getElementById('kupon').value  = '';
-
-  // tampilkan promo SEKALI saja
-  showPromo();
+  } catch (err) {
+    console.error(err);
+    showAlert("Gagal menghubungi server. Coba lagi.", { type:"error", title:"Jaringan bermasalah" });
+  } finally {
+    restore();
+    setEnabled(true);
+  }
 }
 </script>
 
@@ -1446,6 +1418,96 @@ document.addEventListener('DOMContentLoaded', ()=>{
     setTimeout(()=> c.classList.add('loaded'), 80 + i*70);
   });
 });
+</script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  // beri identitas tetap ke setiap kartu sesuai urutan awal
+  document.querySelectorAll('#grid .card').forEach((c,i)=>{
+    c.dataset.original = String(i+1); // "1".."6"
+  });
+});
+</script>
+
+  <script>
+(function(){
+  // sisipkan tombol di bawah input-container
+  const wrap = document.createElement('div');
+  wrap.style.display='flex'; wrap.style.justifyContent='center'; wrap.style.margin='14px 0 6px';
+  const btn = document.createElement('button');
+  btn.className = 'btn'; btn.type='button'; btn.id='btnStart';
+  btn.textContent = 'MULAI BERMAIN';
+  wrap.appendChild(btn);
+  const anchor = document.querySelector('.input-container') || document.body;
+  anchor.insertAdjacentElement('afterend', wrap);
+
+  // util
+  const sleep = ms => new Promise(r=>setTimeout(r,ms));
+  function fisherYates(a){
+    for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+    return a;
+  }
+
+  async function shuffleCardsFLIP(){
+    // validasi input dulu
+    const userId = document.getElementById('userId')?.value.trim();
+    const kupon  = document.getElementById('kupon')?.value.trim();
+    if(!userId || !kupon){
+      showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
+      return;
+    }
+
+    // tutup promo jika ada
+    try{ hidePromo(); }catch{}
+
+    const grid  = document.getElementById('grid');
+    const cards = Array.from(grid.querySelectorAll('.card'));
+    if(cards.length !== 6) return;
+
+    // siapkan FLIP: posisi awal
+    const first = new Map(cards.map(c=>[c, c.getBoundingClientRect()]));
+
+    // tentukan urutan baru (harus berbeda dari sekarang)
+    let order = cards.slice();
+    do { order = fisherYates(order.slice()); }
+    while(order.every((c,i)=> c===cards[i])); // jika sama, acak ulang
+
+    // status UI
+    document.body.classList.add('pas-shuffling');
+    btn.disabled = true; btn.textContent = 'MENGACAK…';
+
+    // pasang kelas penanda
+    order.forEach(c=> c.classList.add('pas-moving'));
+
+    // re-order DOM sesuai urutan baru
+    order.forEach(c=> grid.appendChild(c));
+
+    // posisi akhir
+    order.forEach(c=>{
+      const last = c.getBoundingClientRect();
+      const f = first.get(c);
+      const dx = f.left - last.left;
+      const dy = f.top  - last.top;
+      c.style.transition = 'transform 0s';
+      c.style.transform  = `translate(${dx}px, ${dy}px)`;
+      // animasikan ke tempat baru
+      requestAnimationFrame(()=>{
+        c.style.transition = 'transform 620ms cubic-bezier(.2,.9,.2,1)';
+        c.style.transform  = 'translate(0,0)';
+      });
+    });
+
+    // tunggu animasi selesai
+    await sleep(660);
+
+    // bersih-bersih
+    order.forEach(c=>{ c.classList.remove('pas-moving'); c.style.transition=''; c.style.transform=''; });
+    document.body.classList.remove('pas-shuffling');
+    btn.disabled = false; btn.textContent = 'MULAI BERMAIN';
+  }
+
+  btn.addEventListener('click', shuffleCardsFLIP);
+})();
 </script>
 
 <!-- Modalnya di paling akhir body -->
