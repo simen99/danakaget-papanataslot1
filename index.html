@@ -762,6 +762,81 @@
 }
 @keyframes btnRipple{ to{ transform:scale(10); opacity:0; } }
 
+    /* === SHINE SWEEP EMAS PER CARD === */
+.card {
+  --shine-size: 220%;
+  --shine-rot: 25deg;
+  --shine-speed: 2.8s;
+}
+.card .face::after{
+  content:"";
+  position:absolute; inset:-20%;
+  pointer-events:none;
+  background:
+    linear-gradient(var(--shine-rot),
+      transparent 30%,
+      rgba(255,255,255,.35) 46%,
+      rgba(255,255,255,.8) 50%,
+      rgba(255,255,255,.35) 54%,
+      transparent 70%
+    );
+  transform: translateX(-120%) rotate(var(--shine-rot));
+  animation: pasCardShine var(--shine-speed) cubic-bezier(.25,.6,.3,1) infinite;
+  animation-delay: var(--shine-delay, 0s);
+  mix-blend-mode: screen;
+  filter: blur(0.2px);
+  border-radius:16px;
+}
+@keyframes pasCardShine{
+  0%   { transform: translateX(-120%) rotate(var(--shine-rot)); opacity:.0; }
+  6%   { opacity:.95; }
+  10%  { transform: translateX(120%) rotate(var(--shine-rot)); opacity:.0; }
+  100% { transform: translateX(120%) rotate(var(--shine-rot)); opacity:.0; }
+}
+/* Matikan shine saat dibuka agar fokus ke hadiah */
+.card.flipped .face::after{ display:none; }
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .card .face::after{ animation: none !important; }
+}
+
+/* === SPARKLE GLITTER EMAS === */
+.sparkles{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.sparkles .sp{
+  position:absolute; width:6px; height:6px; border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,0) 60%),
+    radial-gradient(circle at 70% 70%, #ffd700, rgba(255,215,0,0) 70%);
+  box-shadow: 0 0 6px rgba(255,215,0,.7);
+  filter: saturate(1.2);
+  animation: spTwinkle var(--sp-dur, 2.2s) ease-in-out infinite;
+  animation-delay: var(--sp-delay, 0s);
+  opacity:.0;
+}
+@keyframes spTwinkle{
+  0%, 100% { transform: scale(.6) rotate(0); opacity:0; }
+  40%      { transform: scale(1.15) rotate(45deg); opacity:.95; }
+  60%      { transform: scale(.9) rotate(90deg); opacity:.6; }
+}
+.card.flipped .sparkles{ display:none; } /* biar nggak ganggu saat hadiah tampil */
+
+    /* === BOKEH LATAR === */
+#pas-bokeh{
+  position: fixed; inset:0; pointer-events:none; z-index: 0;
+  overflow:hidden;
+}
+.bokeh-dot{
+  position:absolute; border-radius:50%;
+  background: radial-gradient(circle, rgba(255,255,255,.7), rgba(255,255,255,0) 70%);
+  opacity:.12;
+  animation: bokehFloat var(--bk-dur, 18s) linear infinite;
+  filter: blur(1px);
+}
+@keyframes bokehFloat{
+  0%   { transform: translateY(110vh) translateX(0) scale(var(--bk-scale,1)); }
+  100% { transform: translateY(-20vh) translateX(var(--bk-dx, 40px)) scale(var(--bk-scale,1)); }
+}
+
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1141,6 +1216,64 @@ document.querySelectorAll('.btn').forEach(btn=>{
     btn.appendChild(ripple);
     setTimeout(()=> ripple.remove(), 650);
   });
+});
+</script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  // delay acak biar nggak barengan
+  document.querySelectorAll('.card').forEach((c,i)=>{
+    const d = (Math.random()*2.5 + i*0.25).toFixed(2) + 's';
+    c.style.setProperty('--shine-delay', d);
+  });
+});
+</script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  const perCard = 5; // jumlah bintik per kartu
+  document.querySelectorAll('.card .face.front').forEach((face)=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'sparkles';
+    for(let i=0;i<perCard;i++){
+      const sp = document.createElement('span');
+      sp.className = 'sp';
+      // posisi acak di dalam kartu
+      sp.style.left = (Math.random()*88 + 6) + '%';
+      sp.style.top  = (Math.random()*78 + 8) + '%';
+      // waktu & delay acak
+      sp.style.setProperty('--sp-dur',  (1.8 + Math.random()*1.8).toFixed(2)+'s');
+      sp.style.setProperty('--sp-delay',(Math.random()*2.4).toFixed(2)+'s');
+      // ukuran acak
+      const s = (Math.random()*5 + 3).toFixed(0);
+      sp.style.width = sp.style.height = s+'px';
+      wrap.appendChild(sp);
+    }
+    face.appendChild(wrap);
+  });
+});
+</script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  if(!document.getElementById('pas-bokeh')){
+    const bg = document.createElement('div');
+    bg.id = 'pas-bokeh';
+    document.body.appendChild(bg);
+    // buat 18 partikel
+    for(let i=0;i<18;i++){
+      const d = document.createElement('div');
+      d.className = 'bokeh-dot';
+      const size = Math.random()*90 + 30; // 30–120 px
+      d.style.width = d.style.height = size+'px';
+      d.style.left = (Math.random()*100)+'vw';
+      d.style.setProperty('--bk-scale', (Math.random()*0.5+0.7).toFixed(2));
+      d.style.setProperty('--bk-dur', (14 + Math.random()*16).toFixed(1)+'s');
+      d.style.setProperty('--bk-dx',  (Math.random()*160 - 80).toFixed(0)+'px');
+      d.style.animationDelay = (-Math.random()*20).toFixed(2)+'s'; // desync
+      bg.appendChild(d);
+    }
+  }
 });
 </script>
 
