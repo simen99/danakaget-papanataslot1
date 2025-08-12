@@ -912,6 +912,28 @@
 }
 .card.flipped .fx-glowwave { display: none; }
 
+    /* === UX: SPIN LIGHTS (ANTICIPATION) === */
+.ux-spinwrap{ position:absolute; inset:-4px; pointer-events:none; }
+.ux-spinring{
+  position:absolute; left:50%; top:50%;
+  width:88%; height:88%; transform: translate(-50%,-50%);
+}
+.ux-dot{
+  position:absolute; width:8px; height:8px; border-radius:50%;
+  background: radial-gradient(circle, #fff, rgba(255,255,255,0) 70%);
+  opacity:.0;
+  animation: uxDotBlink 1.2s ease-in-out infinite;
+}
+@keyframes uxDotBlink{ 0%,100%{opacity:.15} 50%{opacity:.9} }
+
+/* putar pelan ring supaya dinamis tapi hemat */
+.ux-spinring{ animation: uxRingSpin 1.6s linear infinite; }
+@keyframes uxRingSpin{ to{ transform: translate(-50%,-50%) rotate(360deg); } }
+
+/* matikan saat flipped/selesai */
+.card.flipped .ux-spinwrap{ display:none; }
+
+
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1009,6 +1031,9 @@ async function claim(idx){
   // tombol yang diklik
   const btn = document.querySelector(`.grid .card:nth-child(${idx}) .front .btn`);
   const restore = () => { if (btn) btn.textContent = 'PILIH BOX'; };
+
+  const cardEl = document.querySelector(`.grid .card:nth-child(${idx})`);
+  uxAddSpin(cardEl);
 
   // auto tutup promo kalau masih terbuka
   try { hidePromo(); } catch(e) {}
@@ -1133,6 +1158,7 @@ async function claim(idx){
   });
 } finally {
   restore();
+  try{ uxRemoveSpin(cardEl); }catch{}
   setEnabled(true);
 }
 }
@@ -1434,6 +1460,38 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+
+  <script>
+function uxAddSpin(cardEl){
+  if(cardEl.querySelector('.ux-spinwrap')) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'ux-spinwrap';
+  const ring = document.createElement('div');
+  ring.className = 'ux-spinring';
+  // buat 12 titik
+  const N = 12;
+  for(let i=0;i<N;i++){
+    const d = document.createElement('span');
+    d.className = 'ux-dot';
+    const ang = (i/N)*2*Math.PI;
+    const r = 44; // % dari setengah sisi
+    d.style.left = (50 + Math.cos(ang)*r) + '%';
+    d.style.top  = (50 + Math.sin(ang)*r) + '%';
+    d.style.animationDelay = (i*0.08)+'s';
+    ring.appendChild(d);
+  }
+  wrap.appendChild(ring);
+  cardEl.querySelector('.front')?.appendChild(wrap);
+}
+function uxRemoveSpin(cardEl){
+  cardEl.querySelectorAll('.ux-spinwrap').forEach(e=> e.remove());
+}
+
+/* hook halus ke claim(): tambahkan 2 baris ini di awal & di finally */
+</script>
+
+
+  
 
 <!-- Modalnya di paling akhir body -->
 <div id="alertModal" class="alert-overlay" style="display:none" aria-modal="true" role="dialog">
