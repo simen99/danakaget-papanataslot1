@@ -762,61 +762,6 @@
 }
 @keyframes btnRipple{ to{ transform:scale(10); opacity:0; } }
 
-/* === Kilau menyapu di dalam setiap box === */
-.card { position: relative; overflow: visible; }      /* pastikan relatif */
-.face.front { position: relative; overflow: hidden; } /* kilau tetap di dalam */
-
-.face.front::after{
-  content:"";
-  position:absolute;
-  top:-50%;
-  left:-60%;
-  width:45%;
-  height:200%;
-  /* gradasi kilau: putih -> emas -> putih */
-  background: linear-gradient(
-    120deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,.45) 35%,
-    rgba(255,215,0,.60) 50%,
-    rgba(255,255,255,.45) 65%,
-    rgba(255,255,255,0) 100%
-  );
-  transform: translateX(-130%) rotate(20deg);
-  filter: blur(.5px);
-  mix-blend-mode: screen;
-  pointer-events:none;
-
-  animation: pasShine var(--shine-dur, 3.4s) ease-in-out infinite;
-  animation-delay: var(--shine-delay, 0s);
-}
-
-/* Gerak menyapu satu kali lalu “istirahat” sebentar di ujung */
-@keyframes pasShine{
-  0%   { transform: translateX(-130%) rotate(20deg); opacity:.0; }
-  8%   { opacity:.85; }
-  45%  { transform: translateX(140%) rotate(20deg); opacity:.85; }
-  55%  { opacity:0; }        /* menghilang setelah lewat */
-  100% { transform: translateX(140%) rotate(20deg); opacity:0; }
-}
-
-/* Perbesar visual gambar di dalam box */
-.front{
-  padding: 0 !important;                 /* buang ruang kosong */
-  background-size: 112% auto !important; /* sedikit zoom biar penuh */
-  background-position: center 0 !important;
-}
-
-/* Mobile: sedikit lebih zoom agar tetap mewah */
-@media (max-width: 720px){
-  .front{ background-size: 120% auto !important; }
-}
-
-/* Jika kamu pakai ring emas di .front::after, tipiskan supaya tidak "makan" area gambar */
-.card .front::after{
-  padding: 2px !important;               /* semula mungkin 6px */
-}
-    
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1195,19 +1140,6 @@ document.querySelectorAll('.btn').forEach(btn=>{
     ripple.style.top  = (e.clientY - rect.top  - d/2)+'px';
     btn.appendChild(ripple);
     setTimeout(()=> ripple.remove(), 650);
-  });
-});
-</script>
-
-  <script>
-document.addEventListener('DOMContentLoaded', ()=>{
-  document.querySelectorAll('.card .front').forEach((el, i)=>{
-    // delay acak biar tidak barengan
-    const delay = (Math.random()*2.2).toFixed(2) + 's';
-    // durasi sedikit bervariasi biar natural
-    const dur   = (3.0 + Math.random()*1.6).toFixed(2) + 's';
-    el.style.setProperty('--shine-delay', delay);
-    el.style.setProperty('--shine-dur',   dur);
   });
 });
 </script>
