@@ -1510,6 +1510,15 @@ document.addEventListener('DOMContentLoaded', ()=>{
 })();
 </script>
 
+  <script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  const s = document.getElementById('btnStart');
+  if (s && s.parentElement){
+    s.parentElement.style.margin = '8px 0 4px'; // dari 14px 0 6px
+  }
+});
+</script>
+
 <!-- Modalnya di paling akhir body -->
 <div id="alertModal" class="alert-overlay" style="display:none" aria-modal="true" role="dialog">
   <div class="alert-box" role="document">
