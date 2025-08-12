@@ -80,6 +80,7 @@
       background-size:cover; background-position:center;
       padding:10px;
     }
+    
     .back{
   -webkit-transform: rotateY(180deg);
           transform: rotateY(180deg);
@@ -797,6 +798,23 @@
   45%  { transform: translateX(140%) rotate(20deg); opacity:.85; }
   55%  { opacity:0; }        /* menghilang setelah lewat */
   100% { transform: translateX(140%) rotate(20deg); opacity:0; }
+}
+
+/* Perbesar visual gambar di dalam box */
+.front{
+  padding: 0 !important;                 /* buang ruang kosong */
+  background-size: 112% auto !important; /* sedikit zoom biar penuh */
+  background-position: center 0 !important;
+}
+
+/* Mobile: sedikit lebih zoom agar tetap mewah */
+@media (max-width: 720px){
+  .front{ background-size: 120% auto !important; }
+}
+
+/* Jika kamu pakai ring emas di .front::after, tipiskan supaya tidak "makan" area gambar */
+.card .front::after{
+  padding: 2px !important;               /* semula mungkin 6px */
 }
     
   </style>
