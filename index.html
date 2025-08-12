@@ -912,6 +912,11 @@
 }
 .card.flipped .fx-glowwave { display: none; }
 
+    .card{ opacity:0; transform: translateY(16px); }
+.card.loaded{
+  opacity:1; transform: none; transition: transform .45s ease, opacity .45s ease;
+}
+
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1434,6 +1439,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>  
+
+  <script>
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.querySelectorAll('.card').forEach((c,i)=>{
+    setTimeout(()=> c.classList.add('loaded'), 80 + i*70);
+  });
+});
+</script>
 
 <!-- Modalnya di paling akhir body -->
 <div id="alertModal" class="alert-overlay" style="display:none" aria-modal="true" role="dialog">
