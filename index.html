@@ -917,6 +917,19 @@
   opacity:1; transform: none; transition: transform .45s ease, opacity .45s ease;
 }
 
+    /* Tilt magnet: efek depth */
+.card {
+  transform-style: preserve-3d;
+  transition: transform .15s ease, box-shadow .2s ease;
+  will-change: transform;
+}
+.card.tilted {
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.45),
+    0 0 24px rgba(255,215,0,.35);
+}
+.card .front, .card .back { transform: translateZ(0.01px); } /* jaga layer */
+
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1446,6 +1459,28 @@ document.addEventListener('DOMContentLoaded', ()=>{
     setTimeout(()=> c.classList.add('loaded'), 80 + i*70);
   });
 });
+</script>
+
+  <script>
+(function(){
+  const max = 10; // derajat max
+  document.querySelectorAll('.card').forEach(card=>{
+    const inner = card.querySelector('.card-inner');
+    function move(e){
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left)/r.width - .5;
+      const y = (e.clientY - r.top)/r.height - .5;
+      inner.style.transform = `rotateY(${x*max}deg) rotateX(${ -y*max}deg)`;
+      card.classList.add('tilted');
+    }
+    function leave(){
+      inner.style.transform = '';
+      card.classList.remove('tilted');
+    }
+    card.addEventListener('mousemove', move);
+    card.addEventListener('mouseleave', leave);
+  });
+})();
 </script>
 
 <!-- Modalnya di paling akhir body -->
