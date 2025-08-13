@@ -19,12 +19,6 @@ flex-direction:column;    /* urut vertikal */
 align-items:center;       /* tengah */
 gap:10px;                 /* jarak antar input */
 }
-
-  <!-- === START: tombol mulai bermain (tambahan) === -->
-<div class="start-wrap">
-  <button id="startBtn" type="button">MULAI BERMAIN</button>
-</div>
-  
 .input-gold{
 width:240px;
 padding:12px 14px 12px 46px; /* space untuk ikon kiri */
@@ -918,27 +912,6 @@ to { --angle: 360deg; }
 }
 .card.flipped .fx-glowwave { display: none; }
 
-  /* === Tambahan: Start Button === */
-.start-wrap{
-  width:100%; display:flex; justify-content:center; margin:16px 0 10px;
-}
-#startBtn{
-  appearance:none; border:none; cursor:pointer; border-radius:12px;
-  padding:12px 18px; font-weight:900; letter-spacing:.3px;
-  background: linear-gradient(165deg,#34d399 0%, #10b981 60%, #059669 100%);
-  color:#062b22; text-shadow: 0 1px 0 rgba(255,255,255,.35);
-  box-shadow: 0 6px 0 rgba(0,0,0,.28), 0 0 0 rgba(16,185,129,0);
-  transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
-}
-#startBtn:hover{ transform: translateY(-1px); filter:brightness(1.05); box-shadow: 0 8px 0 rgba(0,0,0,.30), 0 0 14px rgba(16,185,129,.7); }
-#startBtn:disabled{ opacity:.7; cursor:not-allowed; }
-
-/* === Tambahan: helper FLIP untuk animasi shuffle */
-.card-animating{
-  transition: transform .45s cubic-bezier(.2,.8,.2,1);
-  will-change: transform;
-}
-
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1460,143 +1433,6 @@ glow.className = 'fx-glowwave';
 front.appendChild(glow);
 });
 });
-</script>
-
-  <script>
-/* =================== TAMBAHAN – GAME START & SHUFFLE =================== */
-
-/* Status permainan (nama unik agar tak bentrok) */
-let PAS_validatedOK = false;
-let PAS_gameReady   = false;
-
-/* Validasi kupon saat tekan MULAI BERMAIN
-   - Coba action 'validasi' lalu 'cekKupon' di GAS (opsional)
-   - Jika tidak ada, lanjut (kupon akan dicek lagi saat pilih box) */
-async function PAS_validateCoupon(){
-  const userId = document.getElementById('userId')?.value?.trim() || '';
-  const kupon  = document.getElementById('kupon') ?.value?.trim() || '';
-  if (!userId || !kupon){
-    if (typeof showAlert === 'function') {
-      showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
-    }
-    return {ok:false};
-  }
-  const candidates = ['validasi','cekKupon'];
-  for (const action of candidates){
-    try{
-      const url = `${GAS_URL}?action=${action}&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}`;
-      const r = await fetch(url, { method:'GET', redirect:'follow', cache:'no-store' });
-      const txt = await r.text();
-      if (!r.ok) continue;
-      const res = JSON.parse(txt);
-      if (res && (res.status==='success' || res.valid===true)) return {ok:true, res};
-      if (res && res.message){
-        if (typeof showAlert === 'function') showAlert(res.message, {type:'error', title:'Validasi gagal'});
-        return {ok:false};
-      }
-    }catch(e){}
-  }
-  if (typeof showAlert === 'function') showAlert('Kupon akan dicek lagi saat memilih box.', {type:'info', title:'Info', autoclose:1600});
-  return {ok:true, fallback:true};
-}
-
-/* === FLIP helpers untuk animasi shuffle 4 pola === */
-function PAS_getRects(nodes){ return Array.from(nodes, el => el.getBoundingClientRect()); }
-function PAS_applyFLIP(before, after, cards){
-  cards.forEach((card,i)=>{
-    const dx = before[i].left - after[i].left;
-    const dy = before[i].top  - after[i].top;
-    card.classList.add('card-animating');
-    card.style.transform = `translate(${dx}px, ${dy}px)`;
-    card.getBoundingClientRect();              /* force reflow */
-    card.style.transform = 'translate(0,0)';   /* animate to new place */
-  });
-  return new Promise(res => setTimeout(()=>{
-    cards.forEach(c=>{ c.classList.remove('card-animating'); c.style.transform=''; });
-    res();
-  }, 480));
-}
-function PAS_reappendInOrder(grid, newOrder){
-  const nodes = Array.from(grid.children);
-  const map = new Map(nodes.map((n,i)=>[i, n]));
-  newOrder.forEach(idx => grid.appendChild(map.get(idx)));
-}
-function PAS_seqShuffleOrders(){
-  const base = [0,1,2,3,4,5];
-  const orders = [];
-  // A: swap ujung & tengah (1<->6, 2<->4, 3<->5)
-  orders.push([5,3,4,2,1,0]);
-  // B: rotate kanan 1 langkah
-  orders.push([5,0,1,2,3,4]);
-  // C: reverse penuh
-  orders.push([5,4,3,2,1,0]);
-  // D: random (tidak sama dg C)
-  let rand; do{ rand = base.slice().sort(()=> Math.random()-.5); }while(JSON.stringify(rand)===JSON.stringify(orders[2]));
-  orders.push(rand);
-  return orders;
-}
-async function PAS_runShuffle(){
-  const grid = document.getElementById('grid');
-  if (!grid) return;
-  const orders = PAS_seqShuffleOrders();
-  for (const ord of orders){
-    const cardsBefore = grid.querySelectorAll('.card');
-    const before = PAS_getRects(cardsBefore);
-    PAS_reappendInOrder(grid, ord);
-    const cardsAfter = grid.querySelectorAll('.card');
-    const after = PAS_getRects(cardsAfter);
-    await PAS_applyFLIP(before, after, cardsAfter);
-    await new Promise(r => setTimeout(r, 100));
-  }
-}
-
-/* === Flow tombol MULAI BERMAIN === */
-async function PAS_startGame(){
-  const btn = document.getElementById('startBtn');
-  if (!btn) return;
-
-  btn.disabled = true;
-  btn.textContent = 'MEMVALIDASI…';
-  const v = await PAS_validateCoupon();
-  if (!v.ok){ btn.disabled = false; btn.textContent='MULAI BERMAIN'; return; }
-
-  btn.textContent = 'MENGACAK…';
-  try{ if (typeof hidePromo === 'function') hidePromo(); }catch(e){}
-  try{ if (typeof setEnabled === 'function') setEnabled(false); }catch(e){}
-
-  await PAS_runShuffle();
-
-  PAS_validatedOK = true;
-  PAS_gameReady   = true;
-
-  btn.textContent = 'SILAHKAN PILIH BOX';
-  try{ if (typeof setEnabled === 'function') setEnabled(true); }catch(e){}
-}
-
-/* === Binding tombol start (delegasi global, aman disisipkan di akhir) === */
-document.addEventListener('click', function(e){
-  const t = e.target;
-  if (t && t.id === 'startBtn'){
-    PAS_startGame();
-  }
-}, { passive:true });
-
-/* === Guard: cegah pilih box sebelum start. 
-   Dibungkus di ATAS fungsi claim terakhir (atau tempel PALING AKHIR file) === */
-(function(){
-  const prevClaim = window.claim;   // ambil versi paling akhir (termasuk wrapper cooldown kamu)
-  if (typeof prevClaim === 'function'){
-    window.claim = async function(idx){
-      if (!PAS_gameReady || !PAS_validatedOK){
-        if (typeof showAlert === 'function'){
-          showAlert('Tekan tombol MULAI BERMAIN untuk mengacak box terlebih dahulu.', {type:'info', title:'Belum dimulai'});
-        }
-        return;
-      }
-      return prevClaim.apply(this, arguments);
-    };
-  }
-})();
 </script>
 
 <!-- Modalnya di paling akhir body -->
