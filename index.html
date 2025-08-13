@@ -914,6 +914,22 @@ to { --angle: 360deg; }
 
   .card.shuf-spin { transition: transform 0.6s cubic-bezier(.2,.9,.2,1); }
 
+  /* tombol hijau saat siap memilih box */
+.btn-green{
+  background: linear-gradient(165deg,#22c55e 0%, #16a34a 45%, #0f7a3b 100%) !important;
+  color:#fff !important;
+  border-color:#0b5e2e !important;
+  box-shadow:
+    0 4px 0 rgba(0,0,0,.28),
+    0 0 12px rgba(34,197,94,.45);
+}
+.btn-green:hover{
+  box-shadow:
+    0 6px 0 rgba(0,0,0,.30),
+    0 0 16px rgba(34,197,94,.65);
+  transform: translateY(-1px) scale(1.03);
+}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -930,14 +946,14 @@ Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim
 </div>
 </div>
 
-  <!-- PLAY BUTTON -->
-<div style="margin:16px 0 6px;">
-  <button id="playBtn" class="btn" onclick="startGame()">MULAI BERMAIN</button>
-</div>
-
 <div class="input-container">
 <input id="userId" class="input-gold" placeholder="Masukkan USER ID">
 <input id="kupon"  class="input-gold" placeholder="Masukkan KUPON">
+</div>
+
+<!-- PLAY BUTTON -->
+<div style="margin:14px 0 18px;">
+  <button id="playBtn" class="btn" onclick="startGame()">MULAI BERMAIN</button>
 </div>
 
 <div class="grid" id="grid">
@@ -1171,11 +1187,12 @@ document.getElementById('kupon').value  = '';
 canPick = false;
   isShuffling = false;
   const pb = document.getElementById('playBtn');
-  if (pb){
-    pb.disabled = false;          // ⬅️ buka kunci
-    pb.textContent = 'MULAI BERMAIN';
-    pb.title = '';
-  }
+if (pb){
+  pb.disabled = false;
+  pb.textContent = 'MULAI BERMAIN';
+  pb.title = '';
+  pb.classList.remove('btn-green');   // ← kembali kuning
+}
   showPromo();
 }
 </script>
@@ -1353,16 +1370,21 @@ if (SERVER_VALIDATE) {
   try{ if(navigator.vibrate) navigator.vibrate(18); }catch{}
 
  await runShuffle();
-  reindexPickButtons();
+reindexPickButtons(); // kalau kamu sudah pakai fungsi ini
 
-  // selesai acak → boleh pilih
-  canPick = true;
-  btn.textContent = 'SILAHKAN PILIH BOX';
-  document.querySelectorAll('.front .btn').forEach(b => b.style.visibility = 'visible');
+// selesai acak → boleh pilih
+canPick = true;
+btn.textContent = 'SILAHKAN PILIH BOX';
 
-  setEnabled(true);      // re‑enable tombol lain (termasuk tombol box)
-  btn.disabled = true;   // ⬅️ KUNCI tombol MULAI agar tidak bisa di-klik lagi
-  btn.title = 'Box sudah diacak. Pilih salah satu.';
+// ganti warna jadi hijau
+btn.classList.add('btn-green');
+
+// tampilkan tombol-tombol box
+document.querySelectorAll('.front .btn').forEach(b => b.style.visibility = 'visible');
+
+setEnabled(true);
+btn.disabled = true;                // tetap dikunci agar tak re-shuffle
+btn.title = 'Box sudah diacak. Pilih salah satu.';
 }
 </script>
 
