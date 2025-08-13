@@ -912,6 +912,8 @@ to { --angle: 360deg; }
 }
 .card.flipped .fx-glowwave { display: none; }
 
+  .card.shuf-spin { transition: transform 0.6s cubic-bezier(.2,.9,.2,1); }
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -926,6 +928,11 @@ to { --angle: 360deg; }
 Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim Sekarang Juga !!!
 </div>
 </div>
+</div>
+
+  <!-- PLAY BUTTON -->
+<div style="margin:16px 0 6px;">
+  <button id="playBtn" class="btn" onclick="startGame()">MULAI BERMAIN</button>
 </div>
 
 <div class="input-container">
@@ -1160,6 +1167,12 @@ setEnabled(true);
 document.getElementById('userId').value = '';
 document.getElementById('kupon').value  = '';
 
+// reset tombol & status main
+canPick = false;
+isShuffling = false;
+const pb = document.getElementById('playBtn');
+if (pb) pb.textContent = 'MULAI BERMAIN';
+  
 // tampilkan promo SEKALI saja
 showPromo();
 }
@@ -1189,6 +1202,148 @@ b.addEventListener('click', ()=> haptic(10));
 });
 </script>
 
+  <script>
+/* ====== STATE & UTIL ====== */
+let canPick = false;   // baru boleh pilih box setelah shuffle selesai
+let isShuffling = false;
+
+/* (OPSIONAL) Cek ke server dulu sebelum shuffle.
+   Kalau backend kamu BELUM ada action=cekKupon:
+   - Biarin saja fungsi ini hanya cek kosong (frontend),
+   - Atau ganti 'action' sesuai di GAS kamu. */
+async function validateKuponServer(userId, kupon){
+  // >>>> EDIT sesuai backend kalau sudah ada endpoint cek kupon <<<<
+  // Contoh asumsi endpoint:
+  const url = `${GAS_URL}?action=cekKupon&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}`;
+  try{
+    const r = await fetch(url, {method:'GET', cache:'no-store', redirect:'follow'});
+    const txt = await r.text();
+    let res;
+    try { res = JSON.parse(txt); } catch(e){ res = {}; }
+    // Anggap "success" berarti kupon valid (silakan sesuaikan jika beda)
+    return r.ok && res.status === 'success';
+  }catch(e){
+    // Kalau gagal hubungi server, anggap tidak valid dan tampilkan alert di luar
+    return false;
+  }
+}
+
+/* ====== ANIMASI SHUFFLE (FLIP technique) ======
+   Kita siapkan 4 POLA (permutasi index 1..6) dan jalankan berturut-turut biar terlihat "mengacak".
+   Hasil akhirnya DOM benar-benar diacak (susunan card berubah). */
+const SHUFFLE_PATTERNS = [
+  [6,1,5,3,2,4],
+  [2,3,1,6,4,5],
+  [4,2,6,1,5,3],
+  [3,6,2,5,1,4],
+];
+
+function delay(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+async function flipReorder(order /* array 1..6 */){
+  const grid  = document.getElementById('grid');
+  const cards = Array.from(grid.children);       // urutan awal
+  const first = cards.map(el => el.getBoundingClientRect());
+
+  // susun urutan baru
+  const newOrder = order.map(i => cards[i-1]);
+  // re-append sesuai urutan baru
+  newOrder.forEach(el => grid.appendChild(el));
+
+  const last = newOrder.map(el => el.getBoundingClientRect());
+
+  // animate tiap kartu dari posisi lama -> posisi baru
+  newOrder.forEach((el, i) => {
+    const oldIndex = cards.indexOf(el);
+    const dx = first[oldIndex].left - last[i].left;
+    const dy = first[oldIndex].top  - last[i].top;
+    el.style.transition = 'transform 0s';
+    el.style.transform  = `translate(${dx}px, ${dy}px)`;
+    // force reflow
+    el.getBoundingClientRect();
+    // animate ke tempat baru
+    el.style.transition = 'transform 600ms cubic-bezier(.2,.9,.2,1)';
+    el.style.transform  = 'translate(0,0)';
+  });
+
+  // tunggu animasi
+  await delay(650);
+}
+
+/* Jalankan 4 langkah shuffle (acak urutan polanya) */
+async function runShuffle(){
+  if (isShuffling) return;
+  isShuffling = true;
+
+  // pilih 4 pola (boleh ada pengulangan tapi diacak)
+  const seq = [];
+  const pool = [...SHUFFLE_PATTERNS];
+  for(let i=0;i<4;i++){
+    const pick = Math.floor(Math.random()*pool.length);
+    seq.push(pool[pick]);
+    // opsional: rotasi pool supaya variasi
+    pool.push(pool.splice(pick,1)[0]);
+  }
+
+  for(const pat of seq){
+    await flipReorder(pat);
+    await delay(120); // jeda kecil antar pola
+  }
+
+  isShuffling = false;
+}
+
+/* ====== START GAME FLOW ====== */
+async function startGame(){
+  if (locked || isShuffling) return;
+
+  const btn    = document.getElementById('playBtn');
+  const userId = document.getElementById('userId').value.trim();
+  const kupon  = document.getElementById('kupon').value.trim();
+
+  // validasi ringan (frontend)
+  if (!userId || !kupon){
+    showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
+    return;
+  }
+
+  // Kunci tombol & box
+  setEnabled(false);
+  btn.textContent = 'Mengecek...';
+
+  // (OPSIONAL) validasi ke server
+  let ok = true;
+  try{
+    ok = await validateKuponServer(userId, kupon);
+  }catch(e){ ok = false; }
+
+  if (!ok){
+    // Jika backend cekKupon belum ada, kamu bisa sementara "ok=true" untuk tes UI
+    showAlert('Kupon tidak valid / sudah digunakan / gagal verifikasi.', {type:'error', title:'Validasi gagal'});
+    btn.textContent = 'MULAI BERMAIN';
+    setEnabled(true);
+    return;
+  }
+
+  // Lolos validasi → acak!
+  btn.textContent = 'MENGACAK…';
+  // sembunyikan tombol "PILIH BOX" sementara biar fokus animasi
+  document.querySelectorAll('.front .btn').forEach(b => b.style.visibility = 'hidden');
+
+  // haptic kecil
+  try{ if(navigator.vibrate) navigator.vibrate(18); }catch{}
+
+  await runShuffle();
+
+  // selesai acak → boleh pilih
+  canPick = true;
+  btn.textContent = 'SILAHKAN PILIH BOX';
+  // tampilkan kembali label tombol box
+  document.querySelectorAll('.front .btn').forEach(b => b.style.visibility = 'visible');
+  setEnabled(true);
+}
+</script>
+
 <script>
 let cool = false;
 function coolDown(ms=1200){
@@ -1197,9 +1352,13 @@ cool = true; setTimeout(()=> cool = false, ms);
 
 const _claimOrig = claim; // simpan referensi aslinya
 window.claim = async function(idx){
-if (cool) return;
-coolDown();
-await _claimOrig(idx);
+  if (!canPick){
+    showAlert('Klik tombol "MULAI BERMAIN" dulu untuk mengacak box.', {type:'info', title:'Belum mulai'});
+    return;
+  }
+  if (cool) return;
+  coolDown();
+  await _claimOrig(idx);
 }
 </script>
 
