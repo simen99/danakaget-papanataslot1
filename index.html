@@ -1026,7 +1026,7 @@ Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxaixfjNAeGjivavS3Nrw114YLIwwvVhMvXDxURLJg5wJy4HDBi__6XsI0xQpOVwSniJg/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzo9sJxgcmxHmlQGy2w8kSo8ojkUIJvF_mx92ykQKAxNZxsT0SYqZnb1AoYS9A-3zCGxQ/exec";
 let locked = false;
 
 function setEnabled(enabled){
@@ -1206,17 +1206,16 @@ let isShuffling = false;
    - Atau ganti 'action' sesuai di GAS kamu. */
 async function validateKuponServer(userId, kupon){
   try{
-    const res = await api('cekKupon', { userId, kupon });
-
-    // Normalisasi flag "sudah dipakai"
-    const statusStr = (res.status || res.klaim || res.claim || '').toString().toLowerCase();
-    const used = res.used === true || /used|claimed|terpakai|sudah/.test(statusStr);
-
-    const ok =
-      (res.status === 'success' || res.ok === true || res.allow === true) &&
-      !used;
-
-    return { ok, used, res, message: res.message || res.msg || '' };
+    const res   = await api('cekKupon', { userId, kupon });
+    const used  = !!res.used;
+    const allow = !!res.allow;
+    // OK hanya jika allow === true dan belum digunakan
+    return {
+      ok: (allow && !used),
+      used,
+      res,
+      message: res.message || ''
+    };
   }catch(err){
     console.error('cekKupon error:', err);
     return { ok:false, used:false, message:String(err.message||err) };
