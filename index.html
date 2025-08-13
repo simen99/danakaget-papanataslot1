@@ -1169,12 +1169,14 @@ document.getElementById('kupon').value  = '';
 
 // reset tombol & status main
 canPick = false;
-isShuffling = false;
-const pb = document.getElementById('playBtn');
-if (pb) pb.textContent = 'MULAI BERMAIN';
-  
-// tampilkan promo SEKALI saja
-showPromo();
+  isShuffling = false;
+  const pb = document.getElementById('playBtn');
+  if (pb){
+    pb.disabled = false;          // ⬅️ buka kunci
+    pb.textContent = 'MULAI BERMAIN';
+    pb.title = '';
+  }
+  showPromo();
 }
 </script>
 
@@ -1297,6 +1299,11 @@ async function runShuffle(){
 async function startGame(){
   if (locked || isShuffling) return;
 
+  if (canPick) {
+    showAlert('Box sudah diacak. Silakan pilih salah satu.', {type:'info', title:'Sudah diacak'});
+    return;
+  }
+
   const btn    = document.getElementById('playBtn');
   const userId = document.getElementById('userId').value.trim();
   const kupon  = document.getElementById('kupon').value.trim();
@@ -1338,14 +1345,16 @@ if (SERVER_VALIDATE) {
   // haptic kecil
   try{ if(navigator.vibrate) navigator.vibrate(18); }catch{}
 
-  await runShuffle();
+ await runShuffle();
 
   // selesai acak → boleh pilih
   canPick = true;
   btn.textContent = 'SILAHKAN PILIH BOX';
-  // tampilkan kembali label tombol box
   document.querySelectorAll('.front .btn').forEach(b => b.style.visibility = 'visible');
-  setEnabled(true);
+
+  setEnabled(true);      // re‑enable tombol lain (termasuk tombol box)
+  btn.disabled = true;   // ⬅️ KUNCI tombol MULAI agar tidak bisa di-klik lagi
+  btn.title = 'Box sudah diacak. Pilih salah satu.';
 }
 </script>
 
