@@ -1258,22 +1258,30 @@ let isShuffling = false;
    - Biarin saja fungsi ini hanya cek kosong (frontend),
    - Atau ganti 'action' sesuai di GAS kamu. */
 async function validateKuponServer(userId, kupon){
-  // >>>> EDIT sesuai backend kalau sudah ada endpoint cek kupon <<<<
-  // Contoh asumsi endpoint:
   const url = `${GAS_URL}?action=cekKupon&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}`;
   try{
     const r = await fetch(url, {method:'GET', cache:'no-store', redirect:'follow'});
     const txt = await r.text();
-    let res;
-    try { res = JSON.parse(txt); } catch(e){ res = {}; }
-    // Anggap "success" berarti kupon valid (silakan sesuaikan jika beda)
-    return r.ok && res.status === 'success';
+    let res = {};
+    try { res = JSON.parse(txt); } catch {}
+
+    // Normalisasi flag "sudah dipakai"
+    const statusStr = (res.status || res.klaim || res.claim || '').toString().toLowerCase();
+    const used =
+      res.used === true || res.claimed === true || res.already === true ||
+      /used|claimed|terpakai|sudah/.test(statusStr);
+
+    const ok =
+      r.ok &&
+      (res.status === 'success' || res.ok === true || res.allow === true) &&
+      !used;
+
+    return { ok, used, res, message: res.message || res.msg || '' };
   }catch(e){
-    // Kalau gagal hubungi server, anggap tidak valid dan tampilkan alert di luar
-    return true;
+    return { ok:false, used:false, message:'Tidak bisa menghubungi server.' };
   }
 }
-
+    
 /* ====== ANIMASI SHUFFLE (FLIP technique) ======
    Kita siapkan 4 POLA (permutasi index 1..6) dan jalankan berturut-turut biar terlihat "mengacak".
    Hasil akhirnya DOM benar-benar diacak (susunan card berubah). */
@@ -1349,7 +1357,6 @@ function reindexPickButtons(){
 /* ====== START GAME FLOW ====== */
 async function startGame(){
   if (locked || isShuffling) return;
-
   if (canPick) {
     showAlert('Box sudah diacak. Silakan pilih salah satu.', {type:'info', title:'Sudah diacak'});
     return;
@@ -1359,60 +1366,56 @@ async function startGame(){
   const userId = document.getElementById('userId').value.trim();
   const kupon  = document.getElementById('kupon').value.trim();
 
-  // validasi ringan (frontend)
   if (!userId || !kupon){
     showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
     return;
   }
 
-  // Kunci tombol & box
+  // Kunci tombol & mulai cek
   setEnabled(false);
-  btn.textContent = 'Mengecek...';
+  btn.textContent = 'Mengecek…';
 
- // Toggle ini TRUE kalau endpoint cekKupon di GAS sudah siap
-const SERVER_VALIDATE = false; // <-- untuk sekarang matikan dulu
+  // ===== VALIDASI KE SERVER DULU =====
+  const check = await validateKuponServer(userId, kupon);
 
-let ok = true;
-if (SERVER_VALIDATE) {
-  try {
-    ok = await validateKuponServer(userId, kupon);
-  } catch(e) {
-    ok = false;
-  }
-  if (!ok){
-    showAlert('Kupon tidak valid / sudah digunakan / gagal verifikasi.', {type:'error', title:'Validasi gagal'});
+  if (!check.ok){
+    // Jika kupon sudah dipakai -> info; kalau tidak valid / gagal -> error
+    const type  = check.used ? 'info' : 'error';
+    const title = check.used ? 'Kupon sudah digunakan' : 'Validasi gagal';
+    const msg   = check.message || (check.used
+      ? 'Kupon ini sudah pernah dipakai untuk klaim.'
+      : 'Kupon tidak valid / gagal diverifikasi.');
+
+    showAlert(msg, {type, title});
+
+    // Pulihkan tombol dan state
     btn.textContent = 'MULAI BERMAIN';
     setEnabled(true);
     return;
   }
-}
-// kalau SERVER_VALIDATE = false → lanjut ke shuffle
 
- // Lolos validasi → acak!
-btn.textContent = 'MENGACAK…';
+  // ===== LOLOS VALIDASI → SHUFFLE =====
+  btn.textContent = 'MENGACAK…';
 
-// Sembunyikan tombol "PILIH BOX" sementara
-document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
+  // pastikan tombol "PILIH BOX" tetap disembunyikan saat mengacak
+  document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
 
-// haptic kecil
-try { if (navigator.vibrate) navigator.vibrate(18); } catch {}
+  try { if (navigator.vibrate) navigator.vibrate(18); } catch {}
 
-await runShuffle();
-reindexPickButtons();
+  await runShuffle();
+  reindexPickButtons();
 
-// selesai acak → boleh pilih
-canPick = true;
-btn.textContent = 'SILAHKAN PILIH BOX';
+  // Selesai acak → boleh pilih
+  canPick = true;
+  btn.textContent = 'SILAHKAN PILIH BOX';
+  btn.classList.add('btn-green');
 
-// ganti warna jadi hijau
-btn.classList.add('btn-green');
+  // tampilkan tombol-tombol box
+  document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'inline-block');
 
-// tampilkan tombol-tombol box
-document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'inline-block');
-
-setEnabled(true);
-btn.disabled = true;                // tetap dikunci agar tak re-shuffle
-btn.title = 'Box sudah diacak. Pilih salah satu.';
+  setEnabled(true);
+  btn.disabled = true;              // kunci agar tidak re-shuffle
+  btn.title = 'Box sudah diacak. Pilih salah satu.';
 }
 </script>
 
