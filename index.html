@@ -582,7 +582,7 @@ width:100%;
 height:100%;
 -webkit-transform-style: preserve-3d; /* tambahkan */
 transform-style: preserve-3d;
-transition: transform .85s cubic-bezier(.22,.61,.36,1);
+transition: transform 1s cubic-bezier(.22,.8,.22,1);
 }
 
 .face{
@@ -1316,10 +1316,11 @@ async function runShuffle(){
     pool.push(pool.splice(pick,1)[0]);
   }
 
-  for(const pat of seq){
-    await flipReorder(pat, { duration: 900, easing: 'cubic-bezier(.22,.8,.22,1)' });
-    await delay(180); // jeda antar langkah shuffle
-  }
+  // di runShuffle():
+for (const pat of seq){
+  await flipReorder(pat, { duration: 1100, easing: 'cubic-bezier(.22,.8,.22,1)' });
+  await delay(220); // jeda antar langkah
+}
 
   isShuffling = false;
 }
@@ -1717,54 +1718,74 @@ front.appendChild(glow);
 </script>
 
   <script>
-// === POOL untuk PREVIEW (hanya tampilan) ===
 const PREVIEW_POOL = [4000, 6000, 10000, 50000, 100000, 250000];
 
-// Tampilkan semua hadiah sebentar, lalu tutup lagi
-async function showPreview(showMs = 2000) {              // ← TAMBAH { DI SINI
-  const cards = document.querySelectorAll('.card');
+async function showPreview(showMs = 2400){
+  const cards = [...document.querySelectorAll('.card')];
 
-  // sembunyikan tombol PILIH BOX saat preview
+  // sembunyikan tombol pilih
   document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
 
-  // acak nominal untuk ditampilkan
+  // isi sisi belakang untuk preview
   const preview = shuffle([...PREVIEW_POOL]);
-
-  // isi sisi belakang dan flip semua
   cards.forEach((c,i)=>{
     const v = preview[i % preview.length];
     const back = c.querySelector('.back');
     const isZonk = (v === 100000);
     let shownV = v;
-    if (v === 250000) shownV = 25000;   // mapping tampilan
+    if (v === 250000) shownV = 25000;
     else if (v === 50000) shownV = 2000;
 
-    if (isZonk){
-      c.classList.add('zonk-box');
-      back.innerHTML = `<div class="zonk-label">ZONK !</div>`;
-    } else {
-      back.innerHTML = `<div class="fake-amount">Rp ${shownV.toLocaleString('id-ID')}</div>`;
-    }
+    c.classList.toggle('zonk-box', isZonk);
+    back.innerHTML = isZonk
+      ? `<div class="zonk-label">ZONK !</div>`
+      : `<div class="fake-amount">Rp ${shownV.toLocaleString('id-ID')}</div>`;
   });
 
-  // flip berantai biar lebih adem
-  cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*160));
-
-  // tunggu sebentar (lihat hadiahnya)
+  // buka semua kartu berantai → tahan → tutup lagi berantai (reverse)
+  await flipCascade(cards, true, 160);
   await delay(showMs);
+  await flipCascade(cards.slice().reverse(), false, 160);
 
-  // tutup lagi & bersihkan isi
+  // bersih-bersih isi & kelas
   cards.forEach(c=>{
-    c.classList.remove('flipped','zonk-box','selected-box');
-    const back = c.querySelector('.back');
-    if (back) back.innerHTML = '';
+    c.classList.remove('zonk-box','selected-box');
+    c.querySelector('.back').innerHTML = '';
   });
 
-  // jeda kecil sebelum mulai shuffle
-  await delay(180);
+  // buffer kecil sebelum mulai shuffle
+  await delay(140);
 }
 </script>
 
+  <script>
+// tunggu sampai transition transform pada .card-inner selesai
+function waitEnd(inner){
+  return new Promise(resolve=>{
+    const onEnd = (e)=>{
+      if (e.propertyName === 'transform'){
+        inner.removeEventListener('transitionend', onEnd);
+        resolve();
+      }
+    };
+    inner.addEventListener('transitionend', onEnd);
+  });
+}
+
+// flip berantai (open=true buka, open=false tutup)
+async function flipCascade(list, open=true, step=160){
+  for (const card of list){
+    const inner = card.querySelector('.card-inner');
+    if (open) card.classList.add('flipped'); else card.classList.remove('flipped');
+    // mulai kartu berikutnya sedikit lebih awal, tapi tetap tunggu yang terakhir
+    await Promise.race([waitEnd(inner), delay(step)]);
+  }
+  const lastInner = list[list.length-1]?.querySelector('.card-inner');
+  if (lastInner) await waitEnd(lastInner);
+}
+</script>
+
+  
 <!-- Modalnya di paling akhir body -->
 <div id="alertModal" class="alert-overlay" style="display:none" aria-modal="true" role="dialog">
 <div class="alert-box" role="document">
