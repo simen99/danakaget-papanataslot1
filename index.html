@@ -1720,11 +1720,8 @@ front.appendChild(glow);
 // === POOL untuk PREVIEW (hanya tampilan) ===
 const PREVIEW_POOL = [4000, 6000, 10000, 50000, 100000, 250000];
 
-// util kecil
-function delay(ms){ return new Promise(r=>setTimeout(r, ms)); }
-
 // Tampilkan semua hadiah sebentar, lalu tutup lagi
-async function showPreview(showMs = 2000)
+async function showPreview(showMs = 2000) {              // ← TAMBAH { DI SINI
   const cards = document.querySelectorAll('.card');
 
   // sembunyikan tombol PILIH BOX saat preview
@@ -1739,7 +1736,7 @@ async function showPreview(showMs = 2000)
     const back = c.querySelector('.back');
     const isZonk = (v === 100000);
     let shownV = v;
-    if (v === 250000) shownV = 25000;  // tetap pakai mapping tampilan
+    if (v === 250000) shownV = 25000;   // mapping tampilan
     else if (v === 50000) shownV = 2000;
 
     if (isZonk){
@@ -1750,20 +1747,20 @@ async function showPreview(showMs = 2000)
     }
   });
 
-  // flip berurutan biar lebih hidup
+  // flip berantai biar lebih adem
   cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*160));
 
   // tunggu sebentar (lihat hadiahnya)
   await delay(showMs);
 
-  // tutup lagi & bersihkan isi (biar nggak kebawa ke tahap shuffle)
+  // tutup lagi & bersihkan isi
   cards.forEach(c=>{
     c.classList.remove('flipped','zonk-box','selected-box');
     const back = c.querySelector('.back');
     if (back) back.innerHTML = '';
   });
 
-  // beri sedikit jeda sebelum mulai shuffle
+  // jeda kecil sebelum mulai shuffle
   await delay(180);
 }
 </script>
