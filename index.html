@@ -957,12 +957,43 @@ to { --angle: 360deg; }
   /* default: tombol PILIH BOX tidak terlihat */
 .grid .card .front .btn{ display:none; }
 
+  /* dasar */
+#pageTitle{ text-align:center; margin:0 0 14px; }
+
+/* DESKTOP: satu baris + emoji di kiri/kanan via pseudo-element */
+#pageTitle .line1 .em{ display:none; }          /* sembunyikan emoji di dalam */
+#pageTitle .line1, 
+#pageTitle .line2{ display:inline; }            /* gabung jadi 1 baris */
+#pageTitle::before,
+#pageTitle::after{
+  content:"🎁";
+  display:inline;
+  margin:0 .25em;
+}
+
+/* MOBILE: pecah 2 baris, emoji pindah ke baris pertama */
+@media (max-width:520px){
+  #pageTitle{ font-size:clamp(22px,6vw,28px); line-height:1.15; }
+  #pageTitle .line1, 
+  #pageTitle .line2{ display:block; }           /* jadi 2 baris */
+  #pageTitle::before, 
+  #pageTitle::after{ content:none; }            /* matikan emoji global */
+  #pageTitle .line1 .em{ display:inline; }      /* tampilkan emoji di baris 1 */
+}
+
+  #pageTitle .line1{ margin-right:.25em; }
+@media (max-width:520px){ #pageTitle .line1{ margin-right:0; } }
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
-<h1>🎁 Dana Kaget Papanatasslot 🎁</h1>
+  
+<h1 id="pageTitle">
+  <span class="line1"><span class="em">🎁</span> Dana Kaget <span class="em">🎁</span></span>
+  <span class="line2">Papanatasslot</span>
+</h1>
 
 <div class="marquee-box">
 <span class="marquee-icon">📢 :</span>
