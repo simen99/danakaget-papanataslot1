@@ -938,6 +938,22 @@ to { --angle: 360deg; }
   transform: translateY(-1px) scale(1.03);
 }
 
+  /* pastikan play button benar-benar sama seperti LINK LOGIN (tanpa border hitam .btn) */
+.btn.btn-like-login{
+  border:1px solid #b37b00 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.45),
+    inset 0 -3px 8px rgba(0,0,0,.15),
+    0 6px 16px rgba(179,123,0,.18) !important;
+}
+
+/* saat berubah hijau + disabled, jangan meredup */
+#playBtn.btn-green:disabled{
+  opacity:1 !important;
+  filter:none !important;
+  cursor:default !important;
+}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
