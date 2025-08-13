@@ -992,6 +992,25 @@ to { --angle: 360deg; }
   #pageTitle .line1{ margin-right:.25em; }
 @media (max-width:520px){ #pageTitle .line1{ margin-right:0; } }
 
+  /* aktif ketika body punya class .is-shuffling */
+.is-shuffling #grid { pointer-events: none; }             /* cegah hover/klik nyasar */
+.is-shuffling .card { animation: none !important; }       /* hentikan .shake */
+.is-shuffling .card:hover { transform: none !important; } /* matikan scale hover */
+
+.is-shuffling .sparkles .sp,
+.is-shuffling .pas-dust .d,
+.is-shuffling .fx-glowwave,
+.is-shuffling .fx-sparkwrap .fx-spark {
+  animation-play-state: paused !important;
+}
+
+/* Hint GPU & isolasi paint saat bergerak */
+.card { will-change: transform; contain: paint; }
+.card-inner { will-change: transform; transform: translateZ(0); }
+
+  .card.shake { animation: pasShake 4.5s ease-in-out infinite; }
+.is-shuffling .card.shake { animation-play-state: paused !important; }
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1286,18 +1305,23 @@ async function flipReorder(order, opts = {}) {
 
   const last = newOrder.map(el => el.getBoundingClientRect());
 
+  // Set posisi awal (tanpa transisi) → pakai 3D biar ke GPU
   newOrder.forEach((el, i) => {
     const oldIndex = cards.indexOf(el);
     const dx = first[oldIndex].left - last[i].left;
     const dy = first[oldIndex].top  - last[i].top;
-    const rot = (Math.random()*0.6 - 0.3).toFixed(2); // tilt kecil biar natural
+    const rot = (Math.random()*0.6 - 0.3).toFixed(2);
 
     el.style.transition = 'transform 0s';
-    el.style.transform  = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
-    el.getBoundingClientRect(); // reflow
+    el.style.transform  = `translate3d(${dx}px, ${dy}px, 0) rotate(${rot}deg)`;
+  });
 
+  // Pastikan browser commit style dulu → lalu baru transisi ke 0
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  newOrder.forEach((el) => {
     el.style.transition = `transform ${duration}ms ${easing}`;
-    el.style.transform  = 'translate(0,0) rotate(0deg)';
+    el.style.transform  = 'translate3d(0,0,0) rotate(0deg)';
   });
 
   await delay(duration + 40);
@@ -1307,6 +1331,7 @@ async function flipReorder(order, opts = {}) {
 async function runShuffle(){
   if (isShuffling) return;
   isShuffling = true;
+  document.body.classList.add('is-shuffling');   // ← aktifkan mode
 
   const seq = [];
   const pool = [...SHUFFLE_PATTERNS];
@@ -1316,13 +1341,15 @@ async function runShuffle(){
     pool.push(pool.splice(pick,1)[0]);
   }
 
-  // di runShuffle():
-for (const pat of seq){
-  await flipReorder(pat, { duration: 1100, easing: 'cubic-bezier(.22,.8,.22,1)' });
-  await delay(220); // jeda antar langkah
-}
-
-  isShuffling = false;
+  try{
+    for (const pat of seq){
+      await flipReorder(pat, { duration: 1100, easing: 'cubic-bezier(.22,.8,.22,1)' });
+      await delay(220);
+    }
+  } finally {
+    document.body.classList.remove('is-shuffling'); // ← matikan mode
+    isShuffling = false;
+  }
 }
     
 function reindexPickButtons(){
