@@ -582,7 +582,7 @@ width:100%;
 height:100%;
 -webkit-transform-style: preserve-3d; /* tambahkan */
 transform-style: preserve-3d;
-transition: transform .6s ease;
+transition: transform .85s cubic-bezier(.22,.61,.36,1);
 }
 
 .face{
@@ -1130,7 +1130,7 @@ async function claim(idx){
     });
 
     const cards = document.querySelectorAll('.card');
-    cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
+    cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*180));
 
     const pool = [4000, 6000, 10000, 50000, 100000, 250000];
     const hadiahAsli = toNum(res.hadiah);
@@ -1274,34 +1274,33 @@ const SHUFFLE_PATTERNS = [
 
 function delay(ms){ return new Promise(r=>setTimeout(r, ms)); }
 
-async function flipReorder(order /* array 1..6 */){
+async function flipReorder(order, opts = {}) {
+  const { duration = 900, easing = 'cubic-bezier(.22,.8,.22,1)' } = opts;
+
   const grid  = document.getElementById('grid');
-  const cards = Array.from(grid.children);       // urutan awal
+  const cards = Array.from(grid.children);
   const first = cards.map(el => el.getBoundingClientRect());
 
-  // susun urutan baru
   const newOrder = order.map(i => cards[i-1]);
-  // re-append sesuai urutan baru
   newOrder.forEach(el => grid.appendChild(el));
 
   const last = newOrder.map(el => el.getBoundingClientRect());
 
-  // animate tiap kartu dari posisi lama -> posisi baru
   newOrder.forEach((el, i) => {
     const oldIndex = cards.indexOf(el);
     const dx = first[oldIndex].left - last[i].left;
     const dy = first[oldIndex].top  - last[i].top;
+    const rot = (Math.random()*0.6 - 0.3).toFixed(2); // tilt kecil biar natural
+
     el.style.transition = 'transform 0s';
-    el.style.transform  = `translate(${dx}px, ${dy}px)`;
-    // force reflow
-    el.getBoundingClientRect();
-    // animate ke tempat baru
-    el.style.transition = 'transform 600ms cubic-bezier(.2,.9,.2,1)';
-    el.style.transform  = 'translate(0,0)';
+    el.style.transform  = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
+    el.getBoundingClientRect(); // reflow
+
+    el.style.transition = `transform ${duration}ms ${easing}`;
+    el.style.transform  = 'translate(0,0) rotate(0deg)';
   });
 
-  // tunggu animasi
-  await delay(650);
+  await delay(duration + 40);
 }
 
 /* Jalankan 4 langkah shuffle (acak urutan polanya) */
@@ -1309,24 +1308,22 @@ async function runShuffle(){
   if (isShuffling) return;
   isShuffling = true;
 
-  // pilih 4 pola (boleh ada pengulangan tapi diacak)
   const seq = [];
   const pool = [...SHUFFLE_PATTERNS];
   for(let i=0;i<5;i++){
     const pick = Math.floor(Math.random()*pool.length);
     seq.push(pool[pick]);
-    // opsional: rotasi pool supaya variasi
     pool.push(pool.splice(pick,1)[0]);
   }
 
   for(const pat of seq){
-    await flipReorder(pat);
-    await delay(120); // jeda kecil antar pola
+    await flipReorder(pat, { duration: 900, easing: 'cubic-bezier(.22,.8,.22,1)' });
+    await delay(180); // jeda antar langkah shuffle
   }
 
   isShuffling = false;
 }
-
+    
 function reindexPickButtons(){
   document.querySelectorAll('#grid .card').forEach((card, i) => {
     const btn = card.querySelector('.front .btn');
@@ -1381,7 +1378,7 @@ btn.textContent = 'MENAMPILKAN HADIAH…';
 document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
 
 // 1) TAMPILKAN SEMUA HADIAH SEBENTAR
-await showPreview(1400); // atur durasi tampil (ms) suka-suka
+await showPreview(2000); // atur durasi tampil (ms) suka-suka
 
 // 2) LALU MULAI MENGACAK
 btn.textContent = 'MENGACAK…';
@@ -1727,7 +1724,7 @@ const PREVIEW_POOL = [4000, 6000, 10000, 50000, 100000, 250000];
 function delay(ms){ return new Promise(r=>setTimeout(r, ms)); }
 
 // Tampilkan semua hadiah sebentar, lalu tutup lagi
-async function showPreview(showMs = 1400){
+async function showPreview(showMs = 2000)
   const cards = document.querySelectorAll('.card');
 
   // sembunyikan tombol PILIH BOX saat preview
@@ -1754,7 +1751,7 @@ async function showPreview(showMs = 1400){
   });
 
   // flip berurutan biar lebih hidup
-  cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*80));
+  cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*160));
 
   // tunggu sebentar (lihat hadiahnya)
   await delay(showMs);
