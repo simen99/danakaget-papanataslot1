@@ -973,12 +973,20 @@ to { --angle: 360deg; }
 
 /* MOBILE: pecah 2 baris, emoji pindah ke baris pertama */
 @media (max-width:520px){
-  #pageTitle{ font-size:clamp(22px,6vw,28px); line-height:1.15; }
+  /* lebih besar di HP */
+  #pageTitle{
+    font-size: clamp(28px, 9vw, 40px); /* ← naikin batas & vw */
+    line-height: 1.12;
+    letter-spacing: .3px;
+  }
   #pageTitle .line1, 
-  #pageTitle .line2{ display:block; }           /* jadi 2 baris */
+  #pageTitle .line2{ display:block; }
   #pageTitle::before, 
-  #pageTitle::after{ content:none; }            /* matikan emoji global */
-  #pageTitle .line1 .em{ display:inline; }      /* tampilkan emoji di baris 1 */
+  #pageTitle::after{ content:none; }
+  #pageTitle .line1 .em{ display:inline; }
+
+  /* opsional: sedikit beda ukuran baris 2 biar proporsional */
+  #pageTitle .line2{ font-size: .92em; margin-top: 2px; }
 }
 
   #pageTitle .line1{ margin-right:.25em; }
