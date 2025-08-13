@@ -1224,7 +1224,7 @@ async function validateKuponServer(userId, kupon){
     return r.ok && res.status === 'success';
   }catch(e){
     // Kalau gagal hubungi server, anggap tidak valid dan tampilkan alert di luar
-    return false;
+    return true;
   }
 }
 
@@ -1311,19 +1311,24 @@ async function startGame(){
   setEnabled(false);
   btn.textContent = 'Mengecek...';
 
-  // (OPSIONAL) validasi ke server
-  let ok = true;
-  try{
-    ok = await validateKuponServer(userId, kupon);
-  }catch(e){ ok = false; }
+ // Toggle ini TRUE kalau endpoint cekKupon di GAS sudah siap
+const SERVER_VALIDATE = false; // <-- untuk sekarang matikan dulu
 
+let ok = true;
+if (SERVER_VALIDATE) {
+  try {
+    ok = await validateKuponServer(userId, kupon);
+  } catch(e) {
+    ok = false;
+  }
   if (!ok){
-    // Jika backend cekKupon belum ada, kamu bisa sementara "ok=true" untuk tes UI
     showAlert('Kupon tidak valid / sudah digunakan / gagal verifikasi.', {type:'error', title:'Validasi gagal'});
     btn.textContent = 'MULAI BERMAIN';
     setEnabled(true);
     return;
   }
+}
+// kalau SERVER_VALIDATE = false → lanjut ke shuffle
 
   // Lolos validasi → acak!
   btn.textContent = 'MENGACAK…';
