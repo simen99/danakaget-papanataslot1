@@ -332,54 +332,62 @@ animation: none !important;
 .card.shake { animation: none !important; }
 }
 
-/* LINK LOGIN: gaya sama seperti input, teks tebal & uppercase */
+/* LINK LOGIN + PLAY BUTTON (gaya sama) */
 .login-link,
 .login-link:link,
-.login-link:visited{
-display:flex;
-justify-content:center;
-align-items:center;
+.login-link:visited,
+.btn-like-login{
+  display:flex;
+  justify-content:center;
+  align-items:center;
 
-width:240px;
-padding:12px 14px;           /* tanpa ikon kiri */
-border-radius:14px;
-border:1px solid #b37b00;
-background:
-radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
-linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
-box-shadow:
-inset 0 2px 0 rgba(255,255,255,.45),
-inset 0 -3px 8px rgba(0,0,0,.15),
-0 6px 16px rgba(179,123,0,.18);
+  /* lebar responsif sama persis */
+  width: 100%;
+  max-width: 320px;
+  margin-inline: auto;
+  box-sizing: border-box;
 
-color:#1a1300 !important;    /* hilangkan ungu */
-text-decoration:none !important;
-text-transform:uppercase;
-font-weight:900;
-letter-spacing:.6px;
-text-shadow:0 1px 0 rgba(255,255,255,.35);
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid #b37b00 !important;
+  background:
+    radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
+    linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.45),
+    inset 0 -3px 8px rgba(0,0,0,.15),
+    0 6px 16px rgba(179,123,0,.18);
+  color:#1a1300 !important;
+  text-decoration:none !important;
+  text-transform:uppercase;
+  font-weight:900;
+  letter-spacing:.6px;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+
+  /* override gaya .btn kuning default */
+  animation:none !important;
 }
 
+/* efek hover/focus sama */
 .login-link:hover,
-.login-link:focus{
-transform: translateY(-1px);
-border-color:#ffcf33;
-box-shadow:
-inset 0 2px 0 rgba(255,255,255,.55),
-inset 0 -3px 10px rgba(0,0,0,.18),
-0 0 0 3px rgba(255,207,51,.28),
-0 10px 22px rgba(255,215,0,.25);
-outline:0;
+.login-link:focus,
+.btn-like-login:hover,
+.btn-like-login:focus{
+  transform: translateY(-1px);
+  border-color:#ffcf33;
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.55),
+    inset 0 -3px 10px rgba(0,0,0,.18),
+    0 0 0 3px rgba(255,207,51,.28),
+    0 10px 22px rgba(255,215,0,.25);
+  outline:0;
 }
 
-/* Pusatkan tombol LINK LOGIN */
-.login-wrap{
-width:100%;
-display:flex;
-justify-content:center;
-margin:18px 0 28px;
+/* responsif modern: samakan juga untuk tombol play */
+@supports (width: min(92vw, 320px)) {
+  .login-link,
+  .btn-like-login{ width: min(92vw, 320px); }
 }
-.login-link{ margin:0 auto; } /* center */
 
 .card.zonk-box .back{
 background: linear-gradient(160deg,#ff3b30 0%,#ff6b6b 50%,#b00020 100%) !important;
@@ -497,7 +505,7 @@ box-shadow: 0 12px 34px rgba(0,0,0,.45),
 display:grid;
 gap:20px;
 justify-content:center;
-margin:10px auto 6px;
+margin:6px auto 6px;
 grid-template-columns:repeat(3, minmax(160px, 1fr));
 max-width:640px;
 }
@@ -952,8 +960,8 @@ Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim
 </div>
 
 <!-- PLAY BUTTON -->
-<div style="margin:20px 0 18px;">
-  <button id="playBtn" class="btn" onclick="startGame()">MULAI BERMAIN</button>
+<div class="login-wrap" style="margin:12px 0 6px;">
+  <button id="playBtn" class="btn btn-like-login" onclick="startGame()">MULAI BERMAIN</button>
 </div>
 
 <div class="grid" id="grid">
