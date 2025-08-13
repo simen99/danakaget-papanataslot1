@@ -1374,28 +1374,29 @@ async function startGame(){
     return;
   }
 
-  // ===== LOLOS VALIDASI → SHUFFLE =====
-  btn.textContent = 'MENGACAK…';
+  // ===== LOLOS VALIDASI → PREVIEW → SHUFFLE =====
+btn.textContent = 'MENAMPILKAN HADIAH…';
 
-  // pastikan tombol "PILIH BOX" tetap disembunyikan saat mengacak
-  document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
+// sembunyikan tombol PILIH BOX saat preview
+document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
 
-  try { if (navigator.vibrate) navigator.vibrate(18); } catch {}
+// 1) TAMPILKAN SEMUA HADIAH SEBENTAR
+await showPreview(1400); // atur durasi tampil (ms) suka-suka
 
-  await runShuffle();
-  reindexPickButtons();
+// 2) LALU MULAI MENGACAK
+btn.textContent = 'MENGACAK…';
+try { if (navigator.vibrate) navigator.vibrate(18); } catch {}
+await runShuffle();
+reindexPickButtons();
 
-  // Selesai acak → boleh pilih
-  canPick = true;
-  btn.textContent = 'SILAHKAN PILIH BOX';
-  btn.classList.add('btn-green');
-
-  // tampilkan tombol-tombol box
-  document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'inline-block');
-
-  setEnabled(true);
-  btn.disabled = true;              // kunci agar tidak re-shuffle
-  btn.title = 'Box sudah diacak. Pilih salah satu.';
+// 3) SELESAI ACAK → BOLEH PILIH
+canPick = true;
+btn.textContent = 'SILAHKAN PILIH BOX';
+btn.classList.add('btn-green');
+document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'inline-block');
+setEnabled(true);
+btn.disabled = true;
+btn.title = 'Box sudah diacak. Pilih salah satu.';
 }
 </script>
 
@@ -1716,6 +1717,58 @@ glow.className = 'fx-glowwave';
 front.appendChild(glow);
 });
 });
+</script>
+
+  <script>
+// === POOL untuk PREVIEW (hanya tampilan) ===
+const PREVIEW_POOL = [4000, 6000, 10000, 50000, 100000, 250000];
+
+// util kecil
+function delay(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
+// Tampilkan semua hadiah sebentar, lalu tutup lagi
+async function showPreview(showMs = 1400){
+  const cards = document.querySelectorAll('.card');
+
+  // sembunyikan tombol PILIH BOX saat preview
+  document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
+
+  // acak nominal untuk ditampilkan
+  const preview = shuffle([...PREVIEW_POOL]);
+
+  // isi sisi belakang dan flip semua
+  cards.forEach((c,i)=>{
+    const v = preview[i % preview.length];
+    const back = c.querySelector('.back');
+    const isZonk = (v === 100000);
+    let shownV = v;
+    if (v === 250000) shownV = 25000;  // tetap pakai mapping tampilan
+    else if (v === 50000) shownV = 2000;
+
+    if (isZonk){
+      c.classList.add('zonk-box');
+      back.innerHTML = `<div class="zonk-label">ZONK !</div>`;
+    } else {
+      back.innerHTML = `<div class="fake-amount">Rp ${shownV.toLocaleString('id-ID')}</div>`;
+    }
+  });
+
+  // flip berurutan biar lebih hidup
+  cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*80));
+
+  // tunggu sebentar (lihat hadiahnya)
+  await delay(showMs);
+
+  // tutup lagi & bersihkan isi (biar nggak kebawa ke tahap shuffle)
+  cards.forEach(c=>{
+    c.classList.remove('flipped','zonk-box','selected-box');
+    const back = c.querySelector('.back');
+    if (back) back.innerHTML = '';
+  });
+
+  // beri sedikit jeda sebelum mulai shuffle
+  await delay(180);
+}
 </script>
 
 <!-- Modalnya di paling akhir body -->
