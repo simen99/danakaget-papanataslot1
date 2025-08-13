@@ -1026,7 +1026,7 @@ Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzBrCqW_moLD7izqP_p3kCksdT_SDZ6Zq9VZoUDYEs4RD76tSGKmjLPwggR1rwjuSmT3g/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxIw0KEB2JY-VOg1yEI9ZeQjSD-1tJ8C4z7AC66MB8s5h1NX32Gg0_F9MYxevOQuC3wpQ/exec";
 let locked = false;
 
 function setEnabled(enabled){
@@ -1054,176 +1054,123 @@ return String(v);
 const toNum = s => parseInt(String(s).replace(/[^0-9]/g,''), 10) || 0;
 
 async function claim(idx){
-if (locked) return;
+  if (locked) return;
 
-// tombol yang diklik
-const btn = document.querySelector(`.grid .card:nth-child(${idx}) .front .btn`);
-const restore = () => { if (btn) btn.textContent = 'PILIH BOX'; };
+  // tombol yang diklik
+  const btn = document.querySelector(`.grid .card:nth-child(${idx}) .front .btn`);
+  const restore = () => { if (btn) btn.textContent = 'PILIH BOX'; };
 
-// auto tutup promo kalau masih terbuka
-try { hidePromo(); } catch(e) {}
+  // auto tutup promo
+  try { hidePromo(); } catch(e) {}
 
-const userId = document.getElementById('userId').value.trim();
-const kupon  = document.getElementById('kupon').value.trim();
-if(!userId || !kupon){
-showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
-return;
-}
+  const userId = document.getElementById('userId').value.trim();
+  const kupon  = document.getElementById('kupon').value.trim();
+  if(!userId || !kupon){
+    showAlert('Masukkan USER ID dan KUPON terlebih dahulu!', {type:'warning', title:'Data belum lengkap'});
+    return;
+  }
 
-if (btn) btn.textContent = 'Mengecek...';
-setEnabled(false);
+  if (btn) btn.textContent = 'Mengecek...';
+  setEnabled(false);
 
-try {
-const url = `${GAS_URL}?action=pilihBox&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}&idx=${encodeURIComponent(idx)}`;
-const r = await fetch(url, { method: "GET", redirect: "follow", cache: "no-store" });
-const txt = await r.text();
-console.log('RAW RESPONSE:', txt.slice(0,300));
+  try {
+    // === panggil backend TANPA querystring, pakai POST JSON ke /exec ===
+    const res = await api('pilihBox', { userId, kupon, idx });
 
-if (!r.ok) {
-showAlert(`Gagal (HTTP ${r.status}). Cek pengaturan Web App GAS.`, {type:'error', title:'Request gagal'});
-return;
-}
-let res;
-try { res = JSON.parse(txt); }
-catch (e) {
-showAlert("Server tidak mengirim JSON (mungkin Web App belum di-set 'Anyone').\nCek deploy GAS.", {type:'error', title:'Format balasan salah'});
-return;
-}
+    if (res.status !== 'success'){
+      showAlert(res.message || 'Terjadi kesalahan.', {type:'error', title:'Gagal'});
+      return;
+    }
 
-if (res.status !== "success") {
-showAlert(res.message || "Terjadi kesalahan.", {type:'error', title:'Gagal'});
-return;
-}
+    // ====== lanjut flow sukses ======
+    document.querySelectorAll('.card').forEach((c, i) => {
+      if (i !== (idx - 1)) {
+        const b = c.querySelector('.front .btn');
+        if (b) { b.classList.add('btn-hide'); b.style.display = 'none'; }
+      }
+    });
 
-// ====== lanjut flow sukses (sama seperti punyamu) ======
-document.querySelectorAll('.card').forEach((c, i) => {
-if (i !== (idx - 1)) {
-const b = c.querySelector('.front .btn');
-if (b) { b.classList.add('btn-hide'); b.style.display = 'none'; }
-}
-});
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
 
-const cards = document.querySelectorAll('.card');
-cards.forEach((c,i)=> setTimeout(()=> c.classList.add('flipped'), i*120));
+    const pool = [4000, 6000, 10000, 50000, 100000, 250000];
+    const hadiahAsli = toNum(res.hadiah);
+    const hadiahKey  = displayKey(hadiahAsli);
+    const others     = shuffle(pool.filter(v => displayKey(v) !== hadiahKey));
 
-const pool = [4000, 6000, 10000, 50000, 100000, 250000];
-const hadiahAsli = toNum(res.hadiah);            // <- aman format
-const hadiahKey  = displayKey(hadiahAsli);
-const others     = shuffle(pool.filter(v => displayKey(v) !== hadiahKey));
+    const displayAmounts = Array(6);
+    displayAmounts[idx - 1] = hadiahAsli;
+    let k = 0;
+    for (let i=0;i<6;i++){ if(i!==idx-1) displayAmounts[i]=others[k++]; }
 
-const displayAmounts = Array(6);
-displayAmounts[idx - 1] = hadiahAsli;
-let k = 0;
-for (let i=0;i<6;i++){ if(i!==idx-1) displayAmounts[i]=others[k++]; }
+    setTimeout(()=>{
+      cards.forEach((c,i)=>{
+        const back = c.querySelector('.back');
+        const v = displayAmounts[i];
+        const isZonk = (v === 100000);
+        let shownV = v;
+        if (v === 250000) shownV = 25000;
+        else if (v === 50000) shownV = 2000;
+        const labelRp = `Rp ${shownV.toLocaleString('id-ID')}`;
 
-setTimeout(()=>{
-cards.forEach((c,i)=>{
-const back = c.querySelector('.back');
-const v = displayAmounts[i];
-const isZonk = (v === 100000);
-let shownV = v;
-if (v === 250000) shownV = 25000;
-else if (v === 50000) shownV = 2000;
-const labelRp = `Rp ${shownV.toLocaleString('id-ID')}`;
+        if (isZonk) {
+          c.classList.add('zonk-box');
+          back.innerHTML = `<div class="zonk-label">ZONK !</div>`;
+        } else if (i === (idx - 1)) {
+          c.classList.add('selected-box');
+          back.innerHTML = `
+            <div class="saldo-wrap">
+              <div class="saldo-title">SALDO AKUN</div>
+              <div class="saldo-amount">${labelRp}</div>
+            </div>`;
+        } else {
+          back.innerHTML = `<div class="fake-amount">${labelRp}</div>`;
+        }
+      });
+    }, 260);
 
-if (isZonk) {
-c.classList.add('zonk-box');
-back.innerHTML = `<div class="zonk-label">ZONK !</div>`;
-} else if (i === (idx - 1)) {
-c.classList.add('selected-box');
-back.innerHTML = `
-<div class="saldo-wrap">
-<div class="saldo-title">SALDO AKUN</div>
-<div class="saldo-amount">${labelRp}</div>
-</div>`;
-} else {
-back.innerHTML = `<div class="fake-amount">${labelRp}</div>`;
-}
-});
-}, 260);
+    setTimeout(()=>{
+      document.getElementById('popup-content').innerHTML = `
+        <button class="popup-x" aria-label="Tutup"
+          onclick="document.getElementById('popup').style.display='none'">✖</button>
+        <div class="pas-popup">
+          <img class="pas-brand"
+            src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/e02f8a4f84748a98fbfc25bccb2fb8a207d38073/assets/papanatasslot-logo%20(1).png"
+            alt="Papan Atas Slot">
+          <div class="pas-subtitle">Anda mendapatkan</div>
+          <div class="pas-amount">IDR ${hadiahAsli.toLocaleString('id-ID')}</div>
+          <div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
+          <div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
+          <div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
+          <div class="pas-btn-row">
+            <a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
+            <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
+          </div>
+          <button type="button" class="pas-btn pas-reset"
+            onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
+            PILIH BOX LAGI
+          </button>
+        </div>`;
+      document.getElementById('popup').style.display = 'flex';
 
-setTimeout(()=>{
-document.getElementById('popup-content').innerHTML = `
-<button class="popup-x" aria-label="Tutup"
-onclick="document.getElementById('popup').style.display='none'">✖</button>
-<div class="pas-popup">
-<img class="pas-brand"
-src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/e02f8a4f84748a98fbfc25bccb2fb8a207d38073/assets/papanatasslot-logo%20(1).png"
-alt="Papan Atas Slot">
-<div class="pas-subtitle">Anda mendapatkan</div>
-<div class="pas-amount">IDR ${hadiahAsli.toLocaleString('id-ID')}</div>
-<div class="pas-meta">Coupon Code : <b>${res.kupon}</b></div>
-<div class="pas-meta">Username : <b>${(res.username || res.userId || '-')}</b></div>
-<div class="pas-hint">SCREENSHOT DAN KLAIM HADIAH MELALUI WHATSAPP ATAU TELEGRAM</div>
-<div class="pas-btn-row">
-<a href="https://klikblg.com/wa-pas"   target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
-<a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
-</div>
-<button type="button" class="pas-btn pas-reset"
-onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
-PILIH BOX LAGI
-</button>
-</div>`;
-document.getElementById('popup').style.display = 'flex';
+      requestAnimationFrame(()=>{
+        const myCanvas = document.getElementById('confetti-canvas');
+        const myConfetti = confetti.create(myCanvas, { resize: true, useWorker: true });
+        myConfetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
+      });
 
-requestAnimationFrame(()=>{
-const myCanvas = document.getElementById('confetti-canvas');
-const myConfetti = confetti.create(myCanvas, { resize: true, useWorker: true });
-myConfetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
-});
+      locked = true;
+    }, cards.length*120 + 360 + 3000);
 
-locked = true;
-}, cards.length*120 + 360 + 3000);
-
-} catch (err) {
-console.error(err);
-showAlert("Gagal menghubungi server. Coba lagi.", {
-type: "error",
-title: "Jaringan bermasalah"
-});
-} finally {
-restore();
-setEnabled(true);
-}
-}
-
-// ====== PERBAIKI resetBoxes: panggil showPromo() SEKALI saja di akhir ======
-function resetBoxes(){
-const cards = document.querySelectorAll('.card');
-
-cards.forEach(card => {
-card.classList.remove('flipped', 'selected-box', 'zonk-box');
-card.style.boxShadow = '';
-const back = card.querySelector('.back');
-if (back){
-back.innerHTML = '';
-back.style.cssText = '';
-}
-});
-
-document.querySelectorAll('.btn.btn-hide').forEach(b => b.classList.remove('btn-hide'));
-document.querySelectorAll('.front .btn').forEach(b => b.style.removeProperty('display'));
-
-document.getElementById('popup').style.display = 'none';
-locked = false;
-setEnabled(true);
-document.getElementById('userId').value = '';
-document.getElementById('kupon').value  = '';
-
-// reset tombol & status main
-canPick = false;
-  isShuffling = false;
-  const pb = document.getElementById('playBtn');
-if (pb){
-  pb.disabled = false;
-  pb.textContent = 'MULAI BERMAIN';
-  pb.title = '';
-  pb.classList.remove('btn-green');   // ← kembali kuning
-}
-  showPromo();
+  } catch (err) {
+    console.error(err);
+    showAlert('Gagal menghubungi server. Coba lagi.', { type:'error', title:'Jaringan bermasalah' });
+  } finally {
+    restore();
+    setEnabled(true);
+  }
 }
 </script>
-
 
 <!-- Tombol Mengambang Telegram & WhatsApp -->
 <a href="https://klikblg.com/tele-pas" target="_blank" class="floating-btn" style="bottom: 180px;">
@@ -1258,27 +1205,21 @@ let isShuffling = false;
    - Biarin saja fungsi ini hanya cek kosong (frontend),
    - Atau ganti 'action' sesuai di GAS kamu. */
 async function validateKuponServer(userId, kupon){
-  const url = `${GAS_URL}?action=cekKupon&userId=${encodeURIComponent(userId)}&kupon=${encodeURIComponent(kupon)}`;
   try{
-    const r = await fetch(url, {method:'GET', cache:'no-store', redirect:'follow'});
-    const txt = await r.text();
-    let res = {};
-    try { res = JSON.parse(txt); } catch {}
+    const res = await api('cekKupon', { userId, kupon });
 
     // Normalisasi flag "sudah dipakai"
     const statusStr = (res.status || res.klaim || res.claim || '').toString().toLowerCase();
-    const used =
-      res.used === true || res.claimed === true || res.already === true ||
-      /used|claimed|terpakai|sudah/.test(statusStr);
+    const used = res.used === true || /used|claimed|terpakai|sudah/.test(statusStr);
 
     const ok =
-      r.ok &&
       (res.status === 'success' || res.ok === true || res.allow === true) &&
       !used;
 
     return { ok, used, res, message: res.message || res.msg || '' };
-  }catch(e){
-    return { ok:false, used:false, message:'Tidak bisa menghubungi server.' };
+  }catch(err){
+    console.error('cekKupon error:', err);
+    return { ok:false, used:false, message:String(err.message||err) };
   }
 }
     
@@ -1657,6 +1598,75 @@ setTimeout(() => s.remove(), 2000);
 }, 1200);
 });
 });
+</script>
+
+  <script>
+async function api(action, data){
+  const ctrl = new AbortController();
+  const t = setTimeout(()=>ctrl.abort('timeout'), 12000); // biar jelas kalau timeout
+
+  const r = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // ⬅️ ubah ini
+    cache: 'no-store',
+    body: JSON.stringify({ action, ...data }),
+    signal: ctrl.signal
+  }).catch(err=>{
+    throw new Error(err.name==='AbortError' ? 'Waktu koneksi habis.' : 'Tidak bisa menghubungi server.');
+  });
+
+  const text = await r.text();
+  let res;
+  try { res = JSON.parse(text); }
+  catch { throw new Error('Balasan bukan JSON: ' + text.slice(0,120)); }
+
+  if (!r.ok) throw new Error('HTTP ' + r.status + ' — ' + (res.message || ''));
+  return res; // ekspektasi: { status: 'success', ... }
+}
+</script>
+
+  <script>
+function resetBoxes(){
+  const cards = document.querySelectorAll('.card');
+
+  // reset tampilan kartu
+  cards.forEach(card => {
+    card.classList.remove('flipped','selected-box','zonk-box');
+    const back = card.querySelector('.back');
+    if (back) back.innerHTML = '';
+  });
+
+  // sembunyikan kembali tombol "PILIH BOX" (balik ke CSS default)
+  document.querySelectorAll('.front .btn').forEach(b => {
+    b.classList.remove('btn-hide');
+    b.style.removeProperty('display');
+  });
+
+  // tutup popup
+  const pop = document.getElementById('popup');
+  if (pop) pop.style.display = 'none';
+
+  // reset state permainan
+  locked = false;
+  canPick = false;
+  isShuffling = false;
+
+  // pulihkan tombol MULAI
+  const pb = document.getElementById('playBtn');
+  if (pb){
+    pb.disabled = false;
+    pb.textContent = 'MULAI BERMAIN';
+    pb.title = '';
+    pb.classList.remove('btn-green');
+  }
+
+  // (opsional) kosongkan input
+  // document.getElementById('userId').value = '';
+  // document.getElementById('kupon').value  = '';
+
+  // (opsional) tampilkan lagi promo
+  // showPromo();
+}
 </script>
 
 <script>
