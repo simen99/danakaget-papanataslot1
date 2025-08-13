@@ -954,6 +954,9 @@ to { --angle: 360deg; }
   cursor:default !important;
 }
 
+  /* default: tombol PILIH BOX tidak terlihat */
+.grid .card .front .btn{ display:none; }
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1385,16 +1388,17 @@ if (SERVER_VALIDATE) {
 }
 // kalau SERVER_VALIDATE = false → lanjut ke shuffle
 
-  // Lolos validasi → acak!
-  btn.textContent = 'MENGACAK…';
-  // sembunyikan tombol "PILIH BOX" sementara biar fokus animasi
-  document.querySelectorAll('.front .btn').forEach(b => b.style.visibility = 'hidden');
+ // Lolos validasi → acak!
+btn.textContent = 'MENGACAK…';
 
-  // haptic kecil
-  try{ if(navigator.vibrate) navigator.vibrate(18); }catch{}
+// Sembunyikan tombol "PILIH BOX" sementara
+document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
 
- await runShuffle();
-reindexPickButtons(); // kalau kamu sudah pakai fungsi ini
+// haptic kecil
+try { if (navigator.vibrate) navigator.vibrate(18); } catch {}
+
+await runShuffle();
+reindexPickButtons();
 
 // selesai acak → boleh pilih
 canPick = true;
@@ -1404,7 +1408,7 @@ btn.textContent = 'SILAHKAN PILIH BOX';
 btn.classList.add('btn-green');
 
 // tampilkan tombol-tombol box
-document.querySelectorAll('.front .btn').forEach(b => b.style.visibility = 'visible');
+document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'inline-block');
 
 setEnabled(true);
 btn.disabled = true;                // tetap dikunci agar tak re-shuffle
