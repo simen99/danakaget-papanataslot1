@@ -1295,6 +1295,13 @@ async function runShuffle(){
   isShuffling = false;
 }
 
+function reindexPickButtons(){
+  document.querySelectorAll('#grid .card').forEach((card, i) => {
+    const btn = card.querySelector('.front .btn');
+    if (btn) btn.setAttribute('onclick', `claim(${i+1})`);
+  });
+}
+
 /* ====== START GAME FLOW ====== */
 async function startGame(){
   if (locked || isShuffling) return;
@@ -1346,6 +1353,7 @@ if (SERVER_VALIDATE) {
   try{ if(navigator.vibrate) navigator.vibrate(18); }catch{}
 
  await runShuffle();
+  reindexPickButtons();
 
   // selesai acak → boleh pilih
   canPick = true;
