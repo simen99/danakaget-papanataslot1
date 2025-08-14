@@ -1011,6 +1011,35 @@ to { --angle: 360deg; }
   .card.shake { animation: pasShake 4.5s ease-in-out infinite; }
 .is-shuffling .card.shake { animation-play-state: paused !important; }
 
+  /* === NX-3: OPEN FLASH (namespace nx-) === */
+.nx-flash{
+  position:absolute; inset:0; pointer-events:none; border-radius:16px;
+  background: radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,.85), rgba(255,215,0,.65) 35%, transparent 70%);
+  mix-blend-mode:screen; filter:blur(2px);
+  animation:nxFlash .42s ease-out forwards;
+}
+@keyframes nxFlash{ from{opacity:0;transform:scale(.86);} 50%{opacity:1;} to{opacity:0;transform:scale(1.08);} }
+@media (prefers-reduced-motion: reduce){ .nx-flash{ animation:none !important; opacity:.3; } }
+
+  /* === NX-4: COMETS (namespace nx-) === */
+#nx-comets{ position:fixed; inset:0; pointer-events:none; z-index:10; }
+.nx-comet{
+  position:absolute; width:10px; height:10px; border-radius:50%;
+  background: radial-gradient(circle, #fff, rgba(255,255,255,0) 65%),
+              radial-gradient(circle, #ffd700, rgba(255,215,0,0) 75%);
+  box-shadow: 0 0 18px rgba(255,215,0,.7);
+  opacity:.95;
+  transform: translate(-50%,-50%);
+}
+.nx-comet::after{
+  content:""; position:absolute; right:50%; top:50%; height:2px; width:140px;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, rgba(255,215,0,.0), rgba(255,215,0,.7));
+  filter: blur(1px);
+}
+@keyframes nxCometFly{ to{ transform: translate(-50%,-50%) translate(var(--dx), var(--dy)); opacity:0; } }
+@media (prefers-reduced-motion: reduce){ #nx-comets{ display:none !important; } }
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1812,6 +1841,56 @@ async function flipCascade(list, open=true, step=160){
 }
 </script>
 
+  <script>
+/* === NX-3: deteksi .flipped via MutationObserver, injeksi flash 1x === */
+(function(){
+  const grid = document.getElementById('grid');
+  if (!grid) return;
+  const seen = new WeakSet();
+  const obs = new MutationObserver(muts=>{
+    muts.forEach(m=>{
+      m.addedNodes && m.addedNodes.forEach(()=>{ /* noop */ });
+      if (m.target && m.target.classList && m.target.classList.contains('card') && m.attributeName==='class'){
+        const card = m.target;
+        if (card.classList.contains('flipped') && !seen.has(card)){
+          seen.add(card);
+          const back = card.querySelector('.back');
+          if (back){
+            const fx = document.createElement('span');
+            fx.className = 'nx-flash';
+            back.appendChild(fx);
+            setTimeout(()=> fx.remove(), 500);
+          }
+        }
+      }
+    });
+  });
+  obs.observe(grid, { attributes:true, subtree:true, attributeFilter:['class'] });
+})();
+</script>
+
+  <script>
+/* === NX-4: spawn komet 1x tiap ~4s, sangat ringan === */
+document.addEventListener('DOMContentLoaded', ()=>{
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (document.getElementById('nx-comets')) return;
+  const host = document.createElement('div'); host.id='nx-comets'; document.body.appendChild(host);
+  setInterval(()=>{
+    const s = document.createElement('span'); s.className='nx-comet';
+    const x = Math.random()*window.innerWidth*0.8 + window.innerWidth*0.1;
+    const y = Math.random()*window.innerHeight*0.2 + window.innerHeight*0.1;
+    s.style.left = x+'px'; s.style.top = y+'px';
+    const dx = (-window.innerWidth*0.5) + 'px';
+    const dy = (window.innerHeight*(Math.random()*0.6+0.2)) + 'px';
+    s.style.setProperty('--dx', dx);
+    s.style.setProperty('--dy', dy);
+    const dur = (1600 + Math.random()*900) + 'ms';
+    s.style.animation = `nxCometFly ${dur} ease-out forwards`;
+    host.appendChild(s);
+    setTimeout(()=> s.remove(), 2600);
+  }, 4000);
+});
+</script>
   
 <!-- Modalnya di paling akhir body -->
 <div id="alertModal" class="alert-overlay" style="display:none" aria-modal="true" role="dialog">
