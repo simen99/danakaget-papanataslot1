@@ -1040,6 +1040,25 @@ to { --angle: 360deg; }
 @keyframes nxCometFly{ to{ transform: translate(-50%,-50%) translate(var(--dx), var(--dy)); opacity:0; } }
 @media (prefers-reduced-motion: reduce){ #nx-comets{ display:none !important; } }
 
+/* === NX-S5: GHOST TRAIL (nx-) === */
+#nx-trails{position:fixed;inset:0;pointer-events:none;z-index:8;}
+.nx-trail{
+  position:absolute;border-radius:16px;overflow:hidden;will-change:transform,opacity;
+}
+.nx-trail::before{
+  content:"";position:absolute;inset:0;border-radius:16px;
+  background:
+    radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,.25), transparent 65%),
+    linear-gradient(120deg, rgba(255,215,0,.40), rgba(255,215,0,.05));
+  mix-blend-mode:screen;filter:blur(2px);opacity:.85;
+}
+.nx-trail::after{
+  content:"";position:absolute;inset:-8px;border-radius:20px;
+  background:conic-gradient(from var(--nx-ang,0deg), rgba(255,215,0,.20), rgba(255,255,255,.08), rgba(255,215,0,.20));
+  filter:blur(6px);opacity:.28;mix-blend-mode:screen;
+}
+@media (prefers-reduced-motion: reduce){ #nx-trails{display:none!important;} }
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1890,6 +1909,55 @@ document.addEventListener('DOMContentLoaded', ()=>{
     setTimeout(()=> s.remove(), 2600);
   }, 4000);
 });
+</script>
+
+  <script>
+/* NX-S5: buat "ghost" di posisi awal kartu saat mulai transisi transform */
+(function(){
+  const grid = document.getElementById('grid'); if(!grid) return;
+  let host = document.getElementById('nx-trails');
+  if(!host){ host = document.createElement('div'); host.id='nx-trails'; document.body.appendChild(host); }
+
+  function parseTranslate(el){
+    const m = getComputedStyle(el).transform;
+    if(!m || m === 'none') return {x:0,y:0};
+    if(m.startsWith('matrix3d(')){ const a = m.slice(9,-1).split(',').map(Number); return {x:a[12]||0, y:a[13]||0}; }
+    if(m.startsWith('matrix(')){ const a = m.slice(7,-1).split(',').map(Number); return {x:a[4]||0, y:a[5]||0}; }
+    return {x:0,y:0};
+  }
+  function durMs(el){
+    const cs = getComputedStyle(el);
+    const durs = cs.transitionDuration.split(',').map(s=>s.trim());
+    const props = cs.transitionProperty.split(',').map(s=>s.trim());
+    const idx = props.findIndex(p=>p==='transform');
+    const raw = (idx>=0? durs[idx] : durs[0]) || '0.9s';
+    return raw.endsWith('ms') ? parseFloat(raw) : parseFloat(raw)*1000;
+  }
+  grid.addEventListener('transitionstart', (e)=>{
+    if(e.propertyName!=='transform') return;
+    if(!document.body.classList.contains('is-shuffling')) return;
+    const card = e.target.closest('.card'); if(!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const {x, y} = parseTranslate(e.target);          // kartu akan bergerak dari (x,y) -> (0,0)
+    const angle = Math.atan2(-y, -x) * 180/Math.PI;    // arah gerak
+    const t = document.createElement('span');
+    t.className = 'nx-trail';
+    t.style.left = rect.left + 'px';
+    t.style.top  = rect.top  + 'px';
+    t.style.width  = rect.width + 'px';
+    t.style.height = rect.height+ 'px';
+    t.style.setProperty('--nx-ang', angle + 'deg');
+    host.appendChild(t);
+
+    const d = Math.max(380, durMs(e.target)*0.9);
+    t.animate(
+      [{ transform:'translate(0,0) scale(.98)', opacity:.65 },
+       { transform:`translate(${-x}px,${-y}px) scale(1.06)`, opacity:0 }],
+      { duration:d, easing:'cubic-bezier(.22,.8,.22,1)' }
+    ).onfinish = ()=> t.remove();
+  }, true);
+})();
 </script>
   
 <!-- Modalnya di paling akhir body -->
