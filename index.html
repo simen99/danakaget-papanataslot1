@@ -1123,6 +1123,22 @@ to { --angle: 360deg; }
   .pas-slider .slider-track{ transition: none !important; }
 }
 
+/* === FIX ALIGN SLIDER = SAMA DENGAN MARQUEE === */
+:root { --marquee-max: 680px; }           /* pastikan sama dengan marquee */
+.marquee-box { max-width: var(--marquee-max); }  /* sudah ada, biarkan */
+
+.pas-slider{
+  width: 100% !important;                 /* jangan pakai vw */
+  max-width: var(--marquee-max) !important;
+  margin: 10px auto 12px !important;      /* tetap center */
+  box-sizing: border-box;
+}
+
+/* Fallback HP lawas tanpa aspect-ratio: tetap center & proporsional */
+@supports not (aspect-ratio: 1110 / 180){
+  .pas-slider{ height: 0; padding-top: 16.216%; } /* 180/1110*100 */
+  .pas-slider .slider-track{ position:absolute; inset:0; }
+}
 
 </style>
 
