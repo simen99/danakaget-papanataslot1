@@ -1059,18 +1059,28 @@ to { --angle: 360deg; }
 }
 @media (prefers-reduced-motion: reduce){ #nx-trails{display:none!important;} }
 
-  /* === SLIDER PROMO === */
+  /* Samakan ukuran slider & marquee via variabel */
+:root{ --marquee-max: 680px; }               /* ukuran desktop box teks berjalan */
+.marquee-box{ max-width: var(--marquee-max); }
+
+/* ===== SLIDER (di bawah marquee) ===== */
 .pas-slider{
   position: relative;
-  margin: 12px auto 10px;
-  width: min(96vw, 1110px);
-  aspect-ratio: 1110 / 180;         /* jaga rasio 1110x180 */
+  margin: 10px auto 12px;
+  width: min(96vw, var(--marquee-max));      /* desktop = sama dgn marquee, mobile = 96vw */
+  aspect-ratio: 1110 / 180;                  /* rasio asli gambar */
   border-radius: 14px;
   overflow: hidden;
-  background:#000;
+  background: #000;
   box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 0 22px rgba(255,215,0,.20);
 }
-.pas-slider::after{                 /* cincin emas halus */
+/* Fallback HP lawas (tanpa aspect-ratio) */
+@supports not (aspect-ratio: 1110 / 180){
+  .pas-slider{ height: 0; padding-top: 16.216%; }  /* 180/1110 * 100% */
+  .pas-slider .slider-track{ position:absolute; inset:0; }
+}
+
+.pas-slider::after{ /* ring emas tipis */
   content:""; position:absolute; inset:0; pointer-events:none;
   border-radius:14px; padding:3px;
   background: linear-gradient(160deg,#ffe27a 0%,#f1c232 45%,#b8860b 100%);
@@ -1079,15 +1089,14 @@ to { --angle: 360deg; }
 }
 
 .pas-slider .slider-track{
-  display:flex;
-  height:100%;
+  display:flex; height:100%;
   transition: transform .65s cubic-bezier(.22,.8,.22,1);
   will-change: transform;
 }
 .pas-slider .slide{ flex:0 0 100%; height:100%; }
 .pas-slider img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-/* Dots */
+/* Dots tengah */
 .pas-slider .slider-dots{
   position:absolute; left:50%; bottom:10px; transform:translateX(-50%);
   display:flex; gap:8px; z-index:5;
@@ -1096,7 +1105,7 @@ to { --angle: 360deg; }
   width:9px; height:9px; border-radius:50%;
   border:1px solid rgba(255,255,255,.6);
   background: rgba(255,255,255,.3);
-  outline:0; cursor:pointer; padding:0;
+  cursor:pointer;
 }
 .pas-slider .slider-dots .dot.active{
   background:#ffd700; border-color:#b8860b;
@@ -1104,15 +1113,16 @@ to { --angle: 360deg; }
   transform: scale(1.15);
 }
 
-/* Mobile kecil — lebar tetap responsif */
+/* Mobile modern & lawas: aman dan responsif */
 @media (max-width:520px){
-  .pas-slider{ width:min(96vw, 520px); }
+  .pas-slider{ border-radius:12px; }
 }
 
 /* Reduce motion */
 @media (prefers-reduced-motion: reduce){
   .pas-slider .slider-track{ transition: none !important; }
 }
+
 
 </style>
 
@@ -1134,6 +1144,30 @@ Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim
 </div>
 </div>
 
+  <!-- SLIDER PROMO — letakkan tepat di bawah box teks berjalan -->
+<div class="pas-slider" id="promoSlider" aria-label="Promo Slider">
+  <div class="slider-track">
+    <div class="slide">
+      <img src="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/GARANSI.jpg?raw=true"
+           alt="Garansi Kekalahan 100%" loading="lazy">
+    </div>
+    <div class="slide">
+      <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/LUCKYANGPAO.jpg"
+           alt="Lucky Angpao" loading="lazy">
+    </div>
+    <div class="slide">
+      <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/NEW.jpg"
+           alt="Event Baru" loading="lazy">
+    </div>
+    <div class="slide">
+      <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/HARIAN.jpg"
+           alt="Bonus Harian" loading="lazy">
+    </div>
+  </div>
+  <div class="slider-dots" id="sliderDots" aria-label="Navigasi slider"></div>
+</div>
+
+
 <div class="input-container">
 <input id="userId" class="input-gold" placeholder="Masukkan USER ID">
 <input id="kupon"  class="input-gold" placeholder="Masukkan KUPON">
@@ -1143,31 +1177,7 @@ Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim
 <div class="login-wrap" style="margin:12px 0 6px;">
   <button id="playBtn" class="btn btn-like-login" onclick="startGame()">MULAI BERMAIN</button>
 </div>
-
-<!-- SLIDER PROMO (di bawah tombol MULAI BERMAIN) -->
-<div class="pas-slider" id="promoSlider" aria-label="Promo Slider">
-  <div class="slider-track">
-    <div class="slide">
-      <img src="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/GARANSI.jpg?raw=true"
-           alt="Garansi Kekalahan 100%" loading="lazy" />
-    </div>
-    <div class="slide">
-      <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/LUCKYANGPAO.jpg"
-           alt="Lucky Angpao" loading="lazy" />
-    </div>
-    <div class="slide">
-      <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/NEW.jpg"
-           alt="Event Baru" loading="lazy" />
-    </div>
-    <div class="slide">
-      <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/HARIAN.jpg"
-           alt="Bonus Harian" loading="lazy" />
-    </div>
-  </div>
-  <!-- Dot navigasi (otomatis dibuat sesuai jumlah slide = 4) -->
-  <div class="slider-dots" id="sliderDots" aria-label="Navigasi slider"></div>
-</div>
-
+  
 <div class="grid" id="grid">
 <!-- 6 cards -->
 <div class="card"><div class="card-inner">
@@ -2040,7 +2050,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 </script>
 
   <script>
-/* === SLIDER PROMO AUTO 3s (geser kiri) === */
+/* === SLIDER PROMO AUTO 3s (geser kiri) — cocok desktop & HP lawas === */
 (() => {
   const slider = document.getElementById('promoSlider');
   if (!slider) return;
@@ -2054,11 +2064,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   track.insertBefore(lastClone, originalSlides[0]);
   track.appendChild(firstClone);
 
-  let index = 1;                 // mulai di slide pertama (setelah clone)
-  const DURATION = 3000;         // 3 detik
+  let index = 1;               // mulai di slide pertama (setelah clone)
+  const DURATION = 3000;       // 3 detik
   let timer = null;
 
-  // Dots sesuai jumlah slide asli
+  // Dots = jumlah slide asli
   const dotsWrap = document.getElementById('sliderDots');
   const dots = originalSlides.map((_, i) => {
     const d = document.createElement('button');
@@ -2077,10 +2087,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   function setTransform(){
     track.style.transform = `translateX(-${index * 100}%)`;
   }
-  function move(){
-    requestAnimationFrame(setTransform);
-    updateDots();
-  }
+  function move(){ requestAnimationFrame(setTransform); updateDots(); }
 
   // Posisi awal
   requestAnimationFrame(setTransform);
@@ -2092,21 +2099,17 @@ document.addEventListener('DOMContentLoaded', ()=>{
   function stop(){ if (timer){ clearInterval(timer); timer = null; } }
   function restart(){ start(); }
 
-  // Loop tanpa jedag-jedug
+  // Loop tanpa jeda saat sampai clone
   track.addEventListener('transitionend', () => {
     const total = originalSlides.length;
-    if (index === total + 1){       // melewati clone kanan
+    if (index === total + 1){   // melewati clone kanan
       track.style.transition = 'none';
-      index = 1;
-      setTransform();
-      void track.offsetWidth;       // reflow
-      track.style.transition = '';  // hidupkan lagi
-    } else if (index === 0){        // melewati clone kiri
+      index = 1; setTransform();
+      void track.offsetWidth; track.style.transition = '';
+    } else if (index === 0){    // melewati clone kiri
       track.style.transition = 'none';
-      index = total;
-      setTransform();
-      void track.offsetWidth;
-      track.style.transition = '';
+      index = total; setTransform();
+      void track.offsetWidth; track.style.transition = '';
     }
   });
 
@@ -2116,30 +2119,31 @@ document.addEventListener('DOMContentLoaded', ()=>{
   slider.addEventListener('focusin', stop);
   slider.addEventListener('focusout', start);
 
-  // Geser manual (swipe) opsional
+  // Geser manual: dukung pointer & fallback touch (HP lawas)
   let startX = 0, deltaX = 0, dragging = false;
-  slider.addEventListener('pointerdown', e => {
-    dragging = true; startX = e.clientX; stop();
-    slider.setPointerCapture?.(e.pointerId);
-  });
-  slider.addEventListener('pointermove', e => {
-    if (!dragging) return;
-    deltaX = e.clientX - startX;
-    track.style.transition = 'none';
-    track.style.transform = `translateX(calc(-${index*100}% + ${deltaX}px))`;
-  });
-  function endDrag(e){
-    if (!dragging) return;
-    slider.releasePointerCapture?.(e.pointerId);
-    track.style.transition = '';
+  const onStart = x => { dragging = true; startX = x; stop(); track.style.transition = 'none'; };
+  const onMove  = x => { if(!dragging) return; deltaX = x - startX;
+                         track.style.transform = `translateX(calc(-${index*100}% + ${deltaX}px))`; };
+  const onEnd   = () => {
+    if(!dragging) return;
+    dragging = false; track.style.transition = '';
     const threshold = slider.clientWidth / 6;
     if (Math.abs(deltaX) > threshold) index += (deltaX < 0 ? 1 : -1);
-    deltaX = 0; dragging = false; move(); start();
-  }
-  slider.addEventListener('pointerup', endDrag);
-  slider.addEventListener('pointercancel', endDrag);
+    deltaX = 0; move(); start();
+  };
 
-  start();  // jalan otomatis
+  if ('onpointerdown' in window){
+    slider.addEventListener('pointerdown', e => onStart(e.clientX));
+    slider.addEventListener('pointermove', e => onMove(e.clientX));
+    slider.addEventListener('pointerup', onEnd);
+    slider.addEventListener('pointercancel', onEnd);
+  } else {
+    slider.addEventListener('touchstart', e => onStart(e.touches[0].clientX), {passive:true});
+    slider.addEventListener('touchmove',  e => onMove(e.touches[0].clientX),  {passive:true});
+    slider.addEventListener('touchend', onEnd);
+  }
+
+  start(); // mulai auto
 })();
 </script>
   
