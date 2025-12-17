@@ -1156,6 +1156,17 @@ to { --angle: 360deg; }
   }
 }
 
+  /* pastikan ring emas di bawah */
+.pas-slider::after{
+  z-index: 1;
+}
+
+/* pastikan dot di atas SEMUANYA */
+.pas-slider .slider-dots{
+  z-index: 10;
+  pointer-events: auto;
+}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
