@@ -1042,7 +1042,11 @@ to { --angle: 360deg; }
   filter: blur(1px);
 }
 @keyframes nxCometFly{ to{ transform: translate(-50%,-50%) translate(var(--dx), var(--dy)); opacity:0; } }
-@media (prefers-reduced-motion: reduce){ #nx-comets{ display:none !important; } }
+@media (prefers-reduced-motion: reduce){
+  .pas-slider .slider-track{
+    transition-duration: 0.001ms !important;
+  }
+}
 
 /* === NX-S5: GHOST TRAIL (nx-) === */
 #nx-trails{position:fixed;inset:0;pointer-events:none;z-index:8;}
@@ -1061,7 +1065,11 @@ to { --angle: 360deg; }
   background:conic-gradient(from var(--nx-ang,0deg), rgba(255,215,0,.20), rgba(255,255,255,.08), rgba(255,215,0,.20));
   filter:blur(6px);opacity:.28;mix-blend-mode:screen;
 }
-@media (prefers-reduced-motion: reduce){ #nx-trails{display:none!important;} }
+@media (prefers-reduced-motion: reduce){
+  .pas-slider .slider-track{
+    transition-duration: 0.001ms !important;
+  }
+}
 
   /* Samakan ukuran slider & marquee via variabel */
 :root{ --marquee-max: 680px; }               /* ukuran desktop box teks berjalan */
@@ -1121,15 +1129,19 @@ to { --angle: 360deg; }
   display:flex; gap:8px; z-index:5;
 }
 .pas-slider .slider-dots .dot{
-  width:9px; height:9px; border-radius:50%;
-  border:1px solid rgba(255,255,255,.6);
-  background: rgba(255,255,255,.3);
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  border:1px solid #fff;
+  background: rgba(0,0,0,.45); /* kontras */
   cursor:pointer;
 }
+
 .pas-slider .slider-dots .dot.active{
-  background:#ffd700; border-color:#b8860b;
+  background:#ffd700;
+  border-color:#b8860b;
   box-shadow:0 0 10px rgba(255,215,0,.9);
-  transform: scale(1.15);
+  transform: scale(1.2);
 }
 
 /* Mobile modern & lawas: aman dan responsif */
@@ -1139,7 +1151,9 @@ to { --angle: 360deg; }
 
 /* Reduce motion */
 @media (prefers-reduced-motion: reduce){
-  .pas-slider .slider-track{ transition: none !important; }
+  .pas-slider .slider-track{
+    transition-duration: 0.001ms !important;
+  }
 }
 
 </style>
