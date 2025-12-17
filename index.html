@@ -3,6 +3,10 @@
 <head>
 <title>Papanatasslot - Dana Kaget</title>
 <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/049b1ca3-db9f-42b9-980d-7363faac5600.png">
+<link rel="preload" as="image" href="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/GARANSI.jpg?raw=true">
+<link rel="preload" as="image" href="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/LUCKYANGPAO.jpg">
+<link rel="preload" as="image" href="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/NEW.jpg">
+<link rel="preload" as="image" href="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/HARIAN.jpg">
 <base target="_top">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- Fonts -->
@@ -1064,20 +1068,41 @@ to { --angle: 360deg; }
 .marquee-box{ max-width: var(--marquee-max); }
 
 /* ===== SLIDER (di bawah marquee) ===== */
-.pas-slider{
+
+  .pas-slider{
   position: relative;
   margin: 10px auto 12px;
-  width: min(96vw, var(--marquee-max));      /* desktop = sama dgn marquee, mobile = 96vw */
-  aspect-ratio: 1110 / 180;                  /* rasio asli gambar */
+  width: 100%;
+  max-width: var(--marquee-max);
+  aspect-ratio: 16 / 3;
   border-radius: 14px;
   overflow: hidden;
-  background: #000;
-  box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 0 22px rgba(255,215,0,.20);
+  background: #111; /* penting: cegah frame hitam */
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.35),
+    0 0 22px rgba(255,215,0,.20);
 }
-/* Fallback HP lawas (tanpa aspect-ratio) */
-@supports not (aspect-ratio: 1110 / 180){
-  .pas-slider{ height: 0; padding-top: 16.216%; }  /* 180/1110 * 100% */
-  .pas-slider .slider-track{ position:absolute; inset:0; }
+
+/* fallback browser lama */
+@supports not (aspect-ratio: 16 / 3){
+  .pas-slider{
+    height: 0;
+    padding-top: 18.75%;
+  }
+  .pas-slider .slider-track{
+    position:absolute;
+    inset:0;
+  }
+}
+
+/* track (SATU-SATUNYA) */
+.pas-slider .slider-track{
+  display:flex;
+  height:100%;
+  transition: transform .65s cubic-bezier(.22,.8,.22,1);
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translate3d(0,0,0);
 }
 
 .pas-slider::after{ /* ring emas tipis */
@@ -1086,12 +1111,6 @@ to { --angle: 360deg; }
   background: linear-gradient(160deg,#ffe27a 0%,#f1c232 45%,#b8860b 100%);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor; mask-composite: exclude;
-}
-
-.pas-slider .slider-track{
-  display:flex; height:100%;
-  transition: transform .65s cubic-bezier(.22,.8,.22,1);
-  will-change: transform;
 }
 .pas-slider .slide{ flex:0 0 100%; height:100%; }
 .pas-slider img{ width:100%; height:100%; object-fit:cover; display:block; }
@@ -1123,23 +1142,6 @@ to { --angle: 360deg; }
   .pas-slider .slider-track{ transition: none !important; }
 }
 
-/* === FIX ALIGN SLIDER = SAMA DENGAN MARQUEE === */
-:root { --marquee-max: 680px; }           /* pastikan sama dengan marquee */
-.marquee-box { max-width: var(--marquee-max); }  /* sudah ada, biarkan */
-
-.pas-slider{
-  width: 100% !important;                 /* jangan pakai vw */
-  max-width: var(--marquee-max) !important;
-  margin: 10px auto 12px !important;      /* tetap center */
-  box-sizing: border-box;
-}
-
-/* Fallback HP lawas tanpa aspect-ratio: tetap center & proporsional */
-@supports not (aspect-ratio: 1110 / 180){
-  .pas-slider{ height: 0; padding-top: 16.216%; } /* 180/1110*100 */
-  .pas-slider .slider-track{ position:absolute; inset:0; }
-}
-
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -1165,19 +1167,19 @@ Deposit Minimal 100,000 Dan Dapatkan Bonus Garansi Kekalahan 100% Di Akhir Klaim
   <div class="slider-track">
     <div class="slide">
       <img src="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/GARANSI.jpg?raw=true"
-           alt="Garansi Kekalahan 100%" loading="lazy">
+           alt="Garansi Kekalahan 100%" decoding="async">
     </div>
     <div class="slide">
       <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/LUCKYANGPAO.jpg"
-           alt="Lucky Angpao" loading="lazy">
+           alt="Lucky Angpao" decoding="async">
     </div>
     <div class="slide">
       <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/NEW.jpg"
-           alt="Event Baru" loading="lazy">
+           alt="Event Baru" decoding="async">
     </div>
     <div class="slide">
       <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/HARIAN.jpg"
-           alt="Bonus Harian" loading="lazy">
+           alt="Bonus Harian" decoding="async">
     </div>
   </div>
   <div class="slider-dots" id="sliderDots" aria-label="Navigasi slider"></div>
@@ -2101,7 +2103,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     dots.forEach((d, i) => d.classList.toggle('active', i === active));
   }
   function setTransform(){
-    track.style.transform = `translateX(-${index * 100}%)`;
+    track.style.transform = `translate3d(-${index * 100}%,0,0)`;
   }
   function move(){ requestAnimationFrame(setTransform); updateDots(); }
 
@@ -2139,7 +2141,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   let startX = 0, deltaX = 0, dragging = false;
   const onStart = x => { dragging = true; startX = x; stop(); track.style.transition = 'none'; };
   const onMove  = x => { if(!dragging) return; deltaX = x - startX;
-                         track.style.transform = `translateX(calc(-${index*100}% + ${deltaX}px))`; };
+                         track.style.transform = `translate3d(calc(-${index*100}% + ${deltaX}px), 0, 0)`;
   const onEnd   = () => {
     if(!dragging) return;
     dragging = false; track.style.transition = '';
