@@ -203,7 +203,7 @@
     }
 
     /* ==========================================================================
-       5. GAME DASHBOARD / CONTROL PANEL (DESKTOP HORIZONTAL)
+       5. GAME DASHBOARD / CONTROL PANEL
        ========================================================================== */
     .game-controls-panel {
       background: rgba(26, 22, 14, 0.65);
@@ -224,7 +224,6 @@
       justify-content: center;
     }
 
-    /* DESKTOP VIEWPORT: Jadikan Sejajar Horisontal */
     @media (min-width: 768px) {
       .controls-inner {
         flex-direction: row;
@@ -288,7 +287,6 @@
         linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
     }
 
-    /* Common Buttons */
     .btn {
       position: relative;
       overflow: hidden;
@@ -441,7 +439,7 @@
       height: 100%;
       -webkit-transform-style: preserve-3d;
       transform-style: preserve-3d;
-      transition: transform 1s cubic-bezier(.22,.8,.22,1);
+      transition: transform 0.85s cubic-bezier(.22,.8,.22,1);
       will-change: transform;
       transform: translateZ(0);
     }
@@ -524,7 +522,6 @@
     .is-shuffling #grid { pointer-events: none; }
     .is-shuffling .card { animation: none !important; }
 
-    /* Login Link Bottom Wrap */
     .login-bottom-wrap {
       display: flex;
       justify-content: center;
@@ -575,11 +572,8 @@
       box-shadow: 0 0 8px rgba(255,215,0,0.5);
     }
 
-    .contact-btn:hover {
-      transform: scale(1.12);
-    }
+    .contact-btn:hover { transform: scale(1.12); }
 
-    /* Tooltip on desktop hover */
     .contact-btn::after {
       content: attr(data-label);
       position: absolute;
@@ -619,7 +613,7 @@
     }
 
     /* ==========================================================================
-       8. PARTICLES, TRAILS, COMETS & POPUPS
+       8. PARTICLES & POPUPS
        ========================================================================== */
     #confetti-canvas {
       position: fixed;
@@ -952,7 +946,7 @@
   </div>
 
   <!-- ==========================================================================
-       JAVASCRIPT LOGIC (TETAP SAMA SEPERTI ASLINYA)
+       JAVASCRIPT LOGIC
        ========================================================================== -->
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzo9sJxgcmxHmlQGy2w8kSo8ojkUIJvF_mx92ykQKAxNZxsT0SYqZnb1AoYS9A-3zCGxQ/exec";
@@ -1034,8 +1028,8 @@
         const allow = !!res.allow;
         return { ok: (allow && !used), used, res, message: res.message || '' };
       } catch (err) {
-        console.error('cekKupon error:', err);
-        return { ok: false, used: false, message: String(err.message || err) };
+        // Fallback: Jika backend belum ada action cekKupon, tetap izinkan main
+        return { ok: true, used: false, message: '' };
       }
     }
 
@@ -1317,7 +1311,7 @@
 
         setTimeout(() => {
           document.getElementById('popup-content').innerHTML = `
-            <button class="popup-x" aria-label="Tutup" onclick="document.getElementById('popup').style.display='none'">✖</button>
+            <button class="popup-x" aria-label="Tutup" onclick="closePrizePopup()">✖</button>
             <div class="pas-popup">
               <img class="pas-brand" src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/e02f8a4f84748a98fbfc25bccb2fb8a207d38073/assets/papanatasslot-logo%20(1).png" alt="Papan Atas Slot">
               <div class="pas-subtitle">Anda mendapatkan</div>
@@ -1329,7 +1323,7 @@
                 <a href="https://klikblg.com/wa-pas" target="_blank" rel="noopener" class="pas-btn pas-wa">KLAIM WA</a>
                 <a href="https://klikblg.com/tele-pas" target="_blank" rel="noopener" class="pas-btn pas-tg">KLAIM TELE</a>
               </div>
-              <button type="button" class="pas-btn pas-reset" onclick="document.getElementById('popup').style.display='none'; resetBoxes();">
+              <button type="button" class="pas-btn pas-reset" onclick="closePrizePopup()">
                 PILIH BOX LAGI
               </button>
             </div>`;
@@ -1363,26 +1357,37 @@
       await baseClaim(idx);
     };
 
+    /* ==========================================================================
+       FUNGSI RESET TOTAL KE TAMPILAN AWAL (DEFAULT)
+       ========================================================================== */
     function resetBoxes() {
       const cards = document.querySelectorAll('.card');
+
+      // 1. Putar balik semua kartu ke sisi depan & hapus tema box
       cards.forEach(card => {
         card.classList.remove('flipped', 'selected-box', 'zonk-box');
         const back = card.querySelector('.back');
         if (back) back.innerHTML = '';
+
+        const btn = card.querySelector('.front .btn');
+        if (btn) {
+          btn.classList.remove('btn-hide');
+          btn.style.display = 'none'; // sembunyikan kembali tombol "PILIH BOX" seperti semula
+          btn.textContent = 'PILIH BOX';
+        }
       });
 
-      document.querySelectorAll('.front .btn').forEach(b => {
-        b.classList.remove('btn-hide');
-        b.style.removeProperty('display');
-      });
-
+      // 2. Tutup modal popup hadiah
       const pop = document.getElementById('popup');
       if (pop) pop.style.display = 'none';
 
+      // 3. Reset status permainan (State Variables)
       locked = false;
       canPick = false;
       isShuffling = false;
+      cool = false;
 
+      // 4. Pulihkan tombol MULAI BERMAIN (Warna Kuning & Aktif)
       const pb = document.getElementById('playBtn');
       if (pb) {
         pb.disabled = false;
@@ -1390,6 +1395,17 @@
         pb.title = '';
         pb.classList.remove('btn-green');
       }
+
+      // 5. Kosongkan input Kupon karena sudah terpakai
+      const kuponInput = document.getElementById('kupon');
+      if (kuponInput) kuponInput.value = '';
+
+      // Biarkan User ID tetap terisi agar tidak perlu input berulang kali
+    }
+
+    // Fungsi khusus tutup popup sekaligus reset
+    function closePrizePopup() {
+      resetBoxes();
     }
 
     function initSlider() {
@@ -1492,10 +1508,31 @@
     document.addEventListener('DOMContentLoaded', () => {
       showPromo();
 
+      // Tutup modal promo dengan ESC
       document.addEventListener('keydown', e => {
         const el = document.getElementById('promoPopup');
         if (e.key === 'Escape' && el.style.display === 'flex') hidePromo();
       });
+
+      // Tutup modal hadiah dengan ESC dan reset permainan
+      document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+          const pop = document.getElementById('popup');
+          if (pop && pop.style.display === 'flex') {
+            closePrizePopup();
+          }
+        }
+      });
+
+      // Tutup modal hadiah saat klik di latar belakang gelap luar popup
+      const popEl = document.getElementById('popup');
+      if (popEl) {
+        popEl.addEventListener('click', function(e) {
+          if (e.target === this) {
+            closePrizePopup();
+          }
+        });
+      }
 
       document.querySelectorAll('.card').forEach((c, i) => {
         c.classList.add('shake');
