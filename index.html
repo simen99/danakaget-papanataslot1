@@ -23,7 +23,7 @@
 
   <style>
     /* ==========================================================================
-       1. VARIABLES & LUXURY BACKGROUND
+       1. VARIABLES & CLEAN HARDWARE ACCELERATED STYLES
        ========================================================================== */
     :root {
       --gold1: #ffd700;
@@ -37,7 +37,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(ellipse at 50% 15%, #2a2007 0%, #111116 55%, #08080a 100%);
+      background: #0e0d11 radial-gradient(circle at 50% 15%, #251c07 0%, #0e0d11 75%);
       color: #fff;
       text-align: center;
       padding: 24px 12px 60px;
@@ -53,7 +53,7 @@
     }
 
     /* ==========================================================================
-       2. HEADER & BRANDING
+       2. HEADER
        ========================================================================== */
     #pageTitle {
       font-family: 'Orbitron', sans-serif;
@@ -61,7 +61,7 @@
       letter-spacing: 1px;
       margin: 0 0 16px;
       font-size: 34px;
-      text-shadow: 0 0 18px rgba(255, 204, 0, 0.45);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
     }
 
     #pageTitle .line1 .em { display: none; }
@@ -70,7 +70,6 @@
       content: "🎁";
       display: inline;
       margin: 0 .25em;
-      filter: drop-shadow(0 0 8px rgba(255,215,0,0.5));
     }
     #pageTitle .line1 { margin-right: .25em; }
 
@@ -87,7 +86,7 @@
     }
 
     /* ==========================================================================
-       3. MARQUEE ANNOUNCEMENT BAR
+       3. MARQUEE BANNER
        ========================================================================== */
     .marquee-box {
       display: flex;
@@ -97,12 +96,12 @@
       border-radius: 12px;
       width: 100%;
       margin: 0 auto 14px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.35), inset 0 2px 0 rgba(255,255,255,0.45);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.35);
       border: 1px solid #b37b00;
     }
 
     .marquee-icon {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 800;
       margin-right: 10px;
       flex-shrink: 0;
@@ -117,20 +116,21 @@
     .marquee-text {
       display: inline-block;
       white-space: nowrap;
-      animation: marqueeAnim 16s linear infinite;
+      animation: marqueeAnim 18s linear infinite;
       font-weight: 800;
       font-size: 14px;
       color: #1a1300;
       letter-spacing: .3px;
+      will-change: transform;
     }
 
     @keyframes marqueeAnim {
-      0%   { transform: translateX(100%); }
-      100% { transform: translateX(-100%); }
+      0%   { transform: translate3d(100%, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
     }
 
     /* ==========================================================================
-       4. PROMO SLIDER
+       4. PROMO SLIDER (SMOOTH & LIGHTWEIGHT)
        ========================================================================== */
     .pas-slider {
       position: relative;
@@ -139,8 +139,8 @@
       aspect-ratio: 16 / 4.2;
       border-radius: 16px;
       overflow: hidden;
-      background: #0d0d0f;
-      box-shadow: 0 12px 30px rgba(0,0,0,.5), 0 0 25px rgba(255,215,0,.2);
+      background: #000;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       border: 1px solid rgba(255,215,0,0.3);
     }
 
@@ -152,23 +152,8 @@
     .pas-slider .slider-track {
       display: flex;
       height: 100%;
-      transition: transform .65s cubic-bezier(.22,.8,.22,1);
+      transition: transform .5s cubic-bezier(.22,.8,.22,1);
       will-change: transform;
-      backface-visibility: hidden;
-    }
-
-    .pas-slider::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      border-radius: 16px;
-      padding: 3px;
-      background: linear-gradient(160deg, #ffe27a 0%, #f1c232 45%, #b8860b 100%);
-      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      z-index: 1;
     }
 
     .pas-slider .slide { flex: 0 0 100%; height: 100%; }
@@ -181,7 +166,7 @@
       transform: translateX(-50%);
       display: flex;
       gap: 8px;
-      z-index: 10;
+      z-index: 5;
     }
 
     .pas-slider .slider-dots .dot {
@@ -189,7 +174,7 @@
       height: 9px;
       border-radius: 50%;
       border: 1px solid #fff;
-      background: rgba(0,0,0,.5);
+      background: rgba(0,0,0,.6);
       cursor: pointer;
       padding: 0;
       transition: transform .2s, background-color .2s;
@@ -198,22 +183,19 @@
     .pas-slider .slider-dots .dot.active {
       background: #ffd700;
       border-color: #b8860b;
-      box-shadow: 0 0 10px rgba(255,215,0,.9);
       transform: scale(1.25);
     }
 
     /* ==========================================================================
-       5. GAME DASHBOARD / CONTROL PANEL
+       5. GAME DASHBOARD CONTROL PANEL (DESKTOP HORIZONTAL)
        ========================================================================== */
     .game-controls-panel {
-      background: rgba(26, 22, 14, 0.65);
+      background: #17151a;
       border: 1px solid rgba(255, 215, 0, 0.35);
-      border-radius: 18px;
+      border-radius: 16px;
       padding: 14px 18px;
       margin: 0 auto 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
 
     .controls-inner {
@@ -247,15 +229,12 @@
       padding: 12px 14px 12px 46px;
       border-radius: 12px;
       border: 1px solid #b37b00;
-      background:
-        radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
-        linear-gradient(165deg, #ffe27a 0%, #f1c232 40%, #d8a700 100%);
+      background: linear-gradient(165deg, #ffe27a 0%, #f1c232 40%, #d8a700 100%);
       color: #1a1300;
       font-weight: 700;
       letter-spacing: .2px;
       outline: 0;
-      transition: transform .18s ease, box-shadow .2s ease, border-color .2s ease;
-      box-shadow: inset 0 2px 0 rgba(255,255,255,.45), inset 0 -3px 8px rgba(0,0,0,.15), 0 4px 12px rgba(0,0,0,.2);
+      transition: transform .15s ease, border-color .15s ease;
       font-family: inherit;
     }
 
@@ -264,32 +243,26 @@
       text-transform: uppercase;
       letter-spacing: .5px;
       font-weight: 800;
-      text-shadow: 0 1px 0 rgba(255,255,255,.3);
     }
 
-    .input-gold:hover, .input-gold:focus {
-      transform: translateY(-1px);
+    .input-gold:focus {
       border-color: #ffcf33;
-      box-shadow: inset 0 2px 0 rgba(255,255,255,.55), 0 0 0 3px rgba(255,207,51,.3), 0 8px 18px rgba(255,215,0,.25);
+      transform: translateY(-1px);
     }
 
     #userId {
       background:
         url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z' fill='%231a1300'/%3E%3C/svg%3E") no-repeat 14px 50% / 22px,
-        radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
         linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
     }
 
     #kupon {
       background:
         url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%231a1300' d='M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 1 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 1 0 0-4Zm6 1h2v8H9Zm4 0h2v8h-2Z'/%3E%3C/svg%3E") no-repeat 14px 50% / 22px,
-        radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
         linear-gradient(165deg,#ffe27a 0%, #f1c232 40%, #d8a700 100%);
     }
 
     .btn {
-      position: relative;
-      overflow: hidden;
       padding: 10px 18px;
       margin-bottom: 10px;
       border-radius: 12px;
@@ -298,34 +271,15 @@
       font-weight: 900;
       cursor: pointer;
       border: 2px solid #000 !important;
-      transition: transform .15s, box-shadow .2s;
-      animation: pulse 1.5s infinite;
-      box-shadow: 0 4px 0 rgba(0,0,0,.25);
+      transition: transform .12s ease;
       font-family: inherit;
     }
 
     .btn:hover {
-      transform: translateY(-1px) scale(1.03);
-      box-shadow: 0 6px 0 rgba(0,0,0,.28), 0 0 14px rgba(255,215,0,.8);
+      transform: scale(1.03);
     }
 
-    .btn:disabled { opacity: .6; cursor: not-allowed; animation: none; }
-
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 4px 0 rgba(0,0,0,.25), 0 0 0 rgba(255,215,0,0); }
-      50%      { box-shadow: 0 4px 0 rgba(0,0,0,.25), 0 0 14px rgba(255,215,0,.9); }
-    }
-
-    .btn .ripple {
-      position: absolute;
-      border-radius: 50%;
-      transform: scale(0);
-      opacity: .6;
-      pointer-events: none;
-      background: #fff;
-      animation: btnRipple .6s ease-out forwards;
-    }
-    @keyframes btnRipple { to { transform: scale(10); opacity: 0; } }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
 
     .btn-like-login {
       display: flex;
@@ -336,40 +290,36 @@
       padding: 12px 14px;
       border-radius: 12px;
       border: 1px solid #b37b00 !important;
-      background:
-        radial-gradient(120% 80% at 30% 0%, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 60%),
-        linear-gradient(165deg, #ffe27a 0%, #f1c232 40%, #d8a700 100%) !important;
+      background: linear-gradient(165deg, #ffe27a 0%, #f1c232 40%, #d8a700 100%) !important;
       color: #1a1300 !important;
       text-decoration: none !important;
       text-transform: uppercase;
       font-weight: 900;
       letter-spacing: .6px;
-      text-shadow: 0 1px 0 rgba(255,255,255,.35);
-      animation: none !important;
       cursor: pointer;
+      transition: transform .15s ease;
     }
+
+    .btn-like-login:hover { transform: translateY(-1px); }
 
     .btn-green {
       background: linear-gradient(165deg, #22c55e 0%, #16a34a 45%, #0f7a3b 100%) !important;
       color: #fff !important;
       border-color: #0b5e2e !important;
-      box-shadow: 0 4px 0 rgba(0,0,0,.28), 0 0 14px rgba(34,197,94,.5) !important;
     }
 
     #playBtn.btn-green:disabled { opacity: 1 !important; cursor: default !important; }
 
     /* ==========================================================================
-       6. GAME STAGE / ARENA (THE 6 BOXES)
+       6. GAME ARENA (OPTIMIZED HARDWARE 3D FLIP)
        ========================================================================== */
     .game-arena {
-      background: radial-gradient(circle at 50% 30%, rgba(35, 30, 15, 0.7) 0%, rgba(15, 15, 20, 0.85) 100%);
+      background: #151319;
       border: 1.5px solid rgba(255, 215, 0, 0.28);
-      border-radius: 22px;
+      border-radius: 20px;
       padding: 24px 20px 20px;
       margin: 0 auto 20px;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 0 30px rgba(255, 215, 0, 0.1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
     }
 
     .arena-header {
@@ -421,31 +371,26 @@
       margin-inline: auto;
       cursor: pointer;
       border-radius: 18px;
-      transition: box-shadow .25s ease, transform .2s ease;
       will-change: transform;
-      contain: paint;
+      transition: transform .2s ease;
     }
 
     .card:hover {
-      box-shadow: 0 0 16px rgba(255,215,0,0.95), 0 0 32px rgba(255,215,0,0.5);
-      transform: translateY(-3px) scale(1.03);
+      transform: translateY(-3px) scale(1.02);
     }
 
-    .card.flipped:hover { box-shadow: none; transform: none; }
+    .card.flipped:hover { transform: none; }
 
     .card-inner {
       position: relative;
       width: 100%;
       height: 100%;
-      -webkit-transform-style: preserve-3d;
       transform-style: preserve-3d;
-      transition: transform 0.85s cubic-bezier(.22,.8,.22,1);
+      transition: transform 0.6s cubic-bezier(.2,.8,.2,1);
       will-change: transform;
-      transform: translateZ(0);
     }
 
     .card.flipped .card-inner {
-      -webkit-transform: rotateY(180deg);
       transform: rotateY(180deg);
     }
 
@@ -454,12 +399,12 @@
       inset: 0;
       border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 0 1.5px rgba(255,215,0,0.6);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      -webkit-backface-visibility: hidden;
       backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
 
     .front {
@@ -467,16 +412,17 @@
       background-size: cover;
       background-position: center;
       padding: 10px;
+      border: 1.5px solid rgba(255,215,0,0.5);
     }
 
     .back {
-      -webkit-transform: rotateY(180deg);
       transform: rotateY(180deg);
       background: linear-gradient(160deg, var(--gold1) 0%, var(--gold2) 50%, var(--gold3) 100%);
       color: #111;
       display: flex;
       align-items: center !important;
       justify-content: center !important;
+      border: 1.5px solid #ffcc00;
     }
 
     .grid .card .front .btn { display: none; margin-bottom: 6px; }
@@ -484,13 +430,13 @@
     .card.selected-box .back {
       background: linear-gradient(160deg, #00c853 0%, #00e676 50%, #1b5e20 100%) !important;
       color: #fff !important;
-      box-shadow: 0 0 20px rgba(0,255,120,.85), 0 0 40px rgba(0,255,120,.45);
+      border-color: #00ff73;
     }
 
     .card.zonk-box .back {
       background: linear-gradient(160deg, #ff3b30 0%, #ff6b6b 50%, #b00020 100%) !important;
       color: #fff !important;
-      box-shadow: 0 0 20px rgba(255,59,48,.85);
+      border-color: #ff3b30;
     }
 
     .saldo-wrap { text-align: center; }
@@ -501,24 +447,21 @@
     }
     .zonk-label { font-size: 24px; }
 
+    /* Ringan: Goyangan halus tanpa lag */
     @keyframes pasShake {
-      0%, 100% { transform: translate3d(0,0,0) rotate(0deg); }
-      5%  { transform: translate3d(1px,-1px,0) rotate(-0.4deg); }
-      10% { transform: translate3d(-1px,1px,0) rotate(0.4deg); }
-      15% { transform: translate3d(1px,0,0) rotate(-0.3deg); }
-      20% { transform: translate3d(-1px,0,0) rotate(0.3deg); }
-      25% { transform: translate3d(0,1px,0) rotate(-0.2deg); }
-      30% { transform: translate3d(0,-1px,0) rotate(0.2deg); }
-      60%, 99% { transform: translate3d(0,0,0) rotate(0deg); }
+      0%, 100% { transform: translate3d(0,0,0); }
+      20% { transform: translate3d(-1px, 1px, 0); }
+      40% { transform: translate3d(1px, -1px, 0); }
+      60% { transform: translate3d(-1px, 0, 0); }
+      80% { transform: translate3d(1px, 1px, 0); }
     }
 
     .card.shake {
-      animation: pasShake 4.5s ease-in-out infinite;
+      animation: pasShake 4s ease-in-out infinite;
       animation-delay: var(--shake-delay, 0s);
     }
 
     .card:hover, .card.flipped { animation: none !important; }
-
     .is-shuffling #grid { pointer-events: none; }
     .is-shuffling .card { animation: none !important; }
 
@@ -546,21 +489,20 @@
       z-index: 9999;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      background: rgba(18, 18, 22, 0.6);
+      gap: 12px;
+      background: #141318;
       padding: 10px;
       border-radius: 40px;
       border: 1px solid rgba(255, 215, 0, 0.25);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
     }
 
     .contact-btn {
       position: relative;
       display: block;
-      width: 52px;
-      height: 52px;
-      transition: transform .2s ease;
+      width: 50px;
+      height: 50px;
+      transition: transform .15s ease;
     }
 
     .contact-btn img {
@@ -569,36 +511,31 @@
       border-radius: 50%;
       padding: 2px;
       background: linear-gradient(145deg, #ffd700, #b8860b);
-      box-shadow: 0 0 8px rgba(255,215,0,0.5);
     }
 
-    .contact-btn:hover { transform: scale(1.12); }
+    .contact-btn:hover { transform: scale(1.1); }
 
     .contact-btn::after {
       content: attr(data-label);
       position: absolute;
-      left: 64px;
+      left: 62px;
       top: 50%;
-      transform: translateY(-50%) translateX(-8px);
+      transform: translateY(-50%);
       background: #111;
       color: #ffcc00;
       border: 1px solid #b37b00;
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 6px;
       font-size: 12px;
       font-weight: 700;
       white-space: nowrap;
       opacity: 0;
       pointer-events: none;
-      transition: all .2s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+      transition: opacity .15s ease;
     }
 
     @media (min-width: 768px) {
-      .contact-btn:hover::after {
-        opacity: 1;
-        transform: translateY(-50%) translateX(0);
-      }
+      .contact-btn:hover::after { opacity: 1; }
     }
 
     @media (max-width: 720px) {
@@ -606,14 +543,14 @@
         left: 14px;
         bottom: 20px;
         padding: 6px;
-        gap: 10px;
+        gap: 8px;
       }
       .contact-btn { width: 44px; height: 44px; }
       .contact-btn::after { display: none; }
     }
 
     /* ==========================================================================
-       8. PARTICLES & POPUPS
+       8. POPUPS (RINGAN TANPA BLUR)
        ========================================================================== */
     #confetti-canvas {
       position: fixed;
@@ -622,103 +559,15 @@
       z-index: 10000;
     }
 
-    #pas-bokeh {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      overflow: hidden;
-    }
-
-    .bokeh-dot {
-      position: absolute;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,215,0,.35), rgba(255,255,255,0) 70%);
-      opacity: .12;
-      animation: bokehFloat var(--bk-dur, 18s) linear infinite;
-      filter: blur(1.5px);
-    }
-
-    @keyframes bokehFloat {
-      0%   { transform: translateY(110vh) translateX(0) scale(var(--bk-scale,1)); }
-      100% { transform: translateY(-20vh) translateX(var(--bk-dx, 40px)) scale(var(--bk-scale,1)); }
-    }
-
-    .sparkles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-    .sparkles .sp {
-      position: absolute; width: 6px; height: 6px; border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,0) 60%), radial-gradient(circle at 70% 70%, #ffd700, rgba(255,215,0,0) 70%);
-      box-shadow: 0 0 6px rgba(255,215,0,.7);
-      animation: spTwinkle var(--sp-dur, 2.2s) ease-in-out infinite;
-      opacity: 0;
-    }
-    @keyframes spTwinkle {
-      0%, 100% { transform: scale(.6); opacity: 0; }
-      50%      { transform: scale(1.2); opacity: 1; }
-    }
-
-    .pas-dust { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
-    .pas-dust .d {
-      position: absolute; border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,215,0,.0) 65%);
-      opacity: .10; filter: blur(0.5px);
-      animation: pasDust 10s linear infinite;
-    }
-    @keyframes pasDust {
-      0%   { transform: translateY(20%); opacity: 0; }
-      10%, 80% { opacity: .12; }
-      100% { transform: translateY(-120%); opacity: 0; }
-    }
-
-    .fx-glowwave {
-      position: absolute; inset: 0; border-radius: 18px; pointer-events: none;
-      background: conic-gradient(from var(--angle, 0deg), rgba(255,215,0,0.35), rgba(255,255,255,0.08), rgba(255,215,0,0.35));
-      mix-blend-mode: screen; animation: fxGlowWaveSpin 8s linear infinite; opacity: 0.5;
-    }
-    @keyframes fxGlowWaveSpin { to { --angle: 360deg; } }
-
-    .card.flipped .sparkles, .card.flipped .pas-dust, .card.flipped .fx-glowwave { display: none; }
-
-    .nx-flash {
-      position: absolute; inset: 0; pointer-events: none; border-radius: 18px;
-      background: radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,.85), rgba(255,215,0,.65) 35%, transparent 70%);
-      mix-blend-mode: screen; filter: blur(2px);
-      animation: nxFlash .42s ease-out forwards;
-    }
-    @keyframes nxFlash { from { opacity: 0; } 50% { opacity: 1; } to { opacity: 0; } }
-
-    #nx-comets { position: fixed; inset: 0; pointer-events: none; z-index: 10; }
-    .nx-comet {
-      position: absolute; width: 10px; height: 10px; border-radius: 50%;
-      background: radial-gradient(circle, #fff, rgba(255,255,255,0) 65%), radial-gradient(circle, #ffd700, rgba(255,215,0,0) 75%);
-      box-shadow: 0 0 18px rgba(255,215,0,.7);
-      opacity: .95; transform: translate(-50%, -50%);
-    }
-    .nx-comet::after {
-      content: ""; position: absolute; right: 50%; top: 50%; height: 2px; width: 140px;
-      transform: translateY(-50%);
-      background: linear-gradient(90deg, rgba(255,215,0,0), rgba(255,215,0,.7));
-      filter: blur(1px);
-    }
-    @keyframes nxCometFly { to { transform: translate(-50%,-50%) translate(var(--dx), var(--dy)); opacity: 0; } }
-
-    #nx-trails { position: fixed; inset: 0; pointer-events: none; z-index: 8; }
-    .nx-trail { position: absolute; border-radius: 18px; overflow: hidden; will-change: transform, opacity; }
-    .nx-trail::before {
-      content: ""; position: absolute; inset: 0; border-radius: 18px;
-      background: radial-gradient(60% 60% at 50% 50%, rgba(255,255,255,.25), transparent 65%), linear-gradient(120deg, rgba(255,215,0,.40), rgba(255,215,0,.05));
-      mix-blend-mode: screen; filter: blur(2px); opacity: .85;
-    }
-
     /* Prize Popup */
     #popup {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-      background: rgba(0,0,0,.85); z-index: 10050; backdrop-filter: blur(6px);
+      background: rgba(0,0,0,.85); z-index: 10050;
     }
     #popup .popup-box {
       position: relative; width: min(92%, 390px); padding: 24px; border-radius: 18px;
-      background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
-      color: #111; box-shadow: 0 20px 40px rgba(0,0,0,.5);
+      background: #f8f9fa;
+      color: #111; box-shadow: 0 15px 35px rgba(0,0,0,.6);
     }
     .pas-popup { font-family: 'Poppins', sans-serif; text-align: center; }
     .pas-popup .pas-brand { width: 180px; margin: 0 auto 8px; }
@@ -729,7 +578,7 @@
     .pas-popup .pas-meta { font-size: 14px; margin: 3px 0; font-weight: 700; }
     .pas-popup .pas-hint {
       margin: 12px auto; padding: 10px; max-width: 340px; border-radius: 10px;
-      background: #fff; font-weight: 800; font-size: 12px; border: 1px solid rgba(0,0,0,.1);
+      background: #eee; font-weight: 800; font-size: 12px;
     }
     .pas-btn {
       display: block; width: min(100%, 340px); margin: 6px auto; padding: 12px;
@@ -749,11 +598,11 @@
     /* Promo Popup Modal */
     .promo-overlay {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-      background: rgba(0,0,0,.85); z-index: 10080; backdrop-filter: blur(6px);
+      background: rgba(0,0,0,.85); z-index: 10080;
     }
     .promo-box {
       width: 610px; height: 310px; position: relative; overflow: hidden; border-radius: 16px;
-      background: #000; box-shadow: 0 15px 40px rgba(0,0,0,.6), 0 0 25px rgba(255,215,0,.35);
+      background: #000; box-shadow: 0 15px 40px rgba(0,0,0,.6);
       border: 2px solid rgba(255,215,0,0.6);
     }
     .promo-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -768,16 +617,13 @@
     /* Alert Modal */
     .alert-overlay {
       position: fixed; inset: 0; display: none; align-items: center; justify-content: center;
-      background: rgba(0,0,0,.65); backdrop-filter: blur(8px); z-index: 10090;
-      opacity: 0; transition: opacity .2s ease;
+      background: rgba(0,0,0,.75); z-index: 10090;
     }
-    .alert-overlay.show { opacity: 1; }
     .alert-box {
       position: relative; width: min(92vw, 420px); padding: 24px 20px 18px; border-radius: 18px;
-      background: rgba(22, 22, 26, 0.92); border: 1px solid rgba(255,255,255,.1);
-      box-shadow: 0 15px 35px rgba(0,0,0,.6); transform: scale(.95); transition: transform .2s ease;
+      background: #18171d; border: 1px solid rgba(255,255,255,.1);
+      box-shadow: 0 15px 35px rgba(0,0,0,.6);
     }
-    .alert-overlay.show .alert-box { transform: scale(1); }
     .alert-close {
       position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 8px;
       display: grid; place-items: center; background: rgba(255,255,255,.08); border: none;
@@ -802,20 +648,15 @@
 </head>
 <body>
 
-  <!-- Background Canvas & Bokeh -->
   <canvas id="confetti-canvas"></canvas>
-  <div id="pas-bokeh"></div>
 
-  <!-- Main Unified Layout Container -->
   <div class="main-container">
 
-    <!-- Header Judul -->
     <h1 id="pageTitle">
       <span class="line1"><span class="em">🎁</span> Dana Kaget <span class="em">🎁</span></span>
       <span class="line2">Papanatasslot</span>
     </h1>
 
-    <!-- Marquee Banner -->
     <div class="marquee-box">
       <span class="marquee-icon">📢 INFO:</span>
       <div class="marquee-container">
@@ -825,7 +666,6 @@
       </div>
     </div>
 
-    <!-- Promo Slider -->
     <div class="pas-slider" id="promoSlider" aria-label="Promo Slider">
       <div class="slider-track">
         <div class="slide">
@@ -844,7 +684,6 @@
       <div class="slider-dots" id="sliderDots"></div>
     </div>
 
-    <!-- Dashboard Form Controls: Sejajar di Desktop, Bertumpuk di Mobile -->
     <div class="game-controls-panel">
       <div class="controls-inner">
         <input id="userId" class="input-gold" placeholder="USER ID" autocomplete="off">
@@ -853,7 +692,6 @@
       </div>
     </div>
 
-    <!-- Game Arena Box Stage -->
     <div class="game-arena">
       <div class="arena-header">PILIH SALAH SATU KOTAK KEBERUNTUNGAN</div>
       
@@ -897,14 +735,12 @@
       </div>
     </div>
 
-    <!-- Tombol Link Login -->
     <div class="login-bottom-wrap">
       <a class="login-link btn-like-login" href="https://papanatasslotgaming2.com" target="_top">Link Login Utama</a>
     </div>
 
   </div>
 
-  <!-- Contact Floating Dock di Kiri -->
   <div class="contact-dock">
     <a href="https://tawk.to/chat/680c7b424b378d190bfa1983/1ipoc2vkj" target="_blank" class="contact-btn" data-label="Live Chat">
       <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/bac709c8a2eaa772a7233bd7fb86015088362115/assets/livechat.gif" alt="Livechat" />
@@ -917,12 +753,10 @@
     </a>
   </div>
 
-  <!-- Hadiah Popup -->
   <div class="popup" id="popup">
     <div class="popup-box" id="popup-content"></div>
   </div>
 
-  <!-- Promo Popup -->
   <div id="promoPopup" class="promo-overlay" aria-modal="true" role="dialog">
     <div class="promo-box">
       <button class="promo-close" aria-label="Tutup" onclick="hidePromo()">✖</button>
@@ -932,7 +766,6 @@
     </div>
   </div>
 
-  <!-- Custom Alert Modal -->
   <div id="alertModal" class="alert-overlay" aria-modal="true" role="dialog">
     <div class="alert-box" role="document">
       <button class="alert-close" aria-label="Tutup" onclick="hideAlert()">✖</button>
@@ -946,7 +779,7 @@
   </div>
 
   <!-- ==========================================================================
-       JAVASCRIPT LOGIC
+       CLEAN & FAST JAVASCRIPT LOGIC
        ========================================================================== -->
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzo9sJxgcmxHmlQGy2w8kSo8ojkUIJvF_mx92ykQKAxNZxsT0SYqZnb1AoYS9A-3zCGxQ/exec";
@@ -971,7 +804,7 @@
       try { if (navigator.vibrate) navigator.vibrate(ms); } catch(e) {}
     }
 
-    function coolDown(ms = 1200) {
+    function coolDown(ms = 1000) {
       cool = true;
       setTimeout(() => cool = false, ms);
     }
@@ -999,7 +832,7 @@
 
     async function api(action, data) {
       const ctrl = new AbortController();
-      const t = setTimeout(() => ctrl.abort('timeout'), 12000);
+      const t = setTimeout(() => ctrl.abort('timeout'), 10000);
 
       const r = await fetch(GAS_URL, {
         method: 'POST',
@@ -1028,7 +861,6 @@
         const allow = !!res.allow;
         return { ok: (allow && !used), used, res, message: res.message || '' };
       } catch (err) {
-        // Fallback: Jika backend belum ada action cekKupon, tetap izinkan main
         return { ok: true, used: false, message: '' };
       }
     }
@@ -1043,8 +875,6 @@
       document.getElementById('alertMsg').textContent = message;
 
       el.style.display = 'flex';
-      void el.offsetWidth;
-      el.classList.add('show');
 
       const esc = (e) => { if (e.key === 'Escape') hideAlert(); };
       el._esc = esc;
@@ -1058,8 +888,7 @@
 
     function hideAlert() {
       const el = document.getElementById('alertModal');
-      el.classList.remove('show');
-      setTimeout(() => { el.style.display = 'none'; }, 250);
+      el.style.display = 'none';
       if (el._esc) {
         document.removeEventListener('keydown', el._esc);
         el._esc = null;
@@ -1081,7 +910,7 @@
       });
     }
 
-    async function flipCascade(list, open = true, step = 160) {
+    async function flipCascade(list, open = true, step = 100) {
       for (const card of list) {
         const inner = card.querySelector('.card-inner');
         if (open) card.classList.add('flipped'); else card.classList.remove('flipped');
@@ -1091,7 +920,7 @@
       if (lastInner) await waitEnd(lastInner);
     }
 
-    async function showPreview(showMs = 2400) {
+    async function showPreview(showMs = 1800) {
       const cards = [...document.querySelectorAll('.card')];
       document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
 
@@ -1110,20 +939,20 @@
           : `<div class="fake-amount">Rp ${shownV.toLocaleString('id-ID')}</div>`;
       });
 
-      await flipCascade(cards, true, 160);
+      await flipCascade(cards, true, 90);
       await delay(showMs);
-      await flipCascade(cards.slice().reverse(), false, 160);
+      await flipCascade(cards.slice().reverse(), false, 90);
 
       cards.forEach(c => {
         c.classList.remove('zonk-box', 'selected-box');
         c.querySelector('.back').innerHTML = '';
       });
 
-      await delay(140);
+      await delay(100);
     }
 
     async function flipReorder(order, opts = {}) {
-      const { duration = 900, easing = 'cubic-bezier(.22,.8,.22,1)' } = opts;
+      const { duration = 700, easing = 'cubic-bezier(.2,.8,.2,1)' } = opts;
       const grid  = document.getElementById('grid');
       const cards = Array.from(grid.children);
       const first = cards.map(el => el.getBoundingClientRect());
@@ -1137,20 +966,19 @@
         const oldIndex = cards.indexOf(el);
         const dx = first[oldIndex].left - last[i].left;
         const dy = first[oldIndex].top  - last[i].top;
-        const rot = (Math.random() * 0.6 - 0.3).toFixed(2);
 
         el.style.transition = 'transform 0s';
-        el.style.transform  = `translate3d(${dx}px, ${dy}px, 0) rotate(${rot}deg)`;
+        el.style.transform  = `translate3d(${dx}px, ${dy}px, 0)`;
       });
 
       await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
       newOrder.forEach((el) => {
         el.style.transition = `transform ${duration}ms ${easing}`;
-        el.style.transform  = 'translate3d(0,0,0) rotate(0deg)';
+        el.style.transform  = 'translate3d(0,0,0)';
       });
 
-      await delay(duration + 40);
+      await delay(duration + 20);
     }
 
     async function runShuffle() {
@@ -1160,7 +988,7 @@
 
       const seq = [];
       const pool = [...SHUFFLE_PATTERNS];
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 4; i++) {
         const pick = Math.floor(Math.random() * pool.length);
         seq.push(pool[pick]);
         pool.push(pool.splice(pick, 1)[0]);
@@ -1168,8 +996,8 @@
 
       try {
         for (const pat of seq) {
-          await flipReorder(pat, { duration: 1100, easing: 'cubic-bezier(.22,.8,.22,1)' });
-          await delay(220);
+          await flipReorder(pat, { duration: 750, easing: 'cubic-bezier(.2,.8,.2,1)' });
+          await delay(120);
         }
       } finally {
         document.body.classList.remove('is-shuffling');
@@ -1220,10 +1048,10 @@
       btn.textContent = 'MENAMPILKAN HADIAH…';
       document.querySelectorAll('.front .btn').forEach(b => b.style.display = 'none');
 
-      await showPreview(2000);
+      await showPreview(1500);
 
       btn.textContent = 'MENGACAK…';
-      haptic(18);
+      haptic(15);
       await runShuffle();
       reindexPickButtons();
 
@@ -1264,12 +1092,12 @@
         document.querySelectorAll('.card').forEach((c, i) => {
           if (i !== (idx - 1)) {
             const b = c.querySelector('.front .btn');
-            if (b) { b.classList.add('btn-hide'); b.style.display = 'none'; }
+            if (b) { b.style.display = 'none'; }
           }
         });
 
         const cards = document.querySelectorAll('.card');
-        cards.forEach((c, i) => setTimeout(() => c.classList.add('flipped'), i * 180));
+        cards.forEach((c, i) => setTimeout(() => c.classList.add('flipped'), i * 140));
 
         const pool = [4000, 6000, 10000, 50000, 100000, 250000];
         const hadiahAsli = toNum(res.hadiah);
@@ -1307,7 +1135,7 @@
               back.innerHTML = `<div class="fake-amount">${labelRp}</div>`;
             }
           });
-        }, 260);
+        }, 220);
 
         setTimeout(() => {
           document.getElementById('popup-content').innerHTML = `
@@ -1332,11 +1160,11 @@
           requestAnimationFrame(() => {
             const myCanvas = document.getElementById('confetti-canvas');
             const myConfetti = confetti.create(myCanvas, { resize: true, useWorker: true });
-            myConfetti({ particleCount: 160, spread: 70, origin: { y: 0.6 } });
+            myConfetti({ particleCount: 140, spread: 70, origin: { y: 0.6 } });
           });
 
           locked = true;
-        }, cards.length * 120 + 360 + 3000);
+        }, cards.length * 100 + 300 + 2500);
 
       } catch (err) {
         console.error(err);
@@ -1357,13 +1185,9 @@
       await baseClaim(idx);
     };
 
-    /* ==========================================================================
-       FUNGSI RESET TOTAL KE TAMPILAN AWAL (DEFAULT)
-       ========================================================================== */
     function resetBoxes() {
       const cards = document.querySelectorAll('.card');
 
-      // 1. Putar balik semua kartu ke sisi depan & hapus tema box
       cards.forEach(card => {
         card.classList.remove('flipped', 'selected-box', 'zonk-box');
         const back = card.querySelector('.back');
@@ -1371,23 +1195,19 @@
 
         const btn = card.querySelector('.front .btn');
         if (btn) {
-          btn.classList.remove('btn-hide');
-          btn.style.display = 'none'; // sembunyikan kembali tombol "PILIH BOX" seperti semula
+          btn.style.display = 'none';
           btn.textContent = 'PILIH BOX';
         }
       });
 
-      // 2. Tutup modal popup hadiah
       const pop = document.getElementById('popup');
       if (pop) pop.style.display = 'none';
 
-      // 3. Reset status permainan (State Variables)
       locked = false;
       canPick = false;
       isShuffling = false;
       cool = false;
 
-      // 4. Pulihkan tombol MULAI BERMAIN (Warna Kuning & Aktif)
       const pb = document.getElementById('playBtn');
       if (pb) {
         pb.disabled = false;
@@ -1396,14 +1216,10 @@
         pb.classList.remove('btn-green');
       }
 
-      // 5. Kosongkan input Kupon karena sudah terpakai
       const kuponInput = document.getElementById('kupon');
       if (kuponInput) kuponInput.value = '';
-
-      // Biarkan User ID tetap terisi agar tidak perlu input berulang kali
     }
 
-    // Fungsi khusus tutup popup sekaligus reset
     function closePrizePopup() {
       resetBoxes();
     }
@@ -1508,13 +1324,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       showPromo();
 
-      // Tutup modal promo dengan ESC
       document.addEventListener('keydown', e => {
         const el = document.getElementById('promoPopup');
         if (e.key === 'Escape' && el.style.display === 'flex') hidePromo();
       });
 
-      // Tutup modal hadiah dengan ESC dan reset permainan
       document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
           const pop = document.getElementById('popup');
@@ -1524,7 +1338,6 @@
         }
       });
 
-      // Tutup modal hadiah saat klik di latar belakang gelap luar popup
       const popEl = document.getElementById('popup');
       if (popEl) {
         popEl.addEventListener('click', function(e) {
@@ -1536,123 +1349,11 @@
 
       document.querySelectorAll('.card').forEach((c, i) => {
         c.classList.add('shake');
-        c.style.setProperty('--shake-delay', (i * 0.3) + 's');
+        c.style.setProperty('--shake-delay', (i * 0.25) + 's');
       });
-
-      document.querySelectorAll('.btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          haptic(10);
-          const d = Math.max(btn.clientWidth, btn.clientHeight);
-          const ripple = document.createElement('span');
-          ripple.className = 'ripple';
-          ripple.style.width = ripple.style.height = d + 'px';
-          const rect = btn.getBoundingClientRect();
-          ripple.style.left = (e.clientX - rect.left - d / 2) + 'px';
-          ripple.style.top  = (e.clientY - rect.top  - d / 2) + 'px';
-          btn.appendChild(ripple);
-          setTimeout(() => ripple.remove(), 650);
-        });
-      });
-
-      document.querySelectorAll('.card .face.front').forEach(face => {
-        const wrap = document.createElement('div');
-        wrap.className = 'sparkles';
-        for (let i = 0; i < 5; i++) {
-          const sp = document.createElement('span');
-          sp.className = 'sp';
-          sp.style.left = (Math.random() * 88 + 6) + '%';
-          sp.style.top  = (Math.random() * 78 + 8) + '%';
-          sp.style.setProperty('--sp-dur', (1.8 + Math.random() * 1.8).toFixed(2) + 's');
-          const s = (Math.random() * 5 + 3).toFixed(0);
-          sp.style.width = sp.style.height = s + 'px';
-          wrap.appendChild(sp);
-        }
-        face.appendChild(wrap);
-      });
-
-      const bg = document.getElementById('pas-bokeh');
-      for (let i = 0; i < 16; i++) {
-        const d = document.createElement('div');
-        d.className = 'bokeh-dot';
-        const size = Math.random() * 80 + 30;
-        d.style.width = d.style.height = size + 'px';
-        d.style.left = (Math.random() * 100) + 'vw';
-        d.style.setProperty('--bk-scale', (Math.random() * 0.5 + 0.7).toFixed(2));
-        d.style.setProperty('--bk-dur', (14 + Math.random() * 16).toFixed(1) + 's');
-        d.style.setProperty('--bk-dx', (Math.random() * 160 - 80).toFixed(0) + 'px');
-        d.style.animationDelay = (-Math.random() * 20).toFixed(2) + 's';
-        bg.appendChild(d);
-      }
-
-      document.querySelectorAll('.card .face.front').forEach(face => {
-        const w = document.createElement('div');
-        w.className = 'pas-dust';
-        for (let i = 0; i < 6; i++) {
-          const dot = document.createElement('span');
-          dot.className = 'd';
-          const size = (Math.random() * 5 + 3).toFixed(0);
-          dot.style.width = dot.style.height = size + 'px';
-          dot.style.left = (Math.random() * 92) + '%';
-          dot.style.top  = (Math.random() * 100) + '%';
-          dot.style.animationDuration = (9 + Math.random() * 6).toFixed(1) + 's';
-          w.appendChild(dot);
-        }
-        face.appendChild(w);
-      });
-
-      document.querySelectorAll('.card .front').forEach(front => {
-        const glow = document.createElement('div');
-        glow.className = 'fx-glowwave';
-        front.appendChild(glow);
-      });
-
-      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const host = document.createElement('div');
-        host.id = 'nx-comets';
-        document.body.appendChild(host);
-        setInterval(() => {
-          const s = document.createElement('span');
-          s.className = 'nx-comet';
-          const x = Math.random() * window.innerWidth * 0.8 + window.innerWidth * 0.1;
-          const y = Math.random() * window.innerHeight * 0.2 + window.innerHeight * 0.1;
-          s.style.left = x + 'px';
-          s.style.top = y + 'px';
-          const dx = (-window.innerWidth * 0.5) + 'px';
-          const dy = (window.innerHeight * (Math.random() * 0.6 + 0.2)) + 'px';
-          s.style.setProperty('--dx', dx);
-          s.style.setProperty('--dy', dy);
-          s.style.animation = `nxCometFly 2200ms ease-out forwards`;
-          host.appendChild(s);
-          setTimeout(() => s.remove(), 2400);
-        }, 4500);
-      }
 
       initSlider();
     });
-
-    (() => {
-      const grid = document.getElementById('grid');
-      if (!grid) return;
-      const seen = new WeakSet();
-      const obs = new MutationObserver(muts => {
-        muts.forEach(m => {
-          if (m.target && m.target.classList && m.target.classList.contains('card') && m.attributeName === 'class') {
-            const card = m.target;
-            if (card.classList.contains('flipped') && !seen.has(card)) {
-              seen.add(card);
-              const back = card.querySelector('.back');
-              if (back) {
-                const fx = document.createElement('span');
-                fx.className = 'nx-flash';
-                back.appendChild(fx);
-                setTimeout(() => fx.remove(), 450);
-              }
-            }
-          }
-        });
-      });
-      obs.observe(grid, { attributes: true, subtree: true, attributeFilter: ['class'] });
-    })();
   </script>
 </body>
 </html>
