@@ -6,12 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <base target="_top">
 
-  <!-- Favicon & Preload Images -->
+  <!-- Favicon & Preload Images Terbaru -->
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/049b1ca3-db9f-42b9-980d-7363faac5600.png">
-  <link rel="preload" as="image" href="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/GARANSI.jpg?raw=true">
-  <link rel="preload" as="image" href="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/LUCKYANGPAO.jpg">
-  <link rel="preload" as="image" href="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/NEW.jpg">
-  <link rel="preload" as="image" href="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/HARIAN.jpg">
+  <link rel="preload" as="image" href="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/SLIDER%20WS1.png?raw=true">
+  <link rel="preload" as="image" href="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/SLIDER%20WS2.png?raw=true">
+  <link rel="preload" as="image" href="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/SLIDER%20WS3.png?raw=true">
+  <link rel="preload" as="image" href="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/SLIDER%20WS%204.png?raw=true">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -146,34 +146,49 @@
     }
 
     /* ==========================================================================
-       4. PROMO SLIDER (ICY GLOW)
+       4. PROMO SLIDER (OPTIMIZED ANTI-BLANK & ICY GLOW)
        ========================================================================== */
     .pas-slider {
       position: relative;
       margin: 0 auto 16px;
       width: 100%;
       aspect-ratio: 16 / 4.2;
+      min-height: 120px;
       border-radius: 16px;
       overflow: hidden;
-      background: #040914;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 200, 255, 0.2);
+      background: #07152b;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(56, 200, 255, 0.25);
       border: 1.5px solid rgba(56, 200, 255, 0.4);
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     @supports not (aspect-ratio: 16 / 4.2) {
-      .pas-slider { height: 0; padding-top: 26.25%; }
+      .pas-slider { height: 0; padding-top: 26.25%; min-height: 0; }
       .pas-slider .slider-track { position: absolute; inset: 0; }
     }
 
     .pas-slider .slider-track {
       display: flex;
       height: 100%;
-      transition: transform .5s cubic-bezier(.22,.8,.22,1);
+      width: 100%;
       will-change: transform;
     }
 
-    .pas-slider .slide { flex: 0 0 100%; height: 100%; }
-    .pas-slider img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pas-slider .slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .pas-slider img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
 
     .pas-slider .slider-dots {
       position: absolute;
@@ -190,7 +205,7 @@
       height: 9px;
       border-radius: 50%;
       border: 1px solid #fff;
-      background: rgba(4, 20, 42, 0.7);
+      background: rgba(4, 20, 42, 0.75);
       cursor: pointer;
       padding: 0;
       transition: transform .2s, background-color .2s;
@@ -302,7 +317,6 @@
 
     .btn:disabled { opacity: .6; cursor: not-allowed; }
 
-    /* Button Style: 3D Glossy Snow Blue */
     .btn-like-login {
       display: flex;
       justify-content: center;
@@ -459,7 +473,6 @@
 
     .grid .card .front .btn { display: none; margin-bottom: 6px; }
 
-    /* Kotak Menang Terpilih (Aurora Icy Teal) */
     .card.selected-box .back {
       background: linear-gradient(160deg, #a7f3d0 0%, #10b981 50%, #064e3b 100%) !important;
       color: #fff !important;
@@ -467,7 +480,6 @@
       box-shadow: 0 0 25px rgba(16, 185, 129, 0.8) !important;
     }
 
-    /* Kotak ZONK (Aksen Pink/Magenta seperti tulisan 'Slot' pada logo) */
     .card.zonk-box .back {
       background: linear-gradient(160deg, #ff80c2 0%, #e02492 50%, #7b054a 100%) !important;
       color: #fff !important;
@@ -709,19 +721,20 @@
       </div>
     </div>
 
+    <!-- PROMO SLIDER DENGAN 4 GAMBAR TERBARU -->
     <div class="pas-slider" id="promoSlider" aria-label="Promo Slider">
       <div class="slider-track">
         <div class="slide">
-          <img src="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/GARANSI.jpg?raw=true" alt="Garansi Kekalahan 100%" decoding="async">
+          <img src="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/SLIDER%20WS1.png?raw=true" alt="Slider Winterslot 1" decoding="async">
         </div>
         <div class="slide">
-          <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/LUCKYANGPAO.jpg" alt="Lucky Angpao" decoding="async">
+          <img src="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/SLIDER%20WS2.png?raw=true" alt="Slider Winterslot 2" decoding="async">
         </div>
         <div class="slide">
-          <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/NEW.jpg" alt="Event Baru" decoding="async">
+          <img src="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/SLIDER%20WS3.png?raw=true" alt="Slider Winterslot 3" decoding="async">
         </div>
         <div class="slide">
-          <img src="https://raw.githubusercontent.com/simen99/danakaget-papanataslot1/refs/heads/main/assets/HARIAN.jpg" alt="Bonus Harian" decoding="async">
+          <img src="https://github.com/simen99/danakaget-papanataslot1/blob/main/assets/SLIDER%20WS%204.png?raw=true" alt="Slider Winterslot 4" decoding="async">
         </div>
       </div>
       <div class="slider-dots" id="sliderDots"></div>
@@ -1267,74 +1280,150 @@
       resetBoxes();
     }
 
+    /* ==========================================================================
+       SLIDER ENGINE ANTI-BLANK & SMOOTH INFINITE CAROUSEL
+       ========================================================================== */
     function initSlider() {
       const slider = document.getElementById('promoSlider');
       if (!slider) return;
 
       const track = slider.querySelector('.slider-track');
-      const originalSlides = Array.from(track.children);
+      const originalSlides = Array.from(track.children).filter(el => !el.classList.contains('clone'));
+      if (originalSlides.length <= 1) return;
+
+      // Bersihkan clone lama jika ada
+      track.querySelectorAll('.clone').forEach(el => el.remove());
 
       const firstClone = originalSlides[0].cloneNode(true);
       const lastClone  = originalSlides[originalSlides.length - 1].cloneNode(true);
+      firstClone.classList.add('clone');
+      lastClone.classList.add('clone');
+
       track.insertBefore(lastClone, originalSlides[0]);
       track.appendChild(firstClone);
 
+      const total = originalSlides.length;
       let index = 1;
-      const DURATION = 3000;
+      const DURATION = 3500;
+      const SPEED = 500;
       let timer = null;
+      let isTransitioning = false;
 
+      // Inisialisasi Titik Dots
       const dotsWrap = document.getElementById('sliderDots');
+      dotsWrap.innerHTML = '';
       const dots = originalSlides.map((_, i) => {
         const d = document.createElement('button');
-        d.className = 'dot';
+        d.className = 'dot' + (i === 0 ? ' active' : '');
         d.type = 'button';
         d.setAttribute('aria-label', 'Slide ' + (i + 1));
-        d.addEventListener('click', () => { index = i + 1; move(); restart(); });
+        d.addEventListener('click', () => {
+          if (isTransitioning) return;
+          index = i + 1;
+          moveTo(true);
+          restart();
+        });
         dotsWrap.appendChild(d);
         return d;
       });
 
       function updateDots() {
-        const active = (index - 1 + originalSlides.length) % originalSlides.length;
+        const active = (index - 1 + total) % total;
         dots.forEach((d, i) => d.classList.toggle('active', i === active));
       }
 
-      function setTransform() {
-        track.style.transform = `translate3d(-${index * 100}%,0,0)`;
+      function setTransform(animate = true) {
+        if (animate) {
+          track.style.transition = `transform ${SPEED}ms cubic-bezier(.22,.8,.22,1)`;
+        } else {
+          track.style.transition = 'none';
+        }
+        track.style.transform = `translate3d(-${index * 100}%, 0, 0)`;
       }
 
-      function move() {
-        requestAnimationFrame(setTransform);
+      function moveTo(animate = true) {
+        setTransform(animate);
         updateDots();
       }
 
-      requestAnimationFrame(setTransform);
-      updateDots();
+      // Set posisi awal tanpa animasi
+      setTransform(false);
 
-      function next() { index += 1; move(); }
-      function start() { stop(); timer = setInterval(next, DURATION); }
-      function stop() { if (timer) { clearInterval(timer); timer = null; } }
-      function restart() { start(); }
+      function next() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+        index++;
+        moveTo(true);
+      }
 
-      track.addEventListener('transitionend', () => {
-        const total = originalSlides.length;
-        if (index === total + 1) {
-          track.style.transition = 'none';
-          index = 1; setTransform();
-          void track.offsetWidth; track.style.transition = '';
-        } else if (index === 0) {
-          track.style.transition = 'none';
-          index = total; setTransform();
-          void track.offsetWidth; track.style.transition = '';
+      function prev() {
+        if (isTransitioning) return;
+        isTransitioning = true;
+        index--;
+        moveTo(true);
+      }
+
+      function checkIndex() {
+        isTransitioning = false;
+        if (index >= total + 1) {
+          index = 1;
+          setTransform(false);
+        } else if (index <= 0) {
+          index = total;
+          setTransform(false);
+        }
+        updateDots();
+      }
+
+      track.addEventListener('transitionend', (e) => {
+        if (e.target !== track || e.propertyName !== 'transform') return;
+        checkIndex();
+      });
+
+      function start() {
+        stop();
+        if (!document.hidden) {
+          timer = setInterval(next, DURATION);
+        }
+      }
+
+      function stop() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      }
+
+      function restart() {
+        start();
+      }
+
+      // ANTI-BLANK: Jeda slider saat tab di-minimize / pindah tab agar index tidak over-loop
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stop();
+        } else {
+          if (index > total || index < 1) index = 1;
+          isTransitioning = false;
+          setTransform(false);
+          updateDots();
+          start();
         }
       });
 
       slider.addEventListener('mouseenter', stop);
       slider.addEventListener('mouseleave', start);
 
+      // Support Touch & Drag
       let startX = 0, deltaX = 0, dragging = false;
-      const onStart = x => { dragging = true; startX = x; stop(); track.style.transition = 'none'; };
-      const onMove  = x => {
+      const onStart = x => {
+        if (isTransitioning) return;
+        dragging = true;
+        startX = x;
+        stop();
+        track.style.transition = 'none';
+      };
+      const onMove = x => {
         if (!dragging) return;
         deltaX = x - startX;
         track.style.transform = `translate3d(calc(-${index * 100}% + ${deltaX}px), 0, 0)`;
@@ -1342,11 +1431,14 @@
       const onEnd = () => {
         if (!dragging) return;
         dragging = false;
-        track.style.transition = '';
         const threshold = slider.clientWidth / 6;
-        if (Math.abs(deltaX) > threshold) index += (deltaX < 0 ? 1 : -1);
+        if (Math.abs(deltaX) > threshold) {
+          if (deltaX < 0) next();
+          else prev();
+        } else {
+          moveTo(true);
+        }
         deltaX = 0;
-        move();
         start();
       };
 
